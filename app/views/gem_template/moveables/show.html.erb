@@ -1,47 +1,70 @@
-<% title = "#{moveable_title_for(@recording)} to…" %>
+<% title = "#{moveable_title_for(@recording)} to..." %>
 
-<% if @display == :full_page %>
-  <%= render FlatPack::PageTitle::Component.new(
-    title: title,
-    subtitle: "Choose a new destination for #{moveable_label_for(@recording)}"
-  ) %>
-<% else %>
-  <div class="space-y-4">
-    <h2 class="text-xl font-semibold"><%= title %></h2>
-    <p class="text-sm text-[var(--surface-muted-content-color)]">
-      Choose a destination for <%= moveable_label_for(@recording) %>
-    </p>
-  </div>
-<% end %>
-
-<div class="mt-4 space-y-4">
-  <%= form_with url: move_recording_path(recording_id: @recording.id), method: :get, local: true do |form| %>
-    <%= hidden_field_tag :display, @display == :modal ? "modal" : "full_page" %>
-
-    <% if flat_pack_search_available? %>
-      <%= render FlatPack::SearchInput::Component.new(
-        name: :q,
-        value: @query,
-        placeholder: "Search destinations"
-      ) %>
-    <% else %>
-      <%= form.search_field :q, value: @query, placeholder: "Search destinations", class: "w-full rounded border px-3 py-2" %>
-    <% end %>
+<div class="space-y-4">
+  <% if @display == :full_page %>
+    <%= render FlatPack::Breadcrumb::Component.new(
+      items: [{ text: "Back", href: move_back_path, icon: "chevron-left" }],
+      class: "mb-3"
+    ) %>
   <% end %>
 
   <div class="space-y-2">
-    <% if @destinations.empty? %>
-      <p class="text-sm text-[var(--surface-muted-content-color)]">No allowed destinations found.</p>
-    <% end %>
+    <h1 class="font-bold leading-tight text-(--surface-content-color)" style="font-size: var(--page-title-h1-size);">
+      <%= title %>
+    </h1>
+    <p class="text-sm text-(--surface-muted-content-color)">
+      Choose a destination for <%= moveable_label_for(@recording) %>
+    </p>
+  </div>
+</div>
 
-    <% @destinations.each do |destination| %>
-      <%= button_to move_recording_path(recording_id: @recording.id),
-                    method: :post,
-                    params: { destination_id: destination.id },
-                    class: "w-full rounded border p-3 text-left hover:bg-[var(--surface-muted-background-color)]" do %>
-        <div class="font-medium"><%= moveable_label_for(destination) %></div>
-        <div class="text-xs text-[var(--surface-muted-content-color)]"><%= destination.recordable_type %></div>
+<div class="mt-4 max-w-3xl">
+  <div>
+    <section class="space-y-4">
+      <%= form_with url: move_recording_path_for(recording_id: @recording.id), method: :get, local: true do |form| %>
+        <%= hidden_field_tag :display, @display == :modal ? "modal" : "full_page" %>
+        <%= hidden_field_tag :redirect_to, @redirect_to %>
+
+        <%= render FlatPack::SearchInput::Component.new(
+          name: :q,
+          value: @query,
+          placeholder: "Search destinations"
+        ) %>
       <% end %>
-    <% end %>
+
+      <% if @destinations.empty? %>
+        <div class="space-y-1 py-2">
+          <p class="text-sm font-medium text-(--surface-content-color)">No allowed destinations found.</p>
+          <p class="text-sm text-(--surface-muted-content-color)">Try a different search term or review your move permissions.</p>
+        </div>
+      <% else %>
+        <%= render FlatPack::List::Component.new do %>
+          <% @destinations.each do |destination| %>
+            <%= render FlatPack::List::Item.new(class: "items-center", hover: true) do %>
+              <div class="flex items-center justify-between gap-4">
+                <div class="min-w-0 flex-1">
+                  <p class="font-medium text-(--surface-content-color)"><%= moveable_label_for(destination) %></p>
+                  <p class="text-sm text-(--surface-muted-content-color)">
+                    <%= moveable_type_for(destination) %> inside <span class="font-medium text-(--surface-content-color)"><%= moveable_parent_label_for(destination) %></span>
+                  </p>
+                </div>
+
+                <%= form_with url: move_recording_path_for(recording_id: @recording.id), method: :post, local: true, class: "shrink-0" do %>
+                  <%= hidden_field_tag :destination_id, destination.id %>
+                  <%= hidden_field_tag :display, @display == :modal ? "modal" : "full_page" %>
+                  <%= hidden_field_tag :redirect_to, @redirect_to %>
+                  <%= render FlatPack::Button::Component.new(
+                    text: "Move",
+                    style: :default,
+                    size: :sm,
+                    type: "submit"
+                  ) %>
+                <% end %>
+              </div>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </section>
   </div>
 </div>

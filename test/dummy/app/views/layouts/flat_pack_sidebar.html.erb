@@ -22,12 +22,13 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="m-0 h-full overflow-hidden overscroll-none bg-[var(--surface-page-background-color)] text-[var(--surface-content-color)]">
+  <body class="m-0 h-full overflow-hidden overscroll-none bg-(--surface-page-background-color) text-(--surface-content-color)" data-controller="dark-mode">
     <%= render "layouts/icon_sprite" %>
 
-    <%= render FlatPack::SidebarLayout::Component.new(side: :left, storage_key: "flat-pack-sidebar-layout") do |layout| %>
+    <% sidebar_side = params[:side].in?(%w[left right]) ? params[:side].to_sym : :left %>
+    <%= render FlatPack::SidebarLayout::Component.new(side: sidebar_side, storage_key: "flatpack-dummy-shell") do |layout| %>
       <% layout.sidebar do %>
-        <%= render "layouts/flat_pack/sidebar", sidebar_side: :left %>
+        <%= render "layouts/flat_pack/sidebar", sidebar_side: sidebar_side %>
       <% end %>
 
       <% layout.top_nav do %>
@@ -35,8 +36,18 @@
       <% end %>
 
       <% layout.main do %>
-        <main class="h-full overflow-auto p-6">
-          <%= yield %>
+        <main class="p-4 sm:p-8 bg-(--surface-page-background-color) text-(--surface-content-color)">
+          <div class="max-w-4xl mx-auto pb-24">
+            <% if notice.present? %>
+              <%= render FlatPack::Alert::Component.new(description: notice, style: :success, dismissible: true, class: "mb-4") %>
+            <% end %>
+
+            <% if alert.present? %>
+              <%= render FlatPack::Alert::Component.new(description: alert, style: :danger, dismissible: true, class: "mb-4") %>
+            <% end %>
+
+            <%= yield %>
+          </div>
         </main>
       <% end %>
     <% end %>

@@ -1,0 +1,46 @@
+<div class="space-y-8">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Folder Recordables",
+    subtitle: "Folder records in newest-first order with their linked recording ids."
+  ) %>
+
+  <% if @folder_recordables.any? %>
+    <div class="overflow-hidden rounded-2xl border border-(--surface-border-color) bg-(--surface-background-color)">
+      <div class="grid grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1.25fr)_minmax(0,1fr)] gap-4 border-b border-(--surface-border-color) px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--surface-muted-content-color)">
+        <div>Name</div>
+        <div>Recording id</div>
+        <div>Created</div>
+        <div>Open</div>
+      </div>
+
+      <div class="divide-y divide-(--surface-border-color)">
+        <% @folder_recordables.each do |folder| %>
+          <% recording = @recordings_by_folder_id[folder.id] %>
+          <div class="grid grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1.25fr)_minmax(0,1fr)] gap-4 px-4 py-4 text-sm">
+            <div class="min-w-0 space-y-1">
+              <p class="truncate font-medium text-(--surface-content-color)"><%= folder.name %></p>
+              <p class="truncate text-(--surface-muted-content-color)"><%= folder.id %></p>
+            </div>
+
+            <div class="truncate text-(--surface-muted-content-color)"><%= recording&.id || "Missing" %></div>
+            <div class="text-(--surface-muted-content-color)"><%= folder.created_at.strftime("%Y-%m-%d %H:%M:%S") %></div>
+            <div>
+              <%= render FlatPack::Button::Component.new(
+                text: "Open",
+                style: :ghost,
+                size: :sm,
+                url: recording_studio_folder_path(folder)
+              ) %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <%= render FlatPack::EmptyState::Component.new(
+      title: "No folder recordables yet",
+      description: "Bootstrap or create folders to populate this list.",
+      icon: :inbox
+    ) %>
+  <% end %>
+</div>

@@ -1,56 +1,69 @@
-<div class="container mx-auto px-4 py-8">
+<div class="space-y-8">
   <%= render FlatPack::PageTitle::Component.new(
-    title: "RecordingStudio Moveable Addon Demo",
-    subtitle: "Folder/page records can be moved with addon-owned UI",
+    title: "Moveable demo",
+    subtitle: "Browse folders first, then drill into the pages inside each folder.",
     variant: :h1
   ) %>
 
-  <% if notice.present? %>
-    <p class="mt-4 rounded border border-green-500/20 bg-green-500/10 p-3 text-sm text-green-700"><%= notice %></p>
-  <% end %>
+  <section class="space-y-6">
+    <%= render FlatPack::SectionTitle::Component.new(
+      title: "Folders",
+      class: "my-0"
+    ) %>
 
-  <% if alert.present? %>
-    <p class="mt-4 rounded border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-700"><%= alert %></p>
-  <% end %>
+    <% if @folders.any? %>
+      <%= render FlatPack::Grid::Component.new(cols: 3, gap: :lg, align: :stretch) do %>
+        <% @folders.each do |folder_recording| %>
+          <% page_count = @page_counts_by_folder_id.fetch(folder_recording.id, 0) %>
 
-  <div class="mt-8 space-y-8">
-    <section>
-      <h2 class="text-lg font-semibold">Folders</h2>
-      <ul class="mt-2 space-y-2">
-        <% @folders.each do |recording| %>
-          <li>
-            <%= link_to recording.recordable.name, recording_studio_folder_path(recording.recordable), class: "underline" %>
-            —
-            <%= link_to "Move (full page)", recording_studio_moveable.move_recording_path(recording_id: recording.id), class: "underline" %>
-            |
-            <%= link_to "Move (modal)", recording_studio_moveable.move_recording_path(recording_id: recording.id, display: "modal"), class: "underline" %>
-          </li>
+          <%= render FlatPack::Card::Component.new(style: :elevated, padding: :none, class: "h-full") do |card| %>
+            <% card.body do %>
+              <div class="flex h-full flex-col gap-4">
+                <div class="space-y-3 min-w-0">
+                  <%= render(FlatPack::Link::Component.new(href: recording_studio_folder_path(folder_recording.recordable), class: "block text-base font-semibold")) do %>
+                    <%= folder_recording.recordable.name %>
+                  <% end %>
+
+                  <%= render FlatPack::Badge::Component.new(
+                    text: page_count == 1 ? "1 page" : "#{page_count} pages",
+                    style: :default,
+                    size: :sm
+                  ) %>
+
+                  <p class="text-sm text-(--surface-muted-content-color)">
+                    Open this folder to view its pages.
+                  </p>
+                </div>
+
+                <div class="mt-auto flex flex-wrap gap-2">
+                  <%= render FlatPack::Button::Component.new(
+                    text: "Open folder",
+                    style: :default,
+                    size: :sm,
+                    url: recording_studio_folder_path(folder_recording.recordable),
+                    class: "flex-1 justify-center"
+                  ) %>
+
+                  <%= render FlatPack::Button::Component.new(
+                    text: "Move folder",
+                    style: :secondary,
+                    size: :sm,
+                    url: recording_studio_moveable.move_recording_path(recording_id: folder_recording.id),
+                    class: "flex-1 justify-center"
+                  ) %>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+
         <% end %>
-      </ul>
-    </section>
-
-    <section>
-      <h2 class="text-lg font-semibold">Pages</h2>
-      <ul class="mt-2 space-y-2">
-        <% @pages.each do |recording| %>
-          <li>
-            <%= link_to recording.recordable.title, recording_studio_page_path(recording.recordable), class: "underline" %>
-            —
-            <%= link_to "Move (full page)", recording_studio_moveable.move_recording_path(recording_id: recording.id), class: "underline" %>
-            |
-            <%= link_to "Move (modal)", recording_studio_moveable.move_recording_path(recording_id: recording.id, display: "modal"), class: "underline" %>
-          </li>
-        <% end %>
-      </ul>
-    </section>
-
-    <section>
-      <h2 class="text-lg font-semibold">Disallowed destination type</h2>
-      <ul class="mt-2 space-y-2">
-        <% @archive_boxes.each do |recording| %>
-          <li><%= recording.recordable.name %> (RecordingStudioArchiveBox)</li>
-        <% end %>
-      </ul>
-    </section>
-  </div>
+      <% end %>
+    <% else %>
+      <%= render FlatPack::EmptyState::Component.new(
+        title: "No folders available",
+        description: "The demo data has not been created for this workspace yet.",
+        icon: :inbox
+      ) %>
+    <% end %>
+  </section>
 </div>

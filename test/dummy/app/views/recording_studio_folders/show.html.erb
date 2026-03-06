@@ -1,10 +1,100 @@
-<%= render FlatPack::PageTitle::Component.new(
-  title: @folder.name,
-  subtitle: "Folder demo"
-) %>
+<div class="space-y-8" data-controller="move-modal" data-action="submit->move-modal#submit">
+  <%= render FlatPack::Breadcrumb::Component.new(
+    items: [{ text: "All folders", href: root_path, icon: "chevron-left" }],
+    class: "mb-3"
+  ) %>
 
-<div class="mt-4 space-y-2">
-  <%= link_to "Move (full page)", recording_studio_moveable.move_recording_path(recording_id: @recording.id), class: "underline" %>
-  <br>
-  <%= link_to "Move (modal mode)", recording_studio_moveable.move_recording_path(recording_id: @recording.id, display: "modal"), class: "underline" %>
+  <%= render FlatPack::PageTitle::Component.new(
+    title: @folder.name,
+    subtitle: @pages.one? ? "1 page in this folder" : "#{@pages.count} pages in this folder"
+  ) %>
+
+  <div class="flex flex-wrap gap-3">
+    <%= render FlatPack::Button::Component.new(
+      text: "Move folder",
+      style: :primary,
+      size: :sm,
+      url: recording_studio_moveable.move_recording_path(recording_id: @recording.id)
+    ) %>
+    <%= render FlatPack::Button::Component.new(
+      text: "Move folder in modal",
+      style: :ghost,
+      size: :sm,
+      url: recording_studio_moveable.move_recording_path(recording_id: @recording.id, display: "modal"),
+      data: { action: "click->move-modal#open" }
+    ) %>
+  </div>
+
+  <section class="space-y-6">
+    <%= render FlatPack::SectionTitle::Component.new(
+      title: "Pages",
+      class: "my-0"
+    ) %>
+
+    <% if @pages.any? %>
+      <%= render FlatPack::Grid::Component.new(cols: 3, gap: :lg, align: :stretch) do %>
+        <% @pages.each do |page_recording| %>
+          <%= render FlatPack::Card::Component.new(style: :elevated, class: "h-full") do |card| %>
+            <% card.body do %>
+              <div class="flex h-full flex-col gap-4">
+                <div class="min-w-0 space-y-3">
+                  <%= render(FlatPack::Link::Component.new(href: recording_studio_page_path(page_recording.recordable), class: "block text-base font-semibold text-(--surface-content-color)")) do %>
+                    <%= page_recording.recordable.title %>
+                  <% end %>
+
+                  <p class="text-sm leading-6 text-(--surface-muted-content-color)">
+                    <%= page_recording.recordable.body.presence || "No preview text available for this page yet." %>
+                  </p>
+                </div>
+
+                <div class="mt-auto flex flex-wrap gap-2">
+                  <%= render FlatPack::Button::Component.new(
+                    text: "Move",
+                    style: :default,
+                    size: :sm,
+                    url: recording_studio_moveable.move_recording_path(recording_id: page_recording.id),
+                    class: "flex-1 justify-center"
+                  ) %>
+
+                  <%= render FlatPack::Button::Component.new(
+                    text: "Move in modal",
+                    style: :ghost,
+                    size: :sm,
+                    url: recording_studio_moveable.move_recording_path(recording_id: page_recording.id, display: "modal"),
+                    data: { action: "click->move-modal#open" },
+                    class: "flex-1 justify-center"
+                  ) %>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <%= render FlatPack::EmptyState::Component.new(
+        title: "No pages yet",
+        description: "Create or move a page into this folder to populate it.",
+        icon: :inbox
+      ) %>
+    <% end %>
+  </section>
+
+  <%= render FlatPack::Modal::Component.new(
+    id: "move-recording-modal",
+    size: :lg,
+    body_height_mode: :fixed,
+    body_height: "70vh",
+    data: { move_modal_target: "modal" }
+  ) do |modal| %>
+    <% modal.body_content do %>
+      <div data-move-modal-target="body">
+        <%= render FlatPack::EmptyState::Component.new(
+          title: "Choose a move action",
+          description: "Use a move action on this page to load the move UI here.",
+          icon: :inbox,
+          class: "min-h-48 rounded-2xl border border-dashed border-(--surface-border-color) bg-(--surface-muted-background-color) px-6"
+        ) %>
+      </div>
+    <% end %>
+  <% end %>
 </div>

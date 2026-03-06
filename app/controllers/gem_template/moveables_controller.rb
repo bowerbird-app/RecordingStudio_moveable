@@ -4,15 +4,18 @@ module GemTemplate
   class MoveablesController < ApplicationController
     include GemTemplate::MoveablesHelper
 
+    helper_method :move_recording_path_for, :move_back_path
+
     before_action :load_recording
     before_action :ensure_actor!
 
     def show
       @display = params[:display] == "modal" ? :modal : :full_page
       @query = params[:q].to_s.strip
+      @redirect_to = move_redirect_target
       @destinations = filtered_destinations
 
-      render layout: @display == :full_page
+      render layout: full_page_layout
     end
 
     def update
@@ -26,9 +29,13 @@ module GemTemplate
         metadata: metadata
       )
 
-      redirect_to redirect_path, notice: "Moved successfully."
+      redirect_to move_redirect_target, notice: "Moved successfully."
     rescue RecordingStudio::AccessDenied, ArgumentError, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
-      redirect_to move_recording_path(recording_id: @recording.id), alert: e.message
+      redirect_to move_recording_path_for(
+        recording_id: @recording.id,
+        display: params[:display],
+        redirect_to: move_redirect_target
+      ), alert: e.message
     end
 
     private
@@ -116,6 +123,46 @@ module GemTemplate
       return helper.root_path if helper.respond_to?(:root_path)
 
       RecordingStudio::Moveable.configuration.default_redirect_path
+    end
+
+    def move_redirect_target
+      explicit_redirect = normalize_redirect_target(params[:redirect_to])
+      return explicit_redirect if explicit_redirect.present?
+
+      move_back_path
+    end
+
+    def move_recording_path_for(**options)
+      GemTemplate::Engine.routes.url_helpers.move_recording_path(**options)
+    end
+
+    def move_back_path
+      normalize_redirect_target(request&.referer) || redirect_path
+    end
+
+    def normalize_redirect_target(candidate)
+      return if candidate.blank?
+
+      redirect_uri = URI.parse(candidate)
+      current_uri = URI.parse(request.original_url)
+
+      return if redirect_uri.scheme.present? && !%w[http https].include?(redirect_uri.scheme)
+      return if redirect_uri.host.present? && redirect_uri.host != current_uri.host
+      return if redirect_uri.port.present? && redirect_uri.port != current_uri.port
+
+      redirect_path = [redirect_uri.path.presence || "/", redirect_uri.query.presence].compact.join("?")
+      return if redirect_path == request.fullpath
+
+      redirect_path
+    rescue URI::InvalidURIError
+      nil
+    end
+
+    def full_page_layout
+      return false unless @display == :full_page
+      return "flat_pack_sidebar" if lookup_context.exists?("layouts/flat_pack_sidebar", [], false)
+
+      true
     end
   end
 end

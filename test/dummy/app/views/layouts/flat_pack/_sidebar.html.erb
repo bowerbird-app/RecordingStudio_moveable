@@ -2,8 +2,8 @@
   <% sidebar.header do %>
     <%= render FlatPack::Sidebar::Header::Component.new(
       brand_abbr: "RS",
-      title: "Template",
-      subtitle: "Workspace"
+      title: "RecordingStudio",
+      subtitle: "Moveable Demo"
     ) %>
   <% end %>
 
@@ -12,7 +12,36 @@
       <%= render FlatPack::Sidebar::Item::Component.new(
         label: "Home",
         href: "/",
-        icon: :home
+        icon: "home",
+        active: current_page?("/")
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Recordings",
+        href: recordings_path,
+        icon: "rectangle-stack",
+        active: current_page?(recordings_path)
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Folder Recordables",
+        href: folder_recordables_path,
+        icon: "folder",
+        active: current_page?(folder_recordables_path)
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Pages Recordables",
+        href: page_recordables_path,
+        icon: "document-text",
+        active: current_page?(page_recordables_path)
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Events",
+        href: events_path,
+        icon: "calendar-days",
+        active: current_page?(events_path)
       ) %>
 
     </nav>
@@ -23,7 +52,7 @@
       <%= render FlatPack::Sidebar::Item::Component.new(
         label: "Sign out",
         href: destroy_user_session_path,
-        icon: :lock,
+        icon: "arrow-right-on-rectangle",
         class: "mx-0",
         data: { turbo_method: :delete }
       ) %>

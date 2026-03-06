@@ -1,0 +1,37 @@
+<div class="space-y-8">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Events",
+    subtitle: "Newest events first so move activity is visible immediately."
+  ) %>
+
+  <% if @events.any? %>
+    <div class="overflow-hidden rounded-2xl border border-(--surface-border-color) bg-(--surface-background-color)">
+      <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,3fr)] gap-4 border-b border-(--surface-border-color) px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--surface-muted-content-color)">
+        <div>Action</div>
+        <div>Recordable</div>
+        <div>Occurred</div>
+        <div>Metadata</div>
+      </div>
+
+      <div class="divide-y divide-(--surface-border-color)">
+        <% @events.each do |event| %>
+          <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,3fr)] gap-4 px-4 py-4 text-sm">
+            <div class="font-medium text-(--surface-content-color)"><%= event.action %></div>
+            <div class="min-w-0 text-(--surface-muted-content-color)">
+              <p class="truncate"><%= event.recordable_type.demodulize %></p>
+              <p class="truncate"><%= event.recordable_id %></p>
+            </div>
+            <div class="text-(--surface-muted-content-color)"><%= event.occurred_at.strftime("%Y-%m-%d %H:%M:%S") %></div>
+            <div class="text-(--surface-muted-content-color)"><%= event.metadata.presence&.to_json || "{}" %></div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <%= render FlatPack::EmptyState::Component.new(
+      title: "No events yet",
+      description: "Move an item to create an event record for inspection here.",
+      icon: :inbox
+    ) %>
+  <% end %>
+</div>

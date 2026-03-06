@@ -3,8 +3,17 @@
   subtitle: "Page demo"
 ) %>
 
-<div class="mt-4 space-y-2">
-  <%= link_to "Move (full page)", recording_studio_moveable.move_recording_path(recording_id: @recording.id), class: "underline" %>
-  <br>
-  <%= link_to "Move (modal mode)", recording_studio_moveable.move_recording_path(recording_id: @recording.id, display: "modal"), class: "underline" %>
+<div class="mt-4 flex flex-wrap gap-3">
+  <%= render FlatPack::Button::Component.new(
+    text: "Move (full page)",
+    style: :primary,
+    size: :sm,
+    url: recording_studio_moveable.move_recording_path(recording_id: @recording.id)
+  ) %>
+  <%= render FlatPack::Button::Component.new(
+    text: "Move (modal mode)",
+    style: :ghost,
+    size: :sm,
+    url: recording_studio_moveable.move_recording_path(recording_id: @recording.id, display: "modal")
+  ) %>
 </div>

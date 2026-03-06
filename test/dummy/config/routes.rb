@@ -20,6 +20,10 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "home#index"
 
+  resources :recordings, only: :index
+  resources :folder_recordables, only: :index
+  resources :page_recordables, only: :index
+  resources :events, only: :index
   resources :recording_studio_folders, only: :show
   resources :recording_studio_pages, only: :show
 end
