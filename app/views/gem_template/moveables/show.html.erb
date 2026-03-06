@@ -1,0 +1,47 @@
+<% title = "#{moveable_title_for(@recording)} to…" %>
+
+<% if @display == :full_page %>
+  <%= render FlatPack::PageTitle::Component.new(
+    title: title,
+    subtitle: "Choose a new destination for #{moveable_label_for(@recording)}"
+  ) %>
+<% else %>
+  <div class="space-y-4">
+    <h2 class="text-xl font-semibold"><%= title %></h2>
+    <p class="text-sm text-[var(--surface-muted-content-color)]">
+      Choose a destination for <%= moveable_label_for(@recording) %>
+    </p>
+  </div>
+<% end %>
+
+<div class="mt-4 space-y-4">
+  <%= form_with url: move_recording_path(recording_id: @recording.id), method: :get, local: true do |form| %>
+    <%= hidden_field_tag :display, @display == :modal ? "modal" : "full_page" %>
+
+    <% if flat_pack_search_available? %>
+      <%= render FlatPack::SearchInput::Component.new(
+        name: :q,
+        value: @query,
+        placeholder: "Search destinations"
+      ) %>
+    <% else %>
+      <%= form.search_field :q, value: @query, placeholder: "Search destinations", class: "w-full rounded border px-3 py-2" %>
+    <% end %>
+  <% end %>
+
+  <div class="space-y-2">
+    <% if @destinations.empty? %>
+      <p class="text-sm text-[var(--surface-muted-content-color)]">No allowed destinations found.</p>
+    <% end %>
+
+    <% @destinations.each do |destination| %>
+      <%= button_to move_recording_path(recording_id: @recording.id),
+                    method: :post,
+                    params: { destination_id: destination.id },
+                    class: "w-full rounded border p-3 text-left hover:bg-[var(--surface-muted-background-color)]" do %>
+        <div class="font-medium"><%= moveable_label_for(destination) %></div>
+        <div class="text-xs text-[var(--surface-muted-content-color)]"><%= destination.recordable_type %></div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

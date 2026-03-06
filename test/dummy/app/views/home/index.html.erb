@@ -1,7 +1,56 @@
 <div class="container mx-auto px-4 py-8">
   <%= render FlatPack::PageTitle::Component.new(
-    title: "Recording Studio Gem Template",
-    subtitle: "Use this template to build addons for Recording Studio",
+    title: "RecordingStudio Moveable Addon Demo",
+    subtitle: "Folder/page records can be moved with addon-owned UI",
     variant: :h1
   ) %>
+
+  <% if notice.present? %>
+    <p class="mt-4 rounded border border-green-500/20 bg-green-500/10 p-3 text-sm text-green-700"><%= notice %></p>
+  <% end %>
+
+  <% if alert.present? %>
+    <p class="mt-4 rounded border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-700"><%= alert %></p>
+  <% end %>
+
+  <div class="mt-8 space-y-8">
+    <section>
+      <h2 class="text-lg font-semibold">Folders</h2>
+      <ul class="mt-2 space-y-2">
+        <% @folders.each do |recording| %>
+          <li>
+            <%= link_to recording.recordable.name, recording_studio_folder_path(recording.recordable), class: "underline" %>
+            —
+            <%= link_to "Move (full page)", recording_studio_moveable.move_recording_path(recording_id: recording.id), class: "underline" %>
+            |
+            <%= link_to "Move (modal)", recording_studio_moveable.move_recording_path(recording_id: recording.id, display: "modal"), class: "underline" %>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold">Pages</h2>
+      <ul class="mt-2 space-y-2">
+        <% @pages.each do |recording| %>
+          <li>
+            <%= link_to recording.recordable.title, recording_studio_page_path(recording.recordable), class: "underline" %>
+            —
+            <%= link_to "Move (full page)", recording_studio_moveable.move_recording_path(recording_id: recording.id), class: "underline" %>
+            |
+            <%= link_to "Move (modal)", recording_studio_moveable.move_recording_path(recording_id: recording.id, display: "modal"), class: "underline" %>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="text-lg font-semibold">Disallowed destination type</h2>
+      <ul class="mt-2 space-y-2">
+        <% @archive_boxes.each do |recording| %>
+          <li><%= recording.recordable.name %> (RecordingStudioArchiveBox)</li>
+        <% end %>
+      </ul>
+    </section>
+  </div>
 </div>

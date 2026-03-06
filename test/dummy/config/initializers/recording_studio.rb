@@ -2,7 +2,13 @@
 
 RecordingStudio.configure do |config|
   # Registered delegated_type recordables (strings or classes)
-  config.recordable_types = [ "Workspace" ]
+  config.recordable_types = [
+    "Workspace",
+    "RecordingStudioFolder",
+    "RecordingStudioPage",
+    "RecordingStudioArchiveBox",
+    "RecordingStudio::Access"
+  ]
 
   # Actor resolver for events when no actor is explicitly supplied
   config.actor = -> { Current.actor }
@@ -19,6 +25,6 @@ RecordingStudio.configure do |config|
   # Recordable duplication strategy for revisions
   config.recordable_dup_strategy = :dup
 
-  # Built-in capabilities remain disabled until you opt a recordable type into
-  # them by including the relevant RecordingStudio capability module.
+  # Move behavior in this app comes from recording_studio_moveable addon capability
+  # includes on the relevant recordable models.
 end
