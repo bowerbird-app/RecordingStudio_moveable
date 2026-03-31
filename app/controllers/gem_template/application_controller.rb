@@ -5,6 +5,7 @@ module GemTemplate
     protect_from_forgery with: :exception
     layout "application"
     include Rails.application.routes.url_helpers
+
     helper Rails.application.routes.url_helpers
 
     before_action :set_current_context

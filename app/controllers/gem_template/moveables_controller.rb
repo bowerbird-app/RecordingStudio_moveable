@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module GemTemplate
+  # rubocop:disable Metrics/ClassLength
   class MoveablesController < ApplicationController
     include GemTemplate::MoveablesHelper
 
@@ -10,35 +11,42 @@ module GemTemplate
     before_action :load_recording
 
     def show
-      @display = params[:display] == "modal" ? :modal : :full_page
-      @query = params[:q].to_s.strip
-      @redirect_to = move_redirect_target
-      @destinations = filtered_destinations
-
+      prepare_show_state
       render layout: full_page_layout
     end
 
     def update
-      destination = find_destination!(params[:destination_id])
-      metadata = move_metadata
+      move_recording!(find_destination!(params[:destination_id]))
+      redirect_to move_redirect_target, notice: "Moved successfully."
+    rescue RecordingStudio::AccessDenied, ArgumentError, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
+      redirect_to failed_move_path, alert: e.message
+    end
 
+    private
+
+    def prepare_show_state
+      @display = params[:display] == "modal" ? :modal : :full_page
+      @query = params[:q].to_s.strip
+      @redirect_to = move_redirect_target
+      @destinations = filtered_destinations
+    end
+
+    def move_recording!(destination)
       @recording.move_to!(
         new_parent: destination,
         actor: Current.actor,
         impersonator: resolve_impersonator,
-        metadata: metadata
+        metadata: move_metadata
       )
+    end
 
-      redirect_to move_redirect_target, notice: "Moved successfully."
-    rescue RecordingStudio::AccessDenied, ArgumentError, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
-      redirect_to move_recording_path_for(
+    def failed_move_path
+      move_recording_path_for(
         recording_id: @recording.id,
         display: params[:display],
         redirect_to: move_redirect_target
-      ), alert: e.message
+      )
     end
-
-    private
 
     def load_recording
       @recording = RecordingStudio::Recording.find(params[:recording_id])
@@ -50,20 +58,10 @@ module GemTemplate
     end
 
     def filtered_destinations
-      return [] unless RecordingStudio::Moveable::Authorization.source_allowed?(actor: Current.actor, source: @recording)
+      return [] unless source_allowed_for_destinations?
 
-      relation = RecordingStudio::Recording.where(root_recording_id: @recording.root_recording_id)
-                                          .where(recordable_type: allowed_parent_types)
-                                          .where.not(id: excluded_destination_ids)
-                                          .includes(:recordable)
-                                          .order(updated_at: :desc)
-
-      destinations = relation.limit(200).to_a
-
-      if @query.present?
-        query = @query.downcase
-        destinations.select! { |recording| moveable_label_for(recording).downcase.include?(query) }
-      end
+      destinations = destination_candidates
+      destinations = filter_destinations_by_query(destinations)
 
       RecordingStudio::Moveable::Authorization.filter_visible_destinations(
         actor: Current.actor,
@@ -71,6 +69,27 @@ module GemTemplate
         destinations: destinations,
         impersonator: resolve_impersonator
       )
+    end
+
+    def source_allowed_for_destinations?
+      RecordingStudio::Moveable::Authorization.source_allowed?(actor: Current.actor, source: @recording)
+    end
+
+    def destination_candidates
+      RecordingStudio::Recording.where(root_recording_id: @recording.root_recording_id)
+                                .where(recordable_type: allowed_parent_types)
+                                .where.not(id: excluded_destination_ids)
+                                .includes(:recordable)
+                                .order(updated_at: :desc)
+                                .limit(200)
+                                .to_a
+    end
+
+    def filter_destinations_by_query(destinations)
+      return destinations unless @query.present?
+
+      query = @query.downcase
+      destinations.select { |recording| moveable_label_for(recording).downcase.include?(query) }
     end
 
     def excluded_destination_ids
@@ -109,10 +128,10 @@ module GemTemplate
       return {} unless raw_metadata.respond_to?(:to_unsafe_h) || raw_metadata.respond_to?(:to_h)
 
       metadata_hash = if raw_metadata.respond_to?(:to_unsafe_h)
-        raw_metadata.to_unsafe_h
-      else
-        raw_metadata.to_h
-      end
+                        raw_metadata.to_unsafe_h
+                      else
+                        raw_metadata.to_h
+                      end
 
       metadata_hash.stringify_keys
     end
@@ -143,8 +162,8 @@ module GemTemplate
       move_back_path
     end
 
-    def move_recording_path_for(**options)
-      GemTemplate::Engine.routes.url_helpers.move_recording_path(**options)
+    def move_recording_path_for(...)
+      GemTemplate::Engine.routes.url_helpers.move_recording_path(...)
     end
 
     def move_back_path
@@ -157,9 +176,7 @@ module GemTemplate
       redirect_uri = URI.parse(candidate)
       current_uri = URI.parse(request.original_url)
 
-      return if redirect_uri.scheme.present? && !%w[http https].include?(redirect_uri.scheme)
-      return if redirect_uri.host.present? && redirect_uri.host != current_uri.host
-      return if redirect_uri.port.present? && redirect_uri.port != current_uri.port
+      return unless safe_redirect_target?(redirect_uri, current_uri)
 
       redirect_path = [redirect_uri.path.presence || "/", redirect_uri.query.presence].compact.join("?")
       return if redirect_path == request.fullpath
@@ -169,6 +186,23 @@ module GemTemplate
       nil
     end
 
+    def safe_redirect_target?(redirect_uri, current_uri)
+      safe_redirect_scheme?(redirect_uri) && same_redirect_host?(redirect_uri, current_uri) &&
+        same_redirect_port?(redirect_uri, current_uri)
+    end
+
+    def safe_redirect_scheme?(redirect_uri)
+      redirect_uri.scheme.blank? || %w[http https].include?(redirect_uri.scheme)
+    end
+
+    def same_redirect_host?(redirect_uri, current_uri)
+      redirect_uri.host.blank? || redirect_uri.host == current_uri.host
+    end
+
+    def same_redirect_port?(redirect_uri, current_uri)
+      redirect_uri.port.blank? || redirect_uri.port == current_uri.port
+    end
+
     def full_page_layout
       return false unless @display == :full_page
       return "flat_pack_sidebar" if lookup_context.exists?("layouts/flat_pack_sidebar", [], false)
@@ -176,4 +210,5 @@ module GemTemplate
       true
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

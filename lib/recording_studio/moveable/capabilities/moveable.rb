@@ -5,24 +5,36 @@ module RecordingStudio
     module Capabilities
       module Moveable
         def self.to(*allowed_parent_types)
-          type_names = allowed_parent_types.flatten.filter_map do |type|
-            next if type.nil?
+          type_names = capability_type_names(allowed_parent_types)
 
-            type.is_a?(Class) ? type.name : type.to_s
-          end.uniq
+          build_capability_module(type_names)
+        end
 
+        def self.build_capability_module(type_names)
           Module.new do
             extend ActiveSupport::Concern
 
             included do |base|
-              RecordingStudio.enable_capability(:movable, on: base.name)
-              RecordingStudio.set_capability_options(
-                :movable,
-                on: base.name,
-                allowed_parent_types: type_names
-              )
+              RecordingStudio::Moveable::Capabilities::Moveable.apply_capability(base, type_names)
             end
           end
+        end
+
+        def self.apply_capability(base, type_names)
+          RecordingStudio.enable_capability(:movable, on: base.name)
+          RecordingStudio.set_capability_options(
+            :movable,
+            on: base.name,
+            allowed_parent_types: type_names
+          )
+        end
+
+        def self.capability_type_names(allowed_parent_types)
+          allowed_parent_types.flatten.filter_map do |type|
+            next if type.nil?
+
+            type.is_a?(Class) ? type.name : type.to_s
+          end.uniq
         end
 
         module RecordingMethods
@@ -30,7 +42,7 @@ module RecordingStudio
 
           # Equivalent behavior to legacy RecordingStudio::Capabilities::Movable#move_to!
           # with addon-owned authorization handling and metadata logging.
-          # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+          # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/BlockLength
           def move_to!(new_parent:, actor:, impersonator: nil, metadata: {})
             self.class.transaction do
               ordered_ids = [id, new_parent.id].compact.uniq.sort
@@ -46,7 +58,8 @@ module RecordingStudio
               opts = RecordingStudio.capability_options(:movable, for_type: recordable_type) || {}
               allowed_types = Array(opts[:allowed_parent_types]).map(&:to_s)
               unless allowed_types.include?(new_parent.recordable_type)
-                raise ArgumentError, "Cannot move to #{new_parent.recordable_type}; allowed: #{allowed_types.join(', ')}"
+                raise ArgumentError,
+                      "Cannot move to #{new_parent.recordable_type}; allowed: #{allowed_types.join(', ')}"
               end
 
               RecordingStudio::Moveable::Authorization.assert_move_allowed!(
@@ -62,14 +75,17 @@ module RecordingStudio
                 action: "moved",
                 actor: actor,
                 impersonator: impersonator,
-                metadata: metadata.to_h.merge(from_parent_id: from_id, to_parent_id: new_parent.id)
+                metadata: metadata.to_h.merge(
+                  from_parent_id: from_id,
+                  to_parent_id: new_parent.id
+                )
               )
               update!(parent_recording: new_parent)
             end
           end
-          # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
+          # rubocop:enable Metrics/MethodLength, Metrics/AbcSize, Metrics/BlockLength
 
-          alias_method :moveable_to!, :move_to!
+          alias moveable_to! move_to!
         end
       end
     end

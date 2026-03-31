@@ -6,6 +6,9 @@ module RecordingStudio
       module_function
 
       def source_visible?(actor:, source:, impersonator: nil, metadata: {})
+        _ignored_impersonator = impersonator
+        _ignored_metadata = metadata
+
         source_allowed?(actor: actor, source: source)
       end
 
@@ -21,17 +24,20 @@ module RecordingStudio
       end
 
       def destination_allowed?(actor:, source:, destination:, impersonator: nil, metadata: {})
-        return custom_allowed?(actor: actor, source: source, destination: destination, impersonator: impersonator,
-                               metadata: metadata) unless built_in_access?
+        unless built_in_access?
+          return custom_allowed?(actor: actor, source: source, destination: destination, impersonator: impersonator,
+                                 metadata: metadata)
+        end
 
-        source_allowed = source_allowed?(actor: actor, source: source)
-        destination_allowed = RecordingStudio::Services::AccessCheck.allowed?(
+        built_in_destination_allowed?(actor: actor, source: source, destination: destination)
+      end
+
+      def built_in_destination_allowed?(actor:, source:, destination:)
+        source_allowed?(actor: actor, source: source) && RecordingStudio::Services::AccessCheck.allowed?(
           actor: actor,
           recording: destination,
           role: :edit
         )
-
-        source_allowed && destination_allowed
       end
 
       def filter_visible_destinations(actor:, source:, destinations:, impersonator: nil, metadata: {})
@@ -42,18 +48,18 @@ module RecordingStudio
       end
 
       def assert_move_allowed!(actor:, source:, destination:, impersonator: nil, metadata: {})
-        if built_in_access?
-          unless RecordingStudio::Services::AccessCheck.allowed?(actor: actor, recording: source, role: :edit)
-            raise RecordingStudio::AccessDenied, "Actor does not have edit access on the source recording"
-          end
+        return built_in_move_allowed!(actor: actor, source: source, destination: destination) if built_in_access?
 
-          unless RecordingStudio::Services::AccessCheck.allowed?(actor: actor, recording: destination, role: :edit)
-            raise RecordingStudio::AccessDenied, "Actor does not have edit access on the target recording"
-          end
+        assert_custom_move_allowed!(
+          actor: actor,
+          source: source,
+          destination: destination,
+          impersonator: impersonator,
+          metadata: metadata
+        )
+      end
 
-          return true
-        end
-
+      def assert_custom_move_allowed!(actor:, source:, destination:, impersonator:, metadata:)
         allowed = custom_allowed?(
           actor: actor,
           source: source,
@@ -65,6 +71,19 @@ module RecordingStudio
         return true if allowed
 
         raise RecordingStudio::AccessDenied, "Move authorization hook denied this move"
+      end
+
+      def built_in_move_allowed!(actor:, source:, destination:)
+        assert_edit_access!(actor: actor, recording: source,
+                            message: "Actor does not have edit access on the source recording")
+        assert_edit_access!(actor: actor, recording: destination,
+                            message: "Actor does not have edit access on the target recording")
+      end
+
+      def assert_edit_access!(actor:, recording:, message:)
+        return if RecordingStudio::Services::AccessCheck.allowed?(actor: actor, recording: recording, role: :edit)
+
+        raise RecordingStudio::AccessDenied, message
       end
 
       def built_in_access?
