@@ -30,8 +30,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_18_000000) do
   end
 
   create_table "recording_studio_archive_boxes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "name", null: false
     t.datetime "created_at", null: false
+    t.string "name", null: false
     t.datetime "updated_at", null: false
   end
 
@@ -69,15 +69,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_18_000000) do
   end
 
   create_table "recording_studio_folders", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "name", null: false
     t.datetime "created_at", null: false
+    t.string "name", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "recording_studio_pages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "title", null: false
     t.text "body"
     t.datetime "created_at", null: false
+    t.string "title", null: false
     t.datetime "updated_at", null: false
   end
 

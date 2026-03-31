@@ -14,12 +14,6 @@ class HomeController < ApplicationController
       recordable_type: "RecordingStudioFolder"
     ).includes(:recordable).order(updated_at: :desc)
 
-    @page_counts_by_folder_id = RecordingStudio::Recording.where(
-      root_recording_id: @root_recording&.id,
-      parent_recording_id: @folders.map(&:id),
-      recordable_type: "RecordingStudioPage"
-    ).reorder(nil).group(:parent_recording_id).count
-
     render :index
   end
 end

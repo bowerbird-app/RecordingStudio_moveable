@@ -5,10 +5,19 @@ module RecordingStudio
     module Authorization
       module_function
 
+      def source_visible?(actor:, source:, impersonator: nil, metadata: {})
+        source_allowed?(actor: actor, source: source)
+      end
+
       def source_allowed?(actor:, source:)
         return custom_allowed?(actor: actor, source: source, destination: source) unless built_in_access?
 
         RecordingStudio::Services::AccessCheck.allowed?(actor: actor, recording: source, role: :edit)
+      end
+
+      def destination_visible?(actor:, source:, destination:, impersonator: nil, metadata: {})
+        destination_allowed?(actor: actor, source: source, destination: destination, impersonator: impersonator,
+                             metadata: metadata)
       end
 
       def destination_allowed?(actor:, source:, destination:, impersonator: nil, metadata: {})
@@ -23,6 +32,13 @@ module RecordingStudio
         )
 
         source_allowed && destination_allowed
+      end
+
+      def filter_visible_destinations(actor:, source:, destinations:, impersonator: nil, metadata: {})
+        Array(destinations).select do |destination|
+          destination_visible?(actor: actor, source: source, destination: destination, impersonator: impersonator,
+                               metadata: metadata)
+        end
       end
 
       def assert_move_allowed!(actor:, source:, destination:, impersonator: nil, metadata: {})

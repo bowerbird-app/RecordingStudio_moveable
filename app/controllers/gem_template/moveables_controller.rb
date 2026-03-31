@@ -6,8 +6,8 @@ module GemTemplate
 
     helper_method :move_recording_path_for, :move_back_path
 
-    before_action :load_recording
     before_action :ensure_actor!
+    before_action :load_recording
 
     def show
       @display = params[:display] == "modal" ? :modal : :full_page
@@ -42,6 +42,7 @@ module GemTemplate
 
     def load_recording
       @recording = RecordingStudio::Recording.find(params[:recording_id])
+      raise ActiveRecord::RecordNotFound unless source_visible?
     end
 
     def ensure_actor!
@@ -64,10 +65,12 @@ module GemTemplate
         destinations.select! { |recording| moveable_label_for(recording).downcase.include?(query) }
       end
 
-      destinations.select do |destination|
-        RecordingStudio::Moveable::Authorization.destination_allowed?(actor: Current.actor, source: @recording,
-                                                                      destination: destination)
-      end
+      RecordingStudio::Moveable::Authorization.filter_visible_destinations(
+        actor: Current.actor,
+        source: @recording,
+        destinations: destinations,
+        impersonator: resolve_impersonator
+      )
     end
 
     def excluded_destination_ids
@@ -116,6 +119,14 @@ module GemTemplate
 
     def resolve_impersonator
       Current.respond_to?(:impersonator) ? Current.impersonator : nil
+    end
+
+    def source_visible?
+      RecordingStudio::Moveable::Authorization.source_visible?(
+        actor: Current.actor,
+        source: @recording,
+        impersonator: resolve_impersonator
+      )
     end
 
     def redirect_path

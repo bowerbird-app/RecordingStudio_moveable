@@ -22,7 +22,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     get recording_studio_moveable.move_recording_path(recording_id: @page.id)
     assert_response :success
     assert_includes response.body, "Move Move Me to..."
-    assert_includes response.body, "Choose a destination for Move Me"
+    refute_includes response.body, "Choose a destination for Move Me"
     assert_includes response.body, "aria-label=\"Breadcrumb\""
     assert_includes response.body, "Back"
     assert_includes response.body, %(href="/")
@@ -40,7 +40,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
 
     get recording_studio_moveable.move_recording_path(recording_id: @page.id, display: "modal")
     assert_response :success
-    assert_includes response.body, "Choose a destination for Move Me"
+  refute_includes response.body, "Choose a destination for Move Me"
     refute_includes response.body, "aria-label=\"Breadcrumb\""
     assert_includes response.body, %(class="mt-4 max-w-3xl")
     refute_includes response.body, "Main navigation"
@@ -84,6 +84,16 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_equal @target_folder.id, @page.reload.parent_recording_id
   end
 
+  def test_folder_show_hides_page_level_move_buttons_and_keeps_card_actions
+    get recording_studio_folder_path(@source_folder.recordable)
+
+    assert_response :success
+    refute_includes response.body, "Move folder"
+    refute_includes response.body, "Move folder in modal"
+    assert_includes response.body, ">Move<"
+    assert_includes response.body, "Move modal"
+  end
+
   def test_destination_filtering_shows_only_allowed_destinations
     get recording_studio_moveable.move_recording_path(recording_id: @page.id)
 
@@ -96,6 +106,34 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "/recording_studio_moveable/cable"
     assert_includes response.body, @target_folder.recordable.name
     refute_includes response.body, @archive.recordable.name
+  end
+
+  def test_move_screen_returns_not_found_when_actor_cannot_access_source
+    sign_out @user
+
+    outsider = create_user(email: "outsider-ui@example.com")
+    sign_in outsider
+
+    get recording_studio_moveable.move_recording_path(recording_id: @page.id)
+
+    assert_response :not_found
+  end
+
+  def test_move_screen_uses_gem_authorization_to_hide_inaccessible_destinations
+    hidden_folder = @root.record(RecordingStudioFolder, actor: @user, parent_recording: @root) { |f| f.name = "Hidden" }
+
+    RecordingStudio::Moveable.configure do |config|
+      config.use_builtin_access = false
+      config.authorization_hook = lambda do |actor:, source:, destination:, **|
+        actor == @user && source == @page && [@page, @target_folder].include?(destination)
+      end
+    end
+
+    get recording_studio_moveable.move_recording_path(recording_id: @page.id)
+
+    assert_response :success
+    assert_includes response.body, @target_folder.recordable.name
+    refute_includes response.body, hidden_folder.recordable.name
   end
 
   def test_client_feedback_page_uses_shared_move_view

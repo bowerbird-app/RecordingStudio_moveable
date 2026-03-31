@@ -20,6 +20,8 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "home#index"
 
+  get "docs/moveable", to: "moveable_docs#show", as: :moveable_docs
+
   resources :recordings, only: :index
   resources :folder_recordables, only: :index
   resources :page_recordables, only: :index

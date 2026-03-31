@@ -15,12 +15,14 @@ class HomeDemoTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "Songwriting"
-    assert_includes response.body, "Open folder"
-    assert_includes response.body, "3 pages"
+    assert_includes response.body, "Folder"
+    assert_includes response.body, "Move"
+    assert_includes response.body, "Move modal"
     refute_includes response.body, "Lyric Draft"
     refute_includes response.body, "Move page"
+    refute_includes response.body, "Open folder"
     refute_includes response.body, "Archive Box A"
-    refute_includes response.body, 'data-controller="move-modal"'
+    assert_includes response.body, 'data-controller="move-modal"'
 
     root = RecordingStudio::Recording.unscoped.find_by!(recordable: Workspace.find_by!(name: "Studio Workspace"), parent_recording_id: nil)
     assert_equal 3, RecordingStudio::Recording.where(parent_recording_id: root.id, recordable_type: "RecordingStudioFolder").count
@@ -59,18 +61,28 @@ class HomeDemoTest < ActionDispatch::IntegrationTest
     assert_equal target_folder.id, matches.first.parent_recording_id
   end
 
-  def test_folder_page_renders_pages_for_selected_folder
+  def test_folder_page_renders_nested_folders_and_pages_for_selected_folder
     get root_path
 
     folder = RecordingStudioFolder.find_by!(name: "Songwriting")
+    folder_recording = RecordingStudio::Recording.find_by!(recordable: folder)
+    folder_recording.root_recording.record(RecordingStudioFolder, actor: @user, parent_recording: folder_recording) do |child_folder|
+      child_folder.name = "Chorus Ideas"
+    end
+
     get recording_studio_folder_path(folder)
 
     assert_response :success
     assert_includes response.body, "All folders"
+    assert_includes response.body, "4 items in this folder"
+    assert_includes response.body, "Chorus Ideas"
+    assert_includes response.body, "Open this folder to browse its nested folders and pages."
+    assert_includes response.body, "Folder"
     assert_includes response.body, "Lyric Draft"
+    assert_includes response.body, "Page"
     assert_includes response.body, "Demo Arrangement"
     assert_includes response.body, "Move"
-    assert_includes response.body, "Move in modal"
+    assert_includes response.body, "Move modal"
     refute_includes response.body, "Open page"
     refute_includes response.body, "Move page"
     assert_includes response.body, 'data-controller="move-modal"'

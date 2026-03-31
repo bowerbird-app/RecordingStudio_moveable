@@ -17,6 +17,6 @@ class ApplicationController < ActionController::Base
   end
 
   def set_current_actor
-    Current.actor = current_user
+    Current.actor = request.env["warden"]&.authenticated?(:user) ? current_user : nil
   end
 end

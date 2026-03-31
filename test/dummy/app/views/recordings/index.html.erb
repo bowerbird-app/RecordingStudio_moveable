@@ -5,31 +5,28 @@
   ) %>
 
   <% if @recordings.any? %>
-    <div class="overflow-hidden rounded-2xl border border-(--surface-border-color) bg-(--surface-background-color)">
-      <div class="grid grid-cols-[minmax(0,2fr)_minmax(0,1.25fr)_minmax(0,1.25fr)_minmax(0,1fr)] gap-4 border-b border-(--surface-border-color) px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--surface-muted-content-color)">
-        <div>Item</div>
-        <div>Type</div>
-        <div>Parent recording</div>
-        <div>Created</div>
-      </div>
-
-      <div class="divide-y divide-(--surface-border-color)">
-        <% @recordings.each do |recording| %>
-          <div class="grid grid-cols-[minmax(0,2fr)_minmax(0,1.25fr)_minmax(0,1.25fr)_minmax(0,1fr)] gap-4 px-4 py-4 text-sm">
-            <div class="min-w-0 space-y-1">
-              <p class="truncate font-medium text-(--surface-content-color)">
-                <%= recording.recordable.try(:title) || recording.recordable.try(:name) || recording.recordable_type.demodulize %>
-              </p>
-              <p class="truncate text-(--surface-muted-content-color)"><%= recording.id %></p>
-            </div>
-
-            <div class="text-(--surface-content-color)"><%= recording.recordable_type.demodulize %></div>
-            <div class="text-(--surface-muted-content-color)"><%= recording.parent_recording_id || "Root" %></div>
-            <div class="text-(--surface-muted-content-color)"><%= recording.created_at.strftime("%Y-%m-%d %H:%M:%S") %></div>
-          </div>
-        <% end %>
-      </div>
-    </div>
+    <%= render FlatPack::Table::Component.new(data: @recordings) do |table| %>
+      <% table.column(title: "Item", html: ->(recording) {
+           content_tag(:div, class: "min-w-0 space-y-1") do
+             safe_join([
+               content_tag(:p,
+                 recording.recordable.try(:title) || recording.recordable.try(:name) || recording.recordable_type.demodulize,
+                 class: "truncate font-medium text-(--surface-content-color)"
+               ),
+               content_tag(:p, recording.id, class: "truncate text-(--surface-muted-content-color)")
+             ])
+           end
+         }) %>
+      <% table.column(title: "Type", html: ->(recording) {
+           content_tag(:div, recording.recordable_type.demodulize, class: "text-(--surface-content-color)")
+         }) %>
+      <% table.column(title: "Parent recording", html: ->(recording) {
+           content_tag(:div, recording.parent_recording_id || "Root", class: "text-(--surface-muted-content-color)")
+         }) %>
+      <% table.column(title: "Created", html: ->(recording) {
+           content_tag(:div, recording.created_at.strftime("%Y-%m-%d %H:%M:%S"), class: "text-(--surface-muted-content-color)")
+         }) %>
+    <% end %>
   <% else %>
     <%= render FlatPack::EmptyState::Component.new(
       title: "No recordings yet",

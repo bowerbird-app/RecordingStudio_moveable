@@ -2,7 +2,7 @@
   <% sidebar.header do %>
     <%= render FlatPack::Sidebar::Header::Component.new(
       brand_abbr: "RS",
-      title: "RecordingStudio",
+      title: "Moveable",
       subtitle: "Moveable Demo"
     ) %>
   <% end %>
@@ -42,6 +42,13 @@
         href: events_path,
         icon: "calendar-days",
         active: current_page?(events_path)
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Moveable Docs",
+        href: moveable_docs_path,
+        icon: "question",
+        active: current_page?(moveable_docs_path)
       ) %>
 
     </nav>

@@ -4,6 +4,18 @@ This document outlines the security considerations for the gem_template Rails en
 
 ## Security Features
 
+### Move UI Authorization
+- **Status**: ✅ Enforced in gem code
+- The move screen now checks source access before rendering gem-owned UI
+- Inaccessible source recordings return not found instead of rendering record labels or actions
+- Destination lists are filtered through the addon authorization layer, not just the host app demo
+
+This reduces information disclosure from the move screen and keeps UI visibility aligned with the move authorization path.
+
+**Locations**:
+- `app/controllers/gem_template/moveables_controller.rb`
+- `lib/recording_studio/moveable/authorization.rb`
+
 ### CSRF Protection
 - **Status**: ✅ Enabled
 - CSRF authenticity tokens are enabled and enforced
@@ -108,6 +120,7 @@ For security issues, please report via GitHub Issues or contact the maintainers 
 
 ## Updates
 
+- **2026-03-30**: Move UI source access and destination visibility checks enforced in gem-owned code
 - **2025-12-04**: Initial security review completed
 - No vulnerabilities identified in current scope
 - Development environment appropriately configured

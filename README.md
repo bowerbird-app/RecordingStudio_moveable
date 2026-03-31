@@ -20,7 +20,8 @@
   - full-page mode
   - modal mode
   - destination search (uses `FlatPack::SearchInput::Component` when available, plain input fallback)
-  - only shows allowed + authorized destinations
+  - only shows destinations that pass gem-owned move visibility checks
+  - returns not found for inaccessible source recordings
   - move action redirects to root page with success flash
 
 ## Installation
@@ -64,6 +65,8 @@ No extra setup required. In this mode:
 
 - source requires `:edit`
 - destination requires `:edit`
+- move UI source visibility requires `:edit`
+- move UI only lists destinations the actor can move into
 - failures raise `RecordingStudio::AccessDenied`
 
 ### Custom authorization hook mode
@@ -79,6 +82,12 @@ end
 
 If your hook returns false, move is denied with `RecordingStudio::AccessDenied`.
 
+The same authorization layer is also used by the move UI. In custom hook mode:
+
+- the source recording must pass the hook before the move screen is rendered
+- each listed destination must pass the hook
+- inaccessible source recordings return not found instead of rendering the move screen
+
 ## UI usage examples
 
 ### Full page
@@ -92,6 +101,15 @@ If your hook returns false, move is denied with `RecordingStudio::AccessDenied`.
 ```erb
 <%= link_to "Move", recording_studio_moveable.move_recording_path(recording_id: recording.id, display: "modal") %>
 ```
+
+## Move UI access rules
+
+The addon enforces access checks inside the gem-owned move controller.
+
+- The move screen only renders when the current actor can access the source recording under the addon authorization policy.
+- Inaccessible sources return not found so the UI does not disclose record titles or available actions.
+- Destination lists are filtered through the same gem authorization layer that protects `move_to!`.
+- The write path still re-checks authorization inside `move_to!`; UI filtering is not the only enforcement layer.
 
 ## Dummy app demo
 

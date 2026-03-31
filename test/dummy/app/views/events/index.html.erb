@@ -5,28 +5,25 @@
   ) %>
 
   <% if @events.any? %>
-    <div class="overflow-hidden rounded-2xl border border-(--surface-border-color) bg-(--surface-background-color)">
-      <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,3fr)] gap-4 border-b border-(--surface-border-color) px-4 py-3 text-xs font-semibold uppercase tracking-wide text-(--surface-muted-content-color)">
-        <div>Action</div>
-        <div>Recordable</div>
-        <div>Occurred</div>
-        <div>Metadata</div>
-      </div>
-
-      <div class="divide-y divide-(--surface-border-color)">
-        <% @events.each do |event| %>
-          <div class="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,3fr)] gap-4 px-4 py-4 text-sm">
-            <div class="font-medium text-(--surface-content-color)"><%= event.action %></div>
-            <div class="min-w-0 text-(--surface-muted-content-color)">
-              <p class="truncate"><%= event.recordable_type.demodulize %></p>
-              <p class="truncate"><%= event.recordable_id %></p>
-            </div>
-            <div class="text-(--surface-muted-content-color)"><%= event.occurred_at.strftime("%Y-%m-%d %H:%M:%S") %></div>
-            <div class="text-(--surface-muted-content-color)"><%= event.metadata.presence&.to_json || "{}" %></div>
-          </div>
-        <% end %>
-      </div>
-    </div>
+    <%= render FlatPack::Table::Component.new(data: @events) do |table| %>
+      <% table.column(title: "Action", html: ->(event) {
+           content_tag(:div, event.action, class: "font-medium text-(--surface-content-color)")
+         }) %>
+      <% table.column(title: "Recordable", html: ->(event) {
+           content_tag(:div, class: "min-w-0 text-(--surface-muted-content-color)") do
+             safe_join([
+               content_tag(:p, event.recordable_type.demodulize, class: "truncate"),
+               content_tag(:p, event.recordable_id, class: "truncate")
+             ])
+           end
+         }) %>
+      <% table.column(title: "Occurred", html: ->(event) {
+           content_tag(:div, event.occurred_at.strftime("%Y-%m-%d %H:%M:%S"), class: "text-(--surface-muted-content-color)")
+         }) %>
+      <% table.column(title: "Metadata", html: ->(event) {
+           content_tag(:div, event.metadata.presence&.to_json || "{}", class: "text-(--surface-muted-content-color)")
+         }) %>
+    <% end %>
   <% else %>
     <%= render FlatPack::EmptyState::Component.new(
       title: "No events yet",

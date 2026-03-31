@@ -6,64 +6,66 @@
 
   <%= render FlatPack::PageTitle::Component.new(
     title: @folder.name,
-    subtitle: @pages.one? ? "1 page in this folder" : "#{@pages.count} pages in this folder"
+    subtitle: @children.one? ? "1 item in this folder" : "#{@children.count} items in this folder"
   ) %>
 
-  <div class="flex flex-wrap gap-3">
-    <%= render FlatPack::Button::Component.new(
-      text: "Move folder",
-      style: :primary,
-      size: :sm,
-      url: recording_studio_moveable.move_recording_path(recording_id: @recording.id)
-    ) %>
-    <%= render FlatPack::Button::Component.new(
-      text: "Move folder in modal",
-      style: :ghost,
-      size: :sm,
-      url: recording_studio_moveable.move_recording_path(recording_id: @recording.id, display: "modal"),
-      data: { action: "click->move-modal#open" }
-    ) %>
-  </div>
-
-  <section class="space-y-6">
-    <%= render FlatPack::SectionTitle::Component.new(
-      title: "Pages",
-      class: "my-0"
-    ) %>
-
-    <% if @pages.any? %>
+  <section>
+    <% if @children.any? %>
       <%= render FlatPack::Grid::Component.new(cols: 3, gap: :lg, align: :stretch) do %>
-        <% @pages.each do |page_recording| %>
+        <% @children.each do |child_recording| %>
+          <% recordable_type = child_recording.recordable_type.sub(/^RecordingStudio/, "").underscore.humanize %>
           <%= render FlatPack::Card::Component.new(style: :elevated, class: "h-full") do |card| %>
             <% card.body do %>
               <div class="flex h-full flex-col gap-4">
                 <div class="min-w-0 space-y-3">
-                  <%= render(FlatPack::Link::Component.new(href: recording_studio_page_path(page_recording.recordable), class: "block text-base font-semibold text-(--surface-content-color)")) do %>
-                    <%= page_recording.recordable.title %>
+                  <% item_href = if child_recording.recordable_type == "RecordingStudioFolder"
+                                   recording_studio_folder_path(child_recording.recordable)
+                                 else
+                                   recording_studio_page_path(child_recording.recordable)
+                                 end %>
+                  <% item_title = if child_recording.recordable_type == "RecordingStudioFolder"
+                                    child_recording.recordable.name
+                                  else
+                                    child_recording.recordable.title
+                                  end %>
+                  <% item_description = if child_recording.recordable_type == "RecordingStudioFolder"
+                                          "Open this folder to browse its nested folders and pages."
+                                        else
+                                          child_recording.recordable.body.presence || "No preview text available for this page yet."
+                                        end %>
+
+                  <%= render(FlatPack::Link::Component.new(href: item_href, class: "block text-base font-semibold text-(--surface-content-color)")) do %>
+                    <%= item_title %>
                   <% end %>
 
+                  <%= render FlatPack::Badge::Component.new(
+                    text: recordable_type,
+                    style: :default,
+                    size: :sm
+                  ) %>
+
                   <p class="text-sm leading-6 text-(--surface-muted-content-color)">
-                    <%= page_recording.recordable.body.presence || "No preview text available for this page yet." %>
+                    <%= item_description %>
                   </p>
                 </div>
 
-                <div class="mt-auto flex flex-wrap gap-2">
-                  <%= render FlatPack::Button::Component.new(
+                <div class="mt-auto pt-2">
+                  <%= render FlatPack::Button::Dropdown::Component.new(
                     text: "Move",
-                    style: :default,
+                    style: :secondary,
                     size: :sm,
-                    url: recording_studio_moveable.move_recording_path(recording_id: page_recording.id),
-                    class: "flex-1 justify-center"
-                  ) %>
-
-                  <%= render FlatPack::Button::Component.new(
-                    text: "Move in modal",
-                    style: :ghost,
-                    size: :sm,
-                    url: recording_studio_moveable.move_recording_path(recording_id: page_recording.id, display: "modal"),
-                    data: { action: "click->move-modal#open" },
-                    class: "flex-1 justify-center"
-                  ) %>
+                    position: :bottom_right
+                  ) do |dropdown| %>
+                    <% dropdown.with_menu_item(
+                         text: "Move",
+                         href: recording_studio_moveable.move_recording_path(recording_id: child_recording.id)
+                       ) %>
+                    <% dropdown.with_menu_item(
+                         text: "Move modal",
+                         href: recording_studio_moveable.move_recording_path(recording_id: child_recording.id, display: "modal"),
+                         data: { action: "click->move-modal#open" }
+                       ) %>
+                  <% end %>
                 </div>
               </div>
             <% end %>
@@ -72,8 +74,8 @@
       <% end %>
     <% else %>
       <%= render FlatPack::EmptyState::Component.new(
-        title: "No pages yet",
-        description: "Create or move a page into this folder to populate it.",
+        title: "No items yet",
+        description: "Create or move a folder or page into this folder to populate it.",
         icon: :inbox
       ) %>
     <% end %>

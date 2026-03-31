@@ -1,4 +1,4 @@
-<div class="space-y-8">
+<div class="space-y-8" data-controller="move-modal" data-action="submit->move-modal#submit">
   <%= render FlatPack::PageTitle::Component.new(
     title: "Moveable demo",
     subtitle: "Browse folders first, then drill into the pages inside each folder.",
@@ -14,7 +14,7 @@
     <% if @folders.any? %>
       <%= render FlatPack::Grid::Component.new(cols: 3, gap: :lg, align: :stretch) do %>
         <% @folders.each do |folder_recording| %>
-          <% page_count = @page_counts_by_folder_id.fetch(folder_recording.id, 0) %>
+          <% recordable_type = folder_recording.recordable_type.sub(/^RecordingStudio/, "").underscore.humanize %>
 
           <%= render FlatPack::Card::Component.new(style: :elevated, padding: :none, class: "h-full") do |card| %>
             <% card.body do %>
@@ -25,32 +25,29 @@
                   <% end %>
 
                   <%= render FlatPack::Badge::Component.new(
-                    text: page_count == 1 ? "1 page" : "#{page_count} pages",
+                    text: recordable_type,
                     style: :default,
                     size: :sm
                   ) %>
-
-                  <p class="text-sm text-(--surface-muted-content-color)">
-                    Open this folder to view its pages.
-                  </p>
                 </div>
 
-                <div class="mt-auto flex flex-wrap gap-2">
-                  <%= render FlatPack::Button::Component.new(
-                    text: "Open folder",
-                    style: :default,
-                    size: :sm,
-                    url: recording_studio_folder_path(folder_recording.recordable),
-                    class: "flex-1 justify-center"
-                  ) %>
-
-                  <%= render FlatPack::Button::Component.new(
-                    text: "Move folder",
+                <div class="mt-auto pt-2">
+                  <%= render FlatPack::Button::Dropdown::Component.new(
+                    text: "Move",
                     style: :secondary,
                     size: :sm,
-                    url: recording_studio_moveable.move_recording_path(recording_id: folder_recording.id),
-                    class: "flex-1 justify-center"
-                  ) %>
+                    position: :bottom_right
+                  ) do |dropdown| %>
+                    <% dropdown.with_menu_item(
+                         text: "Move",
+                         href: recording_studio_moveable.move_recording_path(recording_id: folder_recording.id)
+                       ) %>
+                    <% dropdown.with_menu_item(
+                         text: "Move modal",
+                         href: recording_studio_moveable.move_recording_path(recording_id: folder_recording.id, display: "modal"),
+                         data: { action: "click->move-modal#open" }
+                       ) %>
+                  <% end %>
                 </div>
               </div>
             <% end %>
@@ -66,4 +63,23 @@
       ) %>
     <% end %>
   </section>
+
+  <%= render FlatPack::Modal::Component.new(
+    id: "move-recording-modal",
+    size: :lg,
+    body_height_mode: :fixed,
+    body_height: "70vh",
+    data: { move_modal_target: "modal" }
+  ) do |modal| %>
+    <% modal.body_content do %>
+      <div data-move-modal-target="body">
+        <%= render FlatPack::EmptyState::Component.new(
+          title: "Choose a move action",
+          description: "Use a move action on this page to load the move UI here.",
+          icon: :inbox,
+          class: "min-h-48 rounded-2xl border border-dashed border-(--surface-border-color) bg-(--surface-muted-background-color) px-6"
+        ) %>
+      </div>
+    <% end %>
+  <% end %>
 </div>
