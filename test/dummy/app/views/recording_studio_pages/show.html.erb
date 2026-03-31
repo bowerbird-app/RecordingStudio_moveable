@@ -17,7 +17,8 @@
          text: "Move (modal mode)",
          style: :ghost,
          size: :sm,
-         url: recording_studio_moveable.move_recording_path(recording_id: @recording.id, display: "modal")
+         url: recording_studio_moveable.move_recording_path(recording_id: @recording.id),
+         data: { recording_studio_moveable_modal: true }
        ))
      ) %>
 <% end %>

@@ -1,4 +1,4 @@
-<div class="space-y-8" data-controller="move-modal" data-action="submit->move-modal#submit">
+<div class="space-y-8">
   <%= render FlatPack::Breadcrumb::Component.new(
     items: [{ text: "All folders", href: root_path, icon: "chevron-left" }],
     class: "mb-3"
@@ -62,8 +62,8 @@
                        ) %>
                     <% dropdown.with_menu_item(
                          text: "Move modal",
-                         href: recording_studio_moveable.move_recording_path(recording_id: child_recording.id, display: "modal"),
-                         data: { action: "click->move-modal#open" }
+                      href: recording_studio_moveable.move_recording_path(recording_id: child_recording.id),
+                      data: { recording_studio_moveable_modal: true }
                        ) %>
                   <% end %>
                 </div>
@@ -80,23 +80,4 @@
       ) %>
     <% end %>
   </section>
-
-  <%= render FlatPack::Modal::Component.new(
-    id: "move-recording-modal",
-    size: :lg,
-    body_height_mode: :fixed,
-    body_height: "70vh",
-    data: { move_modal_target: "modal" }
-  ) do |modal| %>
-    <% modal.body_content do %>
-      <div data-move-modal-target="body">
-        <%= render FlatPack::EmptyState::Component.new(
-          title: "Choose a move action",
-          description: "Use a move action on this page to load the move UI here.",
-          icon: :inbox,
-          class: "min-h-48 rounded-2xl border border-dashed border-(--surface-border-color) bg-(--surface-muted-background-color) px-6"
-        ) %>
-      </div>
-    <% end %>
-  <% end %>
 </div>

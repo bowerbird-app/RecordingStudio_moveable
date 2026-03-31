@@ -18,6 +18,15 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     @archive = @root.record(RecordingStudioArchiveBox, actor: @user, parent_recording: @root) { |a| a.name = "Archive" }
   end
 
+  def test_home_page_layout_exposes_moveable_helpers
+    get root_path
+
+    assert_response :success
+    assert_includes response.body, 'name="recording-studio-moveable"'
+    assert_includes response.body, 'data-recording-studio-moveable-modal-root="true"'
+    assert_includes response.body, 'data-recording-studio-moveable-modal-body="true"'
+  end
+
   def test_full_page_and_modal_render
     get recording_studio_moveable.move_recording_path(recording_id: @page.id)
     assert_response :success
@@ -30,6 +39,8 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Main navigation"
     assert_includes response.body, "Toggle sidebar"
     assert_includes response.body, "Search destinations"
+    assert_includes response.body, %(data-controller="move-search")
+    assert_includes response.body, %(input->move-search#queueSubmit)
     assert_includes response.body, %(class="mt-4 max-w-3xl")
     refute_includes response.body, "container mx-auto max-w-6xl px-4 pb-10 pt-6"
     refute_includes response.body, "Move item"
@@ -37,6 +48,15 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "What happens next"
     refute_includes response.body, "Search + choose"
     refute_includes response.body, "5 allowed destinations"
+    refute_includes response.body, ">Search<"
+
+    get recording_studio_moveable.move_recording_modal_path(recording_id: @page.id)
+    assert_response :success
+    assert_includes response.body, 'data-recording-studio-moveable-modal-root="true"'
+    assert_includes response.body, 'data-recording-studio-moveable-modal-body="true"'
+    assert_includes response.body, 'data-recording-studio-moveable-modal-element="true"'
+    assert_includes response.body, "Move Move Me to..."
+    refute_includes response.body, "Main navigation"
 
     get recording_studio_moveable.move_recording_path(recording_id: @page.id, display: "modal")
     assert_response :success
@@ -92,6 +112,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Move folder in modal"
     assert_includes response.body, ">Move<"
     assert_includes response.body, "Move modal"
+    assert_includes response.body, 'data-recording-studio-moveable-modal="true"'
   end
 
   def test_destination_filtering_shows_only_allowed_destinations
@@ -106,6 +127,31 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "/recording_studio_moveable/cable"
     assert_includes response.body, @target_folder.recordable.name
     refute_includes response.body, @archive.recordable.name
+  end
+
+  def test_destination_search_filters_allowed_destinations
+    other_folder = @root.record(RecordingStudioFolder, actor: @user, parent_recording: @root) { |f| f.name = "Elsewhere" }
+
+    get recording_studio_moveable.move_recording_path(recording_id: @page.id), params: { q: "Target" }
+
+    assert_response :success
+    assert_includes response.body, @target_folder.recordable.name
+    refute_includes response.body, other_folder.recordable.name
+    refute_includes response.body, @archive.recordable.name
+    assert_includes response.body, %(value="Target")
+  end
+
+  def test_destination_search_finds_matches_beyond_initial_result_window
+    205.times do |index|
+      @root.record(RecordingStudioFolder, actor: @user, parent_recording: @root) do |folder|
+        folder.name = "Filler #{index}"
+      end
+    end
+
+    get recording_studio_moveable.move_recording_path(recording_id: @page.id), params: { q: "Target" }
+
+    assert_response :success
+    assert_includes response.body, @target_folder.recordable.name
   end
 
   def test_move_screen_returns_not_found_when_actor_cannot_access_source

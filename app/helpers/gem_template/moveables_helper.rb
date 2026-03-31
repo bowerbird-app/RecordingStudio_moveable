@@ -2,6 +2,28 @@
 
 module GemTemplate
   module MoveablesHelper
+    def recording_studio_moveable_meta_tags
+      tag.meta(name: "recording-studio-moveable", content: "enabled")
+    end
+
+    def recording_studio_moveable_modal_template
+      content_tag(:div, data: { recording_studio_moveable_modal_root: true }) do
+        recording_studio_moveable_modal_component
+      end
+    end
+
+    def recording_studio_moveable_modal_component
+      render FlatPack::Modal::Component.new(
+        id: "recording-studio-moveable-modal",
+        size: :lg,
+        body_height_mode: :fixed,
+        body_height: "70vh",
+        data: { recording_studio_moveable_modal_element: true }
+      ) do |modal|
+        modal.body_content { tag.div("", data: { recording_studio_moveable_modal_body: true }) }
+      end
+    end
+
     def moveable_title_for(recording)
       "Move #{moveable_label_for(recording)}"
     end

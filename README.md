@@ -39,6 +39,12 @@ Then bundle install and mount the engine UI routes:
 mount RecordingStudioMoveable::Engine, at: "/recording_studio_moveable", as: :recording_studio_moveable
 ```
 
+Add the engine JavaScript to your app entrypoint so modal links work out of the box:
+
+```js
+import "recording_studio_moveable"
+```
+
 ## Capability usage
 
 Include move capability on recordable models and define allowed parent types:
@@ -99,8 +105,10 @@ The same authorization layer is also used by the move UI. In custom hook mode:
 ### Modal mode
 
 ```erb
-<%= link_to "Move", recording_studio_moveable.move_recording_path(recording_id: recording.id, display: "modal") %>
+<%= link_to "Move", recording_studio_moveable.move_recording_path(recording_id: recording.id), data: { recording_studio_moveable_modal: true } %>
 ```
+
+The modal shell is rendered on demand by the gem. Host pages do not need to preload a FlatPack modal container.
 
 ## Move UI access rules
 

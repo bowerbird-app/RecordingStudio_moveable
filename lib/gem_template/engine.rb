@@ -1,8 +1,24 @@
 # frozen_string_literal: true
 
+require_relative "../../app/helpers/gem_template/moveables_helper"
+
 module GemTemplate
   class Engine < ::Rails::Engine
     isolate_namespace GemTemplate
+
+    initializer "gem_template.view_helpers" do
+      ActiveSupport.on_load(:action_view) do
+        include GemTemplate::MoveablesHelper
+      end
+    end
+
+    initializer "gem_template.assets.precompile" do |app|
+      app.config.assets.paths << root.join("app/javascript")
+    end
+
+    initializer "gem_template.importmap", before: "importmap" do |app|
+      app.config.importmap.paths << root.join("config/importmap.rb")
+    end
 
     # Run before_initialize hooks
     initializer "gem_template.before_initialize", before: "gem_template.load_config" do |_app|

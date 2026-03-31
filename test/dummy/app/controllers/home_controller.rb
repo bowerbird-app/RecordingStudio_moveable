@@ -8,11 +8,11 @@ class HomeController < ApplicationController
       parent_recording_id: nil
     )
 
-    @folders = RecordingStudio::Recording.where(
+    @items = RecordingStudio::Recording.where(
       root_recording_id: @root_recording&.id,
       parent_recording_id: @root_recording&.id,
-      recordable_type: "RecordingStudioFolder"
-    ).includes(:recordable).order(updated_at: :desc)
+      recordable_type: ["RecordingStudioFolder", "RecordingStudioPage"]
+    ).includes(:recordable).order(recordable_type: :asc, updated_at: :desc)
 
     render :index
   end

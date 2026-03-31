@@ -2,6 +2,7 @@
 
 require "recording_studio/moveable/configuration"
 require "recording_studio/moveable/authorization"
+require "recording_studio/moveable/destination_search"
 require "recording_studio/moveable/capabilities/moveable"
 
 module RecordingStudio

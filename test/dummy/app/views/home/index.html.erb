@@ -1,27 +1,37 @@
-<div class="space-y-8" data-controller="move-modal" data-action="submit->move-modal#submit">
+<div class="space-y-8">
   <%= render FlatPack::PageTitle::Component.new(
     title: "Moveable demo",
-    subtitle: "Browse folders first, then drill into the pages inside each folder.",
+    subtitle: "Browse folders and pages at the root, then drill into folders for nested content.",
     variant: :h1
   ) %>
 
   <section class="space-y-6">
-    <%= render FlatPack::SectionTitle::Component.new(
-      title: "Folders",
-      class: "my-0"
-    ) %>
-
-    <% if @folders.any? %>
+    <% if @items.any? %>
       <%= render FlatPack::Grid::Component.new(cols: 3, gap: :lg, align: :stretch) do %>
-        <% @folders.each do |folder_recording| %>
-          <% recordable_type = folder_recording.recordable_type.sub(/^RecordingStudio/, "").underscore.humanize %>
+        <% @items.each do |item_recording| %>
+          <% recordable_type = item_recording.recordable_type.sub(/^RecordingStudio/, "").underscore.humanize %>
+          <% item_href = if item_recording.recordable_type == "RecordingStudioFolder"
+                           recording_studio_folder_path(item_recording.recordable)
+                         else
+                           recording_studio_page_path(item_recording.recordable)
+                         end %>
+          <% item_title = if item_recording.recordable_type == "RecordingStudioFolder"
+                            item_recording.recordable.name
+                          else
+                            item_recording.recordable.title
+                          end %>
+          <% item_description = if item_recording.recordable_type == "RecordingStudioFolder"
+                                  "Open this folder to browse its nested folders and pages."
+                                else
+                                  item_recording.recordable.body.presence || "No preview text available for this page yet."
+                                end %>
 
           <%= render FlatPack::Card::Component.new(style: :elevated, padding: :none, class: "h-full") do |card| %>
             <% card.body do %>
               <div class="flex h-full flex-col gap-4">
                 <div class="space-y-3 min-w-0">
-                  <%= render(FlatPack::Link::Component.new(href: recording_studio_folder_path(folder_recording.recordable), class: "block text-base font-semibold")) do %>
-                    <%= folder_recording.recordable.name %>
+                  <%= render(FlatPack::Link::Component.new(href: item_href, class: "block text-base font-semibold")) do %>
+                    <%= item_title %>
                   <% end %>
 
                   <%= render FlatPack::Badge::Component.new(
@@ -29,6 +39,10 @@
                     style: :default,
                     size: :sm
                   ) %>
+
+                  <p class="text-sm leading-6 text-(--surface-muted-content-color)">
+                    <%= item_description %>
+                  </p>
                 </div>
 
                 <div class="mt-auto pt-2">
@@ -40,12 +54,12 @@
                   ) do |dropdown| %>
                     <% dropdown.with_menu_item(
                          text: "Move",
-                         href: recording_studio_moveable.move_recording_path(recording_id: folder_recording.id)
+                         href: recording_studio_moveable.move_recording_path(recording_id: item_recording.id)
                        ) %>
                     <% dropdown.with_menu_item(
                          text: "Move modal",
-                         href: recording_studio_moveable.move_recording_path(recording_id: folder_recording.id, display: "modal"),
-                         data: { action: "click->move-modal#open" }
+                      href: recording_studio_moveable.move_recording_path(recording_id: item_recording.id),
+                      data: { recording_studio_moveable_modal: true }
                        ) %>
                   <% end %>
                 </div>
@@ -57,29 +71,10 @@
       <% end %>
     <% else %>
       <%= render FlatPack::EmptyState::Component.new(
-        title: "No folders available",
+        title: "No items available",
         description: "The demo data has not been created for this workspace yet.",
         icon: :inbox
       ) %>
     <% end %>
   </section>
-
-  <%= render FlatPack::Modal::Component.new(
-    id: "move-recording-modal",
-    size: :lg,
-    body_height_mode: :fixed,
-    body_height: "70vh",
-    data: { move_modal_target: "modal" }
-  ) do |modal| %>
-    <% modal.body_content do %>
-      <div data-move-modal-target="body">
-        <%= render FlatPack::EmptyState::Component.new(
-          title: "Choose a move action",
-          description: "Use a move action on this page to load the move UI here.",
-          icon: :inbox,
-          class: "min-h-48 rounded-2xl border border-dashed border-(--surface-border-color) bg-(--surface-muted-background-color) px-6"
-        ) %>
-      </div>
-    <% end %>
-  <% end %>
 </div>

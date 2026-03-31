@@ -22,7 +22,7 @@ class HomeDemoTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Move page"
     refute_includes response.body, "Open folder"
     refute_includes response.body, "Archive Box A"
-    assert_includes response.body, 'data-controller="move-modal"'
+    assert_includes response.body, 'data-recording-studio-moveable-modal="true"'
 
     root = RecordingStudio::Recording.unscoped.find_by!(recordable: Workspace.find_by!(name: "Studio Workspace"), parent_recording_id: nil)
     assert_equal 3, RecordingStudio::Recording.where(parent_recording_id: root.id, recordable_type: "RecordingStudioFolder").count
@@ -85,7 +85,7 @@ class HomeDemoTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Move modal"
     refute_includes response.body, "Open page"
     refute_includes response.body, "Move page"
-    assert_includes response.body, 'data-controller="move-modal"'
+    assert_includes response.body, 'data-recording-studio-moveable-modal="true"'
     refute_includes response.body, "Mic Locker"
   end
 end

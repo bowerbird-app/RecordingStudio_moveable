@@ -15,6 +15,12 @@ module GemTemplate
       render layout: full_page_layout
     end
 
+    def modal
+      prepare_show_state
+      @display = :modal
+      render :modal, layout: false
+    end
+
     def update
       move_recording!(find_destination!(params[:destination_id]))
       redirect_to move_redirect_target, notice: "Moved successfully."
@@ -60,14 +66,8 @@ module GemTemplate
     def filtered_destinations
       return [] unless source_allowed_for_destinations?
 
-      destinations = destination_candidates
-      destinations = filter_destinations_by_query(destinations)
-
-      RecordingStudio::Moveable::Authorization.filter_visible_destinations(
-        actor: Current.actor,
-        source: @recording,
-        destinations: destinations,
-        impersonator: resolve_impersonator
+      destination_search.results(
+        query: @query
       )
     end
 
@@ -75,52 +75,21 @@ module GemTemplate
       RecordingStudio::Moveable::Authorization.source_allowed?(actor: Current.actor, source: @recording)
     end
 
-    def destination_candidates
-      RecordingStudio::Recording.where(root_recording_id: @recording.root_recording_id)
-                                .where(recordable_type: allowed_parent_types)
-                                .where.not(id: excluded_destination_ids)
-                                .includes(:recordable)
-                                .order(updated_at: :desc)
-                                .limit(200)
-                                .to_a
-    end
-
-    def filter_destinations_by_query(destinations)
-      return destinations unless @query.present?
-
-      query = @query.downcase
-      destinations.select { |recording| moveable_label_for(recording).downcase.include?(query) }
-    end
-
-    def excluded_destination_ids
-      [@recording.id, *descendant_ids(@recording)]
-    end
-
-    def descendant_ids(recording)
-      descendants = []
-      frontier = [recording.id]
-
-      until frontier.empty?
-        children = RecordingStudio::Recording.where(parent_recording_id: frontier).pluck(:id)
-        descendants.concat(children)
-        frontier = children
-      end
-
-      descendants
-    end
-
-    def allowed_parent_types
-      options = RecordingStudio.capability_options(:movable, for_type: @recording.recordable_type) || {}
-      Array(options[:allowed_parent_types]).map(&:to_s)
-    end
-
     def find_destination!(destination_id)
       destination = RecordingStudio::Recording.find(destination_id)
-      unless filtered_destinations.map(&:id).include?(destination.id)
+      unless destination_search.allowed_destination?(destination)
         raise RecordingStudio::AccessDenied, "Destination is not allowed for this move"
       end
 
       destination
+    end
+
+    def destination_search
+      @destination_search ||= RecordingStudio::Moveable::DestinationSearch.new(
+        actor: Current.actor,
+        source: @recording,
+        impersonator: resolve_impersonator
+      )
     end
 
     def move_metadata

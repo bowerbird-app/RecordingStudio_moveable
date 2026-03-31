@@ -21,6 +21,7 @@
     <% if !Rails.env.test? && Rails.root.join("app/assets/builds/tailwind.css").exist? %>
       <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <% end %>
+    <%= recording_studio_moveable_meta_tags %>
     <%= javascript_importmap_tags %>
   </head>
 
@@ -53,5 +54,7 @@
         </main>
       <% end %>
     <% end %>
+
+    <%= recording_studio_moveable_modal_template %>
   </body>
 </html>
