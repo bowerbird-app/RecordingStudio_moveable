@@ -1,204 +1,192 @@
 <div class="max-w-4xl mx-auto px-6 py-12">
-  <!-- Header -->
-  <div class="mb-12">
-    <h1 class="text-4xl font-bold text-[var(--ma-color-text)] mb-3">
-      🎉 GemTemplate Engine
-    </h1>
-    <p class="text-lg text-[var(--ma-color-muted)]">
-      Your Rails mountable engine is running successfully!
-    </p>
-  </div>
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "GemTemplate Engine",
+    subtitle: "Your Rails mountable engine is running successfully!",
+    variant: :h1
+  ) %>
 
-  <!-- Grid of Cards -->
-  <div class="grid gap-6 mb-6">
-    <!-- What's Working Card -->
-    <div class="bg-[var(--ma-color-bg)] border border-gray-200 dark:border-gray-700 rounded-[var(--ma-radius-lg)] shadow-[var(--ma-shadow-card)] overflow-hidden">
-      <div class="p-6">
-        <h2 class="text-lg font-semibold text-[var(--ma-color-text)] mb-4">
-          ✅ What's Working
-        </h2>
-        <ul class="space-y-2.5 text-sm text-[var(--ma-color-text)]">
-          <li class="flex items-start">
-            <span class="text-green-600 mr-2">✓</span>
+  <%= render FlatPack::Grid::Component.new(cols: 1, gap: :lg, align: :stretch) do %>
+    <%= render FlatPack::Card::Component.new(style: :elevated) do |card| %>
+      <% card.header do %>
+        <%= render FlatPack::SectionTitle::Component.new(title: "What's Working", class: "my-0") %>
+      <% end %>
+
+      <% card.body do %>
+        <%= render FlatPack::List::Component.new(spacing: :dense) do %>
+          <%= render FlatPack::List::Item.new do %>
             Rails Engine mounted and operational
-          </li>
-          <li class="flex items-start">
-            <span class="text-green-600 mr-2">✓</span>
+          <% end %>
+          <%= render FlatPack::List::Item.new do %>
             PostgreSQL with UUID primary keys
-          </li>
-          <li class="flex items-start">
-            <span class="text-green-600 mr-2">✓</span>
-            TailwindCSS styling (Auto rebuilds. See below)
-          </li>
-          <li class="flex items-start">
-            <span class="text-green-600 mr-2">✓</span>
-            Codespace environment automatically setups dummy app on build
-          </li>
-        </ul>
-      </div>
-    </div>
+          <% end %>
+          <%= render FlatPack::List::Item.new do %>
+            TailwindCSS styling with automatic rebuild support
+          <% end %>
+          <%= render FlatPack::List::Item.new do %>
+            Codespace environment automatically sets up the dummy app on build
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
 
-    <!-- Rename Your Gem Card -->
-    <div class="bg-[var(--ma-color-bg)] border border-gray-200 dark:border-gray-700 rounded-[var(--ma-radius-lg)] shadow-[var(--ma-shadow-card)] overflow-hidden">
-      <div class="p-6">
-        <h2 class="text-lg font-semibold text-[var(--ma-color-text)] mb-3">
-          🚀 Next Steps: Rename Your Gem
-        </h2>
-        <ul class="space-y-2.5 text-sm text-[var(--ma-color-text)]">
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span>This gem is currently named <code class="px-2 py-0.5 bg-[var(--ma-color-bg-soft)] text-[var(--ma-color-accent)] rounded-[var(--ma-radius-sm)] text-xs font-mono">gem_template</code></span>
-          </li>
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span>Run <code class="px-2 py-0.5 bg-[var(--ma-color-bg-soft)] text-[var(--ma-color-accent)] rounded-[var(--ma-radius-sm)] text-xs font-mono">bin/rename_gem your_gem_name</code> to rename it</span>
-          </li>
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span>Or ask AI: <em class="text-[var(--ma-color-muted)]">"Rename this gem to my_engine using the rename script"</em></span>
-          </li>
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span>See <code class="px-2 py-0.5 bg-[var(--ma-color-bg-soft)] text-[var(--ma-color-accent)] rounded-[var(--ma-radius-sm)] text-xs font-mono">docs/RENAMING.md</code> for details</span>
-          </li>
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span>Verify: run tests and check the dummy app starts</span>
-          </li>
-        </ul>
-      </div>
-    </div>
+    <%= render FlatPack::Card::Component.new(style: :elevated) do |card| %>
+      <% card.header do %>
+        <%= render FlatPack::SectionTitle::Component.new(title: "Next Steps: Rename Your Gem", class: "my-0") %>
+      <% end %>
 
-    <!-- Tailwind CSS Card -->
-    <div class="bg-[var(--ma-color-bg)] border border-gray-200 dark:border-gray-700 rounded-[var(--ma-radius-lg)] shadow-[var(--ma-shadow-card)] overflow-hidden">
-      <div class="p-6">
-        <h2 class="text-lg font-semibold text-[var(--ma-color-text)] mb-3">
-          🎨 Tailwind CSS
-        </h2>
-        <ul class="space-y-2.5 text-sm text-[var(--ma-color-text)]">
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span>CSS is prebuilt when Codespaces starts</span>
-          </li>
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span>Tailwind auto-rebuilds if you start the server with <code class="px-2 py-0.5 bg-[var(--ma-color-bg-soft)] text-[var(--ma-color-accent)] rounded-[var(--ma-radius-sm)] text-xs font-mono">cd test/dummy && bin/dev</code> (See test/dummy/Procfile.dev)</span>
-          </li>
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span>In production, the parent app's Tailwind build compiles the gem's styles — run <code class="px-2 py-0.5 bg-[var(--ma-color-bg-soft)] text-[var(--ma-color-accent)] rounded-[var(--ma-radius-sm)] text-xs font-mono">rails g gem_template:install</code> to automatically add the gem's view paths to the parent's Tailwind config</span>
-          </li>
-        </ul>
-      </div>
-    </div>
+      <% card.body do %>
+        <div class="space-y-4">
+          <%= render FlatPack::Alert::Component.new(
+            style: :info,
+            title: "Current gem name",
+            description: "This template is still named gem_template."
+          ) %>
 
-    <!-- Style Guide - FlatPack Card -->
-    <div class="bg-[var(--ma-color-bg)] border border-gray-200 dark:border-gray-700 rounded-[var(--ma-radius-lg)] shadow-[var(--ma-shadow-card)] overflow-hidden">
-      <div class="p-6">
-        <h2 class="text-lg font-semibold text-[var(--ma-color-text)] mb-3">
-          💄 UI Components - FlatPack
-        </h2>
-        <p class="text-sm text-[var(--ma-color-text)] mb-4">
-          This template includes the <strong>FlatPack</strong> gem — a modern Rails 8 UI component library built with ViewComponent, Tailwind CSS, and Hotwire. Features include form components, cards, buttons, tables, and more.
-        </p>
-        <div class="space-y-4 text-sm">
-          <div>
-            <p class="font-medium text-[var(--ma-color-text)] mb-1.5">🎨 Customize Your Theme:</p>
-            <p class="text-[var(--ma-color-muted)] ml-6">
-              FlatPack uses CSS variables for theming. Customize colors, spacing, and design tokens in your application's Tailwind configuration. Changes apply across all components automatically.
-            </p>
-          </div>
-          <div>
-            <p class="font-medium text-[var(--ma-color-text)] mb-1.5">🌙 Dark Mode Support:</p>
-            <p class="text-[var(--ma-color-muted)] ml-6">
-              System preference-driven dark mode works out of the box — no toggle required. Components automatically adapt to light and dark themes.
-            </p>
-          </div>
-          <div>
-            <p class="font-medium text-[var(--ma-color-text)] mb-1.5">🧩 Component Library:</p>
-            <p class="text-[var(--ma-color-muted)] ml-6">
-              Includes buttons, cards, forms (text, email, password, search inputs), tables, alerts, badges, and more. All components are ViewComponent-based, type-safe, and testable.
-            </p>
-          </div>
+          <%= render FlatPack::List::Component.new(ordered: true, spacing: :dense) do %>
+            <%= render FlatPack::List::Item.new do %>
+              Run <code>bin/rename_gem your_gem_name</code> to rename the gem.
+            <% end %>
+            <%= render FlatPack::List::Item.new do %>
+              Or ask AI to rename the gem using the rename script.
+            <% end %>
+            <%= render FlatPack::List::Item.new do %>
+              See <code>docs/RENAMING.md</code> for the full rename workflow.
+            <% end %>
+            <%= render FlatPack::List::Item.new do %>
+              Verify the rename by running tests and checking that the dummy app boots.
+            <% end %>
+          <% end %>
         </div>
-      </div>
-      <div class="px-6 py-4 bg-[var(--ma-color-bg-soft)] border-t border-gray-200 dark:border-gray-700">
-        <a href="https://github.com/bowerbird-app/flatpack" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-[var(--ma-color-brand)] rounded-[var(--ma-radius-md)] hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--ma-color-brand)] transition-opacity">
-          View FlatPack Documentation →
-        </a>
-      </div>
-    </div>
+      <% end %>
+    <% end %>
 
-    <!-- Installing in a Rails App Card -->
-    <div class="bg-[var(--ma-color-bg)] border border-gray-200 dark:border-gray-700 rounded-[var(--ma-radius-lg)] shadow-[var(--ma-shadow-card)] overflow-hidden">
-      <div class="p-6">
-        <h2 class="text-lg font-semibold text-[var(--ma-color-text)] mb-3">
-          📦 Installing in a Rails App
-        </h2>
-        <p class="text-sm text-[var(--ma-color-muted)] mb-4">
-          This gem includes an install generator to set up everything automatically:
-        </p>
-        <ol class="space-y-2.5 text-sm text-[var(--ma-color-text)] list-decimal list-inside mb-4">
-          <li>Add the gem to your app's <code class="px-2 py-0.5 bg-[var(--ma-color-bg-soft)] text-[var(--ma-color-accent)] rounded-[var(--ma-radius-sm)] text-xs font-mono">Gemfile</code> and run <code class="px-2 py-0.5 bg-[var(--ma-color-bg-soft)] text-[var(--ma-color-accent)] rounded-[var(--ma-radius-sm)] text-xs font-mono">bundle install</code></li>
-          <li>Run <code class="px-2 py-0.5 bg-[var(--ma-color-bg-soft)] text-[var(--ma-color-accent)] rounded-[var(--ma-radius-sm)] text-xs font-mono">rails generate gem_template:install</code></li>
-        </ol>
-        <p class="text-sm font-medium text-[var(--ma-color-text)] mb-2">The generator will:</p>
-        <ul class="space-y-2.5 text-sm text-[var(--ma-color-text)]">
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span>Mount the engine at <code class="px-2 py-0.5 bg-[var(--ma-color-bg-soft)] text-[var(--ma-color-accent)] rounded-[var(--ma-radius-sm)] text-xs font-mono">/gem_template</code> in your routes</span>
-          </li>
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span>Configure Tailwind CSS to include the gem's views (if Tailwind is detected)</span>
-          </li>
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span>Display post-installation instructions</span>
-          </li>
-        </ul>
-      </div>
-    </div>
+    <%= render FlatPack::Card::Component.new(style: :elevated) do |card| %>
+      <% card.header do %>
+        <%= render FlatPack::SectionTitle::Component.new(title: "Tailwind CSS", class: "my-0") %>
+      <% end %>
 
-    <!-- Template Features Card -->
-    <div class="bg-[var(--ma-color-bg)] border border-gray-200 dark:border-gray-700 rounded-[var(--ma-radius-lg)] shadow-[var(--ma-shadow-card)] overflow-hidden">
-      <div class="p-6">
-        <h2 class="text-lg font-semibold text-[var(--ma-color-text)] mb-4">
-          ⚡ Template Features
-        </h2>
-        <ul class="space-y-3 text-sm text-[var(--ma-color-text)]">
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span><strong class="font-semibold">Rename Script</strong> — Run <code class="px-2 py-0.5 bg-[var(--ma-color-bg-soft)] text-[var(--ma-color-accent)] rounded-[var(--ma-radius-sm)] text-xs font-mono">bin/rename_gem your_gem_name</code> to rename the entire gem (files, classes, modules, and references)</span>
-          </li>
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span><strong class="font-semibold">Engine Hooks</strong> — Customize engine behavior from your host app with lifecycle hooks (<code class="px-2 py-0.5 bg-[var(--ma-color-bg-soft)] text-[var(--ma-color-accent)] rounded-[var(--ma-radius-sm)] text-xs font-mono">before_initialize</code>, <code class="px-2 py-0.5 bg-[var(--ma-color-bg-soft)] text-[var(--ma-color-accent)] rounded-[var(--ma-radius-sm)] text-xs font-mono">after_initialize</code>), service hooks, and model/controller extensions</span>
-          </li>
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span><strong class="font-semibold">Service Objects</strong> — Business logic encapsulated in services with Result monad pattern for clean success/failure handling</span>
-          </li>
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span><strong class="font-semibold">Install Generator</strong> — Run <code class="px-2 py-0.5 bg-[var(--ma-color-bg-soft)] text-[var(--ma-color-accent)] rounded-[var(--ma-radius-sm)] text-xs font-mono">rails g gem_template:install</code> to mount the engine, create config initializer, and configure Tailwind</span>
-          </li>
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span><strong class="font-semibold">Migrations Generator</strong> — Run <code class="px-2 py-0.5 bg-[var(--ma-color-bg-soft)] text-[var(--ma-color-accent)] rounded-[var(--ma-radius-sm)] text-xs font-mono">rails g gem_template:migrations</code> to copy engine migrations to your host app</span>
-          </li>
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span><strong class="font-semibold">Configuration DSL</strong> — Simple configuration API with YAML and initializer support</span>
-          </li>
-          <li class="flex items-start">
-            <span class="mr-2">•</span>
-            <span><strong class="font-semibold">UUID Primary Keys</strong> — PostgreSQL UUIDs out of the box for all models</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
+      <% card.body do %>
+        <%= render FlatPack::List::Component.new(spacing: :dense) do %>
+          <%= render FlatPack::List::Item.new do %>
+            CSS is prebuilt when Codespaces starts.
+          <% end %>
+          <%= render FlatPack::List::Item.new do %>
+            Tailwind auto-rebuilds if you start the server with <code>cd test/dummy && bin/dev</code>.
+          <% end %>
+          <%= render FlatPack::List::Item.new do %>
+            In production, run <code>rails g gem_template:install</code> to add the gem view paths to the parent app Tailwind configuration.
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <%= render FlatPack::Card::Component.new(style: :elevated) do |card| %>
+      <% card.header do %>
+        <%= render FlatPack::SectionTitle::Component.new(title: "UI Components - FlatPack", class: "my-0") %>
+      <% end %>
+
+      <% card.body do %>
+        <div class="space-y-4">
+          <%= render FlatPack::Alert::Component.new(
+            style: :info,
+            title: "FlatPack is included",
+            description: "This template ships with FlatPack, a Rails 8 ViewComponent library for forms, cards, buttons, tables, alerts, badges, and other app UI primitives."
+          ) %>
+
+          <%= render FlatPack::List::Component.new(divider: true, spacing: :dense) do %>
+            <%= render FlatPack::List::Item.new do %>
+              <strong>Customize your theme:</strong> FlatPack uses CSS variables for theming, so color and spacing changes apply across components automatically.
+            <% end %>
+            <%= render FlatPack::List::Item.new do %>
+              <strong>Dark mode support:</strong> Components automatically adapt to system light and dark themes.
+            <% end %>
+            <%= render FlatPack::List::Item.new do %>
+              <strong>Component library:</strong> The included set covers buttons, cards, forms, tables, alerts, badges, and more.
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% card.footer do %>
+        <%= render FlatPack::Button::Component.new(
+          text: "View FlatPack Documentation",
+          style: :primary,
+          size: :sm,
+          url: "https://github.com/bowerbird-app/flatpack",
+          target: "_blank"
+        ) %>
+      <% end %>
+    <% end %>
+
+    <%= render FlatPack::Card::Component.new(style: :elevated) do |card| %>
+      <% card.header do %>
+        <%= render FlatPack::SectionTitle::Component.new(title: "Installing in a Rails App", class: "my-0") %>
+      <% end %>
+
+      <% card.body do %>
+        <div class="space-y-4">
+          <%= render FlatPack::Alert::Component.new(
+            style: :info,
+            title: "Install generator included",
+            description: "This gem includes an install generator to wire everything up automatically."
+          ) %>
+
+          <%= render FlatPack::List::Component.new(ordered: true, spacing: :dense) do %>
+            <%= render FlatPack::List::Item.new do %>
+              Add the gem to your app's <code>Gemfile</code> and run <code>bundle install</code>.
+            <% end %>
+            <%= render FlatPack::List::Item.new do %>
+              Run <code>rails generate gem_template:install</code>.
+            <% end %>
+          <% end %>
+
+          <%= render FlatPack::List::Component.new(divider: true, spacing: :dense) do %>
+            <%= render FlatPack::List::Item.new do %>
+              Mount the engine at <code>/gem_template</code> in your routes.
+            <% end %>
+            <%= render FlatPack::List::Item.new do %>
+              Configure Tailwind CSS to include the gem views when Tailwind is detected.
+            <% end %>
+            <%= render FlatPack::List::Item.new do %>
+              Display post-installation instructions.
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <%= render FlatPack::Card::Component.new(style: :elevated) do |card| %>
+      <% card.header do %>
+        <%= render FlatPack::SectionTitle::Component.new(title: "Template Features", class: "my-0") %>
+      <% end %>
+
+      <% card.body do %>
+        <%= render FlatPack::List::Component.new(divider: true, spacing: :dense) do %>
+          <%= render FlatPack::List::Item.new do %>
+            <strong>Rename Script</strong> — Run <code>bin/rename_gem your_gem_name</code> to rename files, classes, modules, and references.
+          <% end %>
+          <%= render FlatPack::List::Item.new do %>
+            <strong>Engine Hooks</strong> — Customize engine behavior from the host app with lifecycle, service, model, and controller hooks.
+          <% end %>
+          <%= render FlatPack::List::Item.new do %>
+            <strong>Service Objects</strong> — Business logic is encapsulated in services with a Result-style success and failure flow.
+          <% end %>
+          <%= render FlatPack::List::Item.new do %>
+            <strong>Install Generator</strong> — Run <code>rails g gem_template:install</code> to mount the engine, add configuration, and set up Tailwind.
+          <% end %>
+          <%= render FlatPack::List::Item.new do %>
+            <strong>Migrations Generator</strong> — Run <code>rails g gem_template:migrations</code> to copy engine migrations into the host app.
+          <% end %>
+          <%= render FlatPack::List::Item.new do %>
+            <strong>Configuration DSL</strong> — A simple API supports configuration through YAML and initializers.
+          <% end %>
+          <%= render FlatPack::List::Item.new do %>
+            <strong>UUID Primary Keys</strong> — PostgreSQL UUIDs are available out of the box for models.
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
 </div>
 
 

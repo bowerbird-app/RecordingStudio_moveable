@@ -8,11 +8,23 @@ class ConfigurationTest < Minitest::Test
   end
 
   def test_merge_updates_known_attributes
-    @configuration.merge!(api_key: "abc123", timeout: 9, enable_feature_x: true)
+    @configuration.merge!(
+      api_key: "abc123",
+      timeout: 9,
+      enable_feature_x: true,
+      move_modal_prefetch_enabled: false,
+      move_modal_prefetch_delay_ms: 150,
+      move_modal_prefetch_ttl_ms: 20_000,
+      move_modal_reuse_shell: false
+    )
 
     assert_equal "abc123", @configuration.api_key
     assert_equal 9, @configuration.timeout
     assert_equal true, @configuration.enable_feature_x
+    assert_equal false, @configuration.move_modal_prefetch_enabled
+    assert_equal 150, @configuration.move_modal_prefetch_delay_ms
+    assert_equal 20_000, @configuration.move_modal_prefetch_ttl_ms
+    assert_equal false, @configuration.move_modal_reuse_shell
   end
 
   def test_merge_ignores_unknown_keys
@@ -42,6 +54,13 @@ class ConfigurationTest < Minitest::Test
 
     assert_equal 2, result.fetch(:hooks_registered).fetch(:before_initialize)
     assert_equal 1, result.fetch(:hooks_registered).fetch(:after_service)
+  end
+
+  def test_move_modal_configuration_defaults
+    assert_equal true, @configuration.move_modal_prefetch_enabled
+    assert_equal 80, @configuration.move_modal_prefetch_delay_ms
+    assert_equal 10_000, @configuration.move_modal_prefetch_ttl_ms
+    assert_equal true, @configuration.move_modal_reuse_shell
   end
 
   def test_configure_without_block_is_safe

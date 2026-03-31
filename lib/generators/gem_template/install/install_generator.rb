@@ -15,6 +15,30 @@ module GemTemplate
         template "gem_template_initializer.rb", "config/initializers/gem_template.rb"
       end
 
+      def add_javascript_import
+        javascript_path = Rails.root.join("app/javascript/application.js")
+
+        unless File.exist?(javascript_path)
+          say(
+            "JavaScript entrypoint not found. Add `import \"recording_studio_moveable\"` " \
+            "to your app entrypoint to enable modal links.",
+            :yellow
+          )
+          return
+        end
+
+        javascript_content = File.read(javascript_path)
+        import_line = 'import "recording_studio_moveable"'
+
+        if javascript_content.include?(import_line)
+          say "RecordingStudio Moveable JavaScript already imported.", :green
+          return
+        end
+
+        append_to_file javascript_path, "\n#{import_line}\n"
+        say "Added RecordingStudio Moveable JavaScript import.", :green
+      end
+
       def add_yaml_config
         return unless yes?("Would you like to add `config/gem_template.yml` for environment-specific settings? [y/N]")
 

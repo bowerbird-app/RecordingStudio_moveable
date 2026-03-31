@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   # Keep legacy links working by redirecting the base path to the app home.
   get "/recording_studio", to: redirect("/"), as: nil
   mount RecordingStudio::Engine, at: "/recording_studio"
+  mount RecordingStudioMoveable::Engine, at: "/recording_studio_moveable", as: :recording_studio_moveable
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -18,4 +19,13 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   root "home#index"
+
+  get "docs/moveable", to: "moveable_docs#show", as: :moveable_docs
+
+  resources :recordings, only: :index
+  resources :folder_recordables, only: :index
+  resources :page_recordables, only: :index
+  resources :events, only: :index
+  resources :recording_studio_folders, only: :show
+  resources :recording_studio_pages, only: :show
 end

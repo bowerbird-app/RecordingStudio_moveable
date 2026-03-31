@@ -1,131 +1,160 @@
-# GemTemplate
+# RecordingStudio Moveable Addon
 
-Gem template with RecordingStudio already setup. Use for extending RecordingStudio.
+`RecordingStudio_moveable` extracts move behavior from legacy RecordingStudio built-ins into an addon-owned implementation.
 
-## What's Included
+## What this addon provides
 
-- **RecordingStudio** gem installed and configured
-- **Devise** authentication with a pre-seeded admin user
-- **Workspace** root recording set up following RecordingStudio's Quick Start pattern
-- **FlatPack** UI component library for all views
-- **Dummy app** (`test/dummy/`) with a working login screen and FlatPack default sidebar layout for authenticated pages
+- Addon-owned capability module with addon-facing naming:
+  - `RecordingStudio::Capabilities::Moveable.to(*types)` (preferred)
+  - `RecordingStudio::Capabilities::Movable.to(*types)` (compat alias)
+- `move_to!` behavior equivalent to legacy `movable` behavior:
+  - must remain in same root
+  - cannot move under itself or descendants
+  - destination type must be in `allowed_parent_types`
+  - logs event metadata with `from_parent_id` and `to_parent_id`
+  - supports `actor`, optional `impersonator`, optional `metadata`
+- Authorization modes:
+  - **Built-in mode (default):** uses `RecordingStudio::Services::AccessCheck` and raises `RecordingStudio::AccessDenied` on failures
+  - **Custom hook mode:** disable built-in mode and provide your own `authorization_hook`
+- Gem-provided reusable move UI:
+  - full-page mode
+  - modal mode
+  - destination search (uses `FlatPack::SearchInput::Component` when available, plain input fallback)
+  - only shows destinations that pass gem-owned move visibility checks
+  - returns not found for inaccessible source recordings
+  - move action redirects to root page with success flash
 
-## Quick Start
+## Installation
 
-### GitHub Codespaces (Recommended)
-
-1. Click **Code** → **Codespaces** → **Create codespace**
-2. Wait for setup to complete
-3. Run:
-   ```bash
-   cd test/dummy
-   bin/rails db:setup
-   bin/dev
-   ```
-4. Open port 3000 — you'll see the login screen
-
-The dummy app already includes FlatPack generator output (`flat_pack:install` and default sidebar layout scaffold) so authenticated pages render with the FlatPack sidebar shell by default.
-
-### Login Credentials
-
-| Field    | Value             |
-|----------|-------------------|
-| Email    | admin@admin.com   |
-| Password | Password          |
-
-The login form is prefilled with these credentials for fast access.
-
-## Architecture
-
-### Root Recording Pattern
-
-This template follows RecordingStudio's root recording pattern:
-
-- **Workspace** is the top-level recordable
-- A root `RecordingStudio::Recording` wraps the Workspace
-- The admin user has root-level admin access via `RecordingStudio::Access`
-- `Current.actor` is set from `current_user` (Devise) in `ApplicationController`
-
-### Extending RecordingStudio
-
-To add new recordable types:
-
-1. Create your model (e.g., `Page`, `Comment`)
-2. Register it in `config/initializers/recording_studio.rb`:
-   ```ruby
-   RecordingStudio.configure do |config|
-     config.recordable_types = ["Workspace", "YourNewType"]
-   end
-   ```
-3. Leave optional behavior off by default, then opt into capabilities on the specific recordable models that need them:
-   ```ruby
-   class YourNewType < ApplicationRecord
-     include RecordingStudio::Capabilities::Movable.to("Workspace")
-     include RecordingStudio::Capabilities::Copyable.to("Workspace")
-   end
-   ```
-4. If you want per-device root persistence, wire it explicitly in your controller layer:
-   ```ruby
-   class ApplicationController < ActionController::Base
-     include RecordingStudio::Concerns::DeviceSessionConcern
-   end
-   ```
-5. Create recordings under the root:
-   ```ruby
-   root_recording.record(YourNewType) do |record|
-     record.title = "Example"
-   end
-   ```
-
-### Capabilities
-
-This template uses the current RecordingStudio approach: built-in capabilities are off by default and are enabled per recordable type by including the relevant module on the model.
-
-- `movable`
-- `copyable`
-
-Device session persistence is separate from capabilities. It is enabled only when you include `RecordingStudio::Concerns::DeviceSessionConcern` in your controller layer.
-
-Enable behavior intentionally where it belongs:
+Add to your Gemfile:
 
 ```ruby
-class RecordingStudioPage < ApplicationRecord
-  include RecordingStudio::Capabilities::Movable.to("Workspace")
-  include RecordingStudio::Capabilities::Copyable.to("Workspace")
+gem "recording_studio_moveable"
+```
+
+Then bundle install and mount the engine UI routes:
+
+```ruby
+# config/routes.rb
+mount RecordingStudioMoveable::Engine, at: "/recording_studio_moveable", as: :recording_studio_moveable
+```
+
+Add the engine JavaScript to your app entrypoint so modal links work out of the box:
+
+```js
+import "recording_studio_moveable"
+```
+
+## Capability usage
+
+Include move capability on recordable models and define allowed parent types:
+
+```ruby
+class RecordingStudioFolder < ApplicationRecord
+  include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder")
 end
 
-class ApplicationController < ActionController::Base
-  include RecordingStudio::Concerns::DeviceSessionConcern
+class RecordingStudioPage < ApplicationRecord
+  include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder")
 end
 ```
 
-### FlatPack UI Components
+### Migration note from legacy built-in gate
 
-All views use FlatPack ViewComponents. Available components include:
+This addon registers `:movable` without a legacy feature gate so it can continue working even when legacy move built-in is disabled.
 
-- `FlatPack::Button::Component` — Buttons (`:primary`, `:secondary`, `:ghost`)
-- `FlatPack::Card::Component` — Cards (`:default`, `:elevated`, `:outlined`)
-- `FlatPack::Alert::Component` — Alerts (`:success`, `:error`, `:warning`, `:info`)
-- `FlatPack::Badge::Component` — Status badges
-- `FlatPack::Table::Component` — Data tables
-- `FlatPack::TextInput::Component`, `EmailInput`, `PasswordInput` — Form inputs
-- `FlatPack::Breadcrumb::Component` — Navigation breadcrumbs
-- `FlatPack::Navbar::Component` — Navigation sidebar
+## Authorization configuration
 
-See the [FlatPack README](https://github.com/bowerbird-app/flatpack) for full documentation.
+### Default (built-in) mode
 
-## Tech Stack
+No extra setup required. In this mode:
 
-| Component       | Version |
-|-----------------|---------|
-| Ruby            | 3.3+    |
-| Rails           | 8.1+    |
-| PostgreSQL      | 16      |
-| TailwindCSS     | 4       |
-| RecordingStudio | latest  |
-| FlatPack        | 0.1.2 (latest, from `bowerbird-app/flatpack`) |
-| Devise          | latest  |
+- source requires `:edit`
+- destination requires `:edit`
+- move UI source visibility requires `:edit`
+- move UI only lists destinations the actor can move into
+- failures raise `RecordingStudio::AccessDenied`
 
-## Documentation
+### Custom authorization hook mode
 
-The original gem template documentation is preserved in `docs/gem_template/` as architectural reference material.
+```ruby
+RecordingStudio::Moveable.configure do |config|
+  config.use_builtin_access = false
+  config.authorization_hook = lambda do |actor:, source:, destination:, impersonator:, metadata:|
+    actor.present? && source.root_recording_id == destination.root_recording_id
+  end
+end
+```
+
+If your hook returns false, move is denied with `RecordingStudio::AccessDenied`.
+
+The same authorization layer is also used by the move UI. In custom hook mode:
+
+- the source recording must pass the hook before the move screen is rendered
+- each listed destination must pass the hook
+- inaccessible source recordings return not found instead of rendering the move screen
+
+## UI usage examples
+
+### Full page
+
+```erb
+<%= link_to "Move", recording_studio_moveable.move_recording_path(recording_id: recording.id) %>
+```
+
+### Modal mode
+
+```erb
+<%= link_to "Move", recording_studio_moveable.move_recording_path(recording_id: recording.id), data: { recording_studio_moveable_modal: true } %>
+```
+
+The modal shell is rendered on demand by the gem. Host pages do not need to preload a FlatPack modal container.
+
+## Move UI access rules
+
+The addon enforces access checks inside the gem-owned move controller.
+
+- The move screen only renders when the current actor can access the source recording under the addon authorization policy.
+- Inaccessible sources return not found so the UI does not disclose record titles or available actions.
+- Destination lists are filtered through the same gem authorization layer that protects `move_to!`.
+- The write path still re-checks authorization inside `move_to!`; UI filtering is not the only enforcement layer.
+
+## Dummy app demo
+
+The dummy app includes:
+
+- `Workspace` root recordable
+- `RecordingStudioFolder` and `RecordingStudioPage` (move-enabled)
+- `RecordingStudioArchiveBox` (disallowed destination type demo)
+- routes/controllers/views to demonstrate move full-page and modal flows
+
+### Seed reset instructions
+
+From `test/dummy`:
+
+```bash
+bin/rails db:seed
+```
+
+Optional hard reset:
+
+```bash
+bin/rails db:drop db:create db:migrate db:seed
+```
+
+Seeds are idempotent and create substantial folders/pages for destination search demos.
+
+## Tests added
+
+- capability behavior
+  - allowed/disallowed destination
+  - same-root enforcement
+  - self/descendant protection
+  - move event metadata
+- authorization modes
+  - built-in access mode
+  - custom hook mode
+- UI behavior
+  - full page and modal rendering
+  - destination filtering
+  - move action redirect + flash
