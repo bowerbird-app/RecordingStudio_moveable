@@ -53,15 +53,18 @@ module GemTemplate
     end
 
     def moveable_picker_item_for(recording)
+      recording_id = recording.id
+      label = moveable_label_for(recording)
+
       {
-        id: recording.id,
+        id: recording_id,
         kind: "record",
-        name: moveable_label_for(recording),
-        label: moveable_label_for(recording),
+        name: label,
+        label: label,
         description: moveable_parent_label_for(recording),
         badge: moveable_type_for(recording),
-        meta: "ID #{recording.id}",
-        payload: { id: recording.id }
+        meta: "ID #{recording_id}",
+        payload: { id: recording_id }
       }
     end
   end
