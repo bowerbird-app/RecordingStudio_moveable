@@ -100,6 +100,58 @@
 
   <section class="space-y-4">
     <%= render FlatPack::SectionTitle::Component.new(
+      title: "Where the UI redirects after a move",
+      anchor_link: true,
+      anchor_id: "where-the-ui-redirects-after-a-move",
+      class: "my-0"
+    ) %>
+
+    <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
+      <% card.body do %>
+        <div class="space-y-4">
+          <%= render FlatPack::Alert::Component.new(
+            style: :info,
+            title: "Post-move redirects are configurable.",
+            description: "Use a safe redirect_to URL for an explicit destination, or redirect_mode for first-class modes like previous_page, moved_record, destination, and root."
+          ) %>
+
+          <%= render FlatPack::CodeBlock::Component.new(
+            snippets: [
+              {
+                label: "Ruby",
+                language: "ruby",
+                code: <<~CODE
+                  RecordingStudio::Moveable.configure do |config|
+                    config.default_redirect_mode = :moved_record
+                  end
+
+                  recording_studio_moveable.move_recording_path(
+                    recording_id: @recording.id,
+                    redirect_mode: "destination"
+                  )
+                CODE
+              }
+            ]
+          ) %>
+
+          <%= render FlatPack::List::Component.new(divider: true, spacing: :dense) do %>
+            <%= render FlatPack::List::Item.new do %>
+              <strong>redirect_to wins first:</strong> if you pass a same-origin <code>redirect_to</code>, the move action uses it.
+            <% end %>
+            <%= render FlatPack::List::Item.new do %>
+              <strong>redirect_mode is the first-class fallback:</strong> choose <code>previous_page</code>, <code>moved_record</code>, <code>destination</code>, or <code>root</code>.
+            <% end %>
+            <%= render FlatPack::List::Item.new do %>
+              <strong>Custom routes are supported:</strong> if your host app needs non-standard URLs, provide <code>config.redirect_resolver</code>.
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+  </section>
+
+  <section class="space-y-4">
+    <%= render FlatPack::SectionTitle::Component.new(
       title: "Other guardrails",
       anchor_link: true,
       anchor_id: "other-guardrails",

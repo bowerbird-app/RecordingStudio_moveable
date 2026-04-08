@@ -1,0 +1,44 @@
+<div class="space-y-4">
+  <% if @display == :full_page %>
+    <%= render FlatPack::Breadcrumb::Component.new(
+      items: [{ text: "Back", href: move_back_path, icon: "chevron-left" }],
+      class: "mb-3"
+    ) %>
+  <% end %>
+
+  <%= render FlatPack::PageTitle::Component.new(
+    title: title,
+    class: "pb-0 mb-0"
+  ) %>
+</div>
+
+<div class="mt-4 max-w-3xl">
+  <%= render FlatPack::Picker::Component.new(
+    id: "move-destination-picker-#{@recording.id}",
+    items: moveable_picker_items_for(@destinations),
+    title: "",
+    class: "!border-0 !bg-transparent !shadow-none !rounded-none !p-0 sm:!p-0",
+    selection_mode: :single,
+    auto_confirm: true,
+    accepted_kinds: ["record"],
+    searchable: true,
+    search_placeholder: "Search destinations",
+    search_mode: :local,
+    results_layout: :list,
+    output_mode: :field,
+    modal: false,
+    empty_state_text: "No allowed destinations found. Try a different search term or review your move permissions.",
+    form: {
+      url: move_recording_path_for(
+        recording_id: @recording.id,
+        display: @display == :modal ? "modal" : "full_page",
+        redirect_to: @redirect_to,
+        redirect_mode: @redirect_mode,
+        q: @query.presence
+      ),
+      method: :post,
+      field: "destination_id",
+      value_mode: :id
+    }
+  ) %>
+</div>

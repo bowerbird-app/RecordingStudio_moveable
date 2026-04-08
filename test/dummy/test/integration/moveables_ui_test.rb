@@ -9,7 +9,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     @user = create_user(email: "ui@example.com")
     sign_in @user
 
-    _, @root = create_workspace_root
+    @workspace, @root = create_workspace_root
     grant_root_access(root: @root, actor: @user, role: :admin)
 
     @source_folder = @root.record(RecordingStudioFolder, actor: @user, parent_recording: @root) { |f| f.name = "Source" }
@@ -35,12 +35,13 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "aria-label=\"Breadcrumb\""
     assert_includes response.body, "Back"
     assert_includes response.body, %(href="/")
-    assert_includes response.body, "#icon-chevron-left"
+    assert_includes response.body, %(data-flat-pack--icon-name-value="chevron-left")
     assert_includes response.body, "Main navigation"
     assert_includes response.body, "Toggle sidebar"
     assert_includes response.body, "Search destinations"
     assert_includes response.body, %(data-controller="flat-pack--picker")
     assert_includes response.body, %(id="move-destination-picker-#{@page.id}")
+    assert_includes response.body, "!border-0 !bg-transparent !shadow-none !rounded-none !p-0 sm:!p-0"
     refute_includes response.body, "container mx-auto max-w-6xl px-4 pb-10 pt-6"
     refute_includes response.body, "Move item"
     refute_includes response.body, "Current location"
@@ -56,6 +57,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'data-recording-studio-moveable-modal-element="true"'
     assert_includes response.body, "Move Move Me to..."
     assert_includes response.body, %(data-controller="flat-pack--picker")
+    assert_includes response.body, "!border-0 !bg-transparent !shadow-none !rounded-none !p-0 sm:!p-0"
     refute_includes response.body, "Main navigation"
 
     get recording_studio_moveable.move_recording_path(recording_id: @page.id, display: "modal")
@@ -102,6 +104,53 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_equal @target_folder.id, @page.reload.parent_recording_id
   end
 
+  def test_full_page_move_can_follow_moved_record
+    expected_path = "/recording_studio_pages/#{@page.recordable.id}"
+
+    get recording_studio_moveable.move_recording_path(recording_id: @page.id, redirect_mode: "moved_record")
+
+    assert_response :success
+    assert_includes response.body, "redirect_mode=moved_record"
+
+    post recording_studio_moveable.move_recording_path(recording_id: @page.id), params: {
+      destination_id: @target_folder.id,
+      redirect_mode: "moved_record"
+    }
+
+    assert_redirected_to expected_path
+    assert_equal @target_folder.id, @page.reload.parent_recording_id
+  end
+
+  def test_full_page_move_can_follow_destination
+    expected_path = "/recording_studio_folders/#{@target_folder.recordable.id}"
+
+    get recording_studio_moveable.move_recording_path(recording_id: @page.id, redirect_mode: "destination")
+
+    assert_response :success
+    assert_includes response.body, "redirect_mode=destination"
+
+    post recording_studio_moveable.move_recording_path(recording_id: @page.id), params: {
+      destination_id: @target_folder.id,
+      redirect_mode: "destination"
+    }
+
+    assert_redirected_to expected_path
+    assert_equal @target_folder.id, @page.reload.parent_recording_id
+  end
+
+  def test_default_redirect_mode_can_follow_moved_record
+    RecordingStudio::Moveable.configure do |config|
+      config.default_redirect_mode = :moved_record
+    end
+
+    post recording_studio_moveable.move_recording_path(recording_id: @page.id), params: {
+      destination_id: @target_folder.id
+    }
+
+    assert_redirected_to "/recording_studio_pages/#{@page.recordable.id}"
+    assert_equal @target_folder.id, @page.reload.parent_recording_id
+  end
+
   def test_folder_show_hides_page_level_move_buttons_and_keeps_card_actions
     get recording_studio_folder_path(@source_folder.recordable)
 
@@ -109,7 +158,16 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Move folder"
     refute_includes response.body, "Move folder in modal"
     assert_includes response.body, ">Move<"
-    assert_includes response.body, "Move modal"
+    assert_includes response.body, ">Modal<"
+    assert_includes response.body, 'data-recording-studio-moveable-modal="true"'
+  end
+
+  def test_page_show_renders_page_level_move_buttons
+    get recording_studio_page_path(@page.recordable)
+
+    assert_response :success
+    assert_includes response.body, "Move (full page)"
+    assert_includes response.body, "Move (modal mode)"
     assert_includes response.body, 'data-recording-studio-moveable-modal="true"'
   end
 
@@ -117,11 +175,21 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     get recording_studio_moveable.move_recording_path(recording_id: @page.id)
 
     assert_response :success
-    assert_includes response.body, %(action="/recording_studio_moveable/move/#{@page.id}")
+    assert_includes response.body, %(/recording_studio_moveable/move/#{@page.id}?display=full_page)
     assert_includes response.body, %(data-flat-pack--picker-form-value=)
+    assert_includes response.body, %(data-flat-pack--picker-auto-confirm-value="true")
     assert_includes response.body, @target_folder.id.to_s
     assert_includes response.body, @target_folder.recordable.name
+    refute_includes response.body, "Move here"
+    refute_includes response.body, "Clear selection"
     refute_includes response.body, @archive.recordable.name
+
+    workspace_index = response.body.index(@workspace.name)
+    target_index = response.body.index(@target_folder.recordable.name)
+
+    assert workspace_index.present?, "Expected workspace root to be rendered as a destination"
+    assert target_index.present?, "Expected target folder to be rendered as a destination"
+    assert_operator workspace_index, :<, target_index, "Expected workspace root to appear before nested destinations"
   end
 
   def test_destination_search_filters_allowed_destinations
@@ -206,6 +274,19 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     }
 
     assert_redirected_to "/"
+    assert_equal @target_folder.id, @page.reload.parent_recording_id
+  end
+
+  def test_redirect_to_takes_precedence_over_redirect_mode
+    referer = recording_studio_folder_path(@source_folder.recordable)
+
+    post recording_studio_moveable.move_recording_path(recording_id: @page.id), params: {
+      destination_id: @target_folder.id,
+      redirect_to: referer,
+      redirect_mode: "moved_record"
+    }
+
+    assert_redirected_to referer
     assert_equal @target_folder.id, @page.reload.parent_recording_id
   end
 end

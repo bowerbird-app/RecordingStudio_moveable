@@ -1,0 +1,52 @@
+<div class="max-w-4xl mx-auto px-6 py-12">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "RecordingStudio Moveable",
+    subtitle: "The addon engine is mounted and ready to test.",
+    variant: :h1
+  ) %>
+
+  <%= render FlatPack::Grid::Component.new(cols: 1, gap: :lg, align: :stretch) do %>
+    <%= render FlatPack::Card::Component.new(style: :elevated) do |card| %>
+      <% card.header do %>
+        <%= render FlatPack::SectionTitle::Component.new(title: "Runtime Status", class: "my-0") %>
+      <% end %>
+
+      <% card.body do %>
+        <%= render FlatPack::List::Component.new(spacing: :dense) do %>
+          <%= render FlatPack::List::Item.new do %>
+            Engine mounted under the addon namespace
+          <% end %>
+          <%= render FlatPack::List::Item.new do %>
+            Move UI uses FlatPack components
+          <% end %>
+          <%= render FlatPack::List::Item.new do %>
+            Dummy app is wired for full-page and modal move flows
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <%= render FlatPack::Card::Component.new(style: :elevated) do |card| %>
+      <% card.header do %>
+        <%= render FlatPack::SectionTitle::Component.new(title: "Install Flow", class: "my-0") %>
+      <% end %>
+
+      <% card.body do %>
+        <%= render FlatPack::List::Component.new(ordered: true, spacing: :dense) do %>
+          <%= render FlatPack::List::Item.new do %>
+            Add the gem and bundle install.
+          <% end %>
+          <%= render FlatPack::List::Item.new do %>
+            Run <code>rails generate recording_studio_moveable:install</code>.
+          <% end %>
+          <%= render FlatPack::List::Item.new do %>
+            Mount <code>RecordingStudioMoveable::Engine</code> at <code>/recording_studio_moveable</code>.
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
+
+
+

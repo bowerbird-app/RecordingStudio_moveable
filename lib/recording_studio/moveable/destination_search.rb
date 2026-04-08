@@ -5,34 +5,39 @@ module RecordingStudio
     class DestinationSearch
       DEFAULT_LIMIT = 200
 
-      def initialize(actor:, source:, impersonator: nil, metadata: {})
+      def initialize(actor:, source:, impersonator: nil, metadata: {}, policy: nil)
         @actor = actor
         @source = source
         @impersonator = impersonator
         @metadata = metadata
+        @policy = policy
       end
 
       def results(query: nil, limit: DEFAULT_LIMIT)
         destinations = structurally_allowed_destinations
-        destinations = Authorization.filter_visible_destinations(
-          actor: actor,
-          source: source,
-          destinations: destinations,
-          impersonator: impersonator,
-          metadata: metadata
-        )
+        destinations = policy.filter_visible_destinations(destinations: destinations)
         destinations = filter_by_query(destinations, query)
+        destinations = promote_workspace_root(destinations)
 
         limit ? destinations.first(limit) : destinations
       end
 
       def allowed_destination?(destination)
-        results(limit: nil).any? { |candidate| candidate.id == destination.id }
+        structurally_allowed_destination?(destination) && policy.destination_selectable?(destination: destination)
       end
 
       private
 
       attr_reader :actor, :source, :impersonator, :metadata
+
+      def policy
+        @policy ||= RecordingStudio::Moveable::Policy.new(
+          actor: actor,
+          source: source,
+          impersonator: impersonator,
+          metadata: metadata
+        )
+      end
 
       def structurally_allowed_destinations
         RecordingStudio::Recording.where(root_recording_id: source.root_recording_id)
@@ -50,6 +55,12 @@ module RecordingStudio
 
       def excluded_destination_ids
         [source.id, *descendant_ids(source)]
+      end
+
+      def structurally_allowed_destination?(destination)
+        destination.root_recording_id == source.root_recording_id &&
+          allowed_parent_types.include?(destination.recordable_type.to_s) &&
+          excluded_destination_ids.exclude?(destination.id)
       end
 
       def descendant_ids(recording)
@@ -72,6 +83,13 @@ module RecordingStudio
         destinations.select do |recording|
           searchable_terms(recording).any? { |term| term.include?(normalized_query) }
         end
+      end
+
+      def promote_workspace_root(destinations)
+        root_destinations, nested_destinations = destinations.partition do |recording|
+          recording.parent_recording_id.blank?
+        end
+        root_destinations + nested_destinations
       end
 
       def searchable_terms(recording)

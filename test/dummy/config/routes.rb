@@ -21,10 +21,11 @@ Rails.application.routes.draw do
   root "home#index"
 
   get "docs/moveable", to: "moveable_docs#show", as: :moveable_docs
+  get "docs/access", to: "moveable_docs#access", as: :access_docs
+  get "docs/setup", to: "moveable_docs#setup", as: :setup_docs
+  get "docs/methods", to: "moveable_docs#methods", as: :methods_docs
+  get "docs/redirects", to: "moveable_docs#redirects", as: :redirects_docs
 
-  resources :recordings, only: :index
-  resources :folder_recordables, only: :index
-  resources :page_recordables, only: :index
   resources :events, only: :index
   resources :recording_studio_folders, only: :show
   resources :recording_studio_pages, only: :show

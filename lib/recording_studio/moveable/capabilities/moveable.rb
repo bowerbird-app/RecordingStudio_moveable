@@ -62,13 +62,12 @@ module RecordingStudio
                       "Cannot move to #{new_parent.recordable_type}; allowed: #{allowed_types.join(', ')}"
               end
 
-              RecordingStudio::Moveable::Authorization.assert_move_allowed!(
+              RecordingStudio::Moveable::Policy.new(
                 actor: actor,
                 source: self,
-                destination: new_parent,
                 impersonator: impersonator,
                 metadata: metadata
-              )
+              ).authorize_move!(destination: new_parent)
 
               from_id = parent_recording_id
               log_event!(

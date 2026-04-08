@@ -6,8 +6,16 @@ GIT
       rails (>= 8.1.0)
 
 GIT
+  remote: https://github.com/bowerbird-app/RecordingStudio_icons.git
+  revision: 7c32c08d4c0a28dca5cfcb624d1beb03632f79b0
+  specs:
+    recording_studio_icons (0.1.0)
+      rails (>= 8.1.0)
+
+GIT
   remote: https://github.com/bowerbird-app/flatpack.git
   revision: 075bc9d5a998ac7fd1ad8997297e14a6b90374a5
+  branch: main
   specs:
     flat_pack (0.1.12)
       pagy (~> 9.0)
@@ -21,6 +29,7 @@ PATH
     recording_studio_moveable (0.1.0)
       rails (>= 7.0.0)
       recording_studio (>= 0.1.0)
+      recording_studio_icons (>= 0.1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -250,13 +259,13 @@ GEM
       rubocop-ast (>= 1.44.0, < 2.0)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
-    sin_lru_redux (2.5.2)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.13.2)
     simplecov_json_formatter (0.1.4)
+    sin_lru_redux (2.5.2)
     sprockets (4.2.2)
       concurrent-ruby (~> 1.0)
       logger
@@ -303,6 +312,7 @@ DEPENDENCIES
   flat_pack!
   puma
   recording_studio!
+  recording_studio_icons!
   recording_studio_moveable!
   rubocop
   rubocop-rails
@@ -384,6 +394,7 @@ CHECKSUMS
   rake (13.3.1) sha256=8c9e89d09f66a26a01264e7e3480ec0607f0c497a861ef16063604b1b08eb19c
   rdoc (6.16.1) sha256=71357cc208e6da77ba0c4494e01ae870dd18b437c7c7d801dd73ee2f340b9f5c
   recording_studio (0.1.0)
+  recording_studio_icons (0.1.0)
   recording_studio_moveable (0.1.0)
   regexp_parser (2.11.3) sha256=ca13f381a173b7a93450e53459075c9b76a10433caadcb2f1180f2c741fc55a4
   reline (0.6.3) sha256=1198b04973565b36ec0f11542ab3f5cfeeec34823f4e54cebde90968092b1835
@@ -392,10 +403,10 @@ CHECKSUMS
   rubocop-rails (2.34.2) sha256=10ff246ee48b25ffeabddc5fee86d159d690bb3c7b9105755a9c7508a11d6e22
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
-  sin_lru_redux (2.5.2) sha256=feed104c943afaeeecb1ad83f3f63562088b9785a816625c32b2305eccbd9963
   simplecov (0.22.0) sha256=fe2622c7834ff23b98066bb0a854284b2729a569ac659f82621fc22ef36213a5
   simplecov-html (0.13.2) sha256=bd0b8e54e7c2d7685927e8d6286466359b6f16b18cb0df47b508e8d73c777246
   simplecov_json_formatter (0.1.4) sha256=529418fbe8de1713ac2b2d612aa3daa56d316975d307244399fa4838c601b428
+  sin_lru_redux (2.5.2) sha256=feed104c943afaeeecb1ad83f3f63562088b9785a816625c32b2305eccbd9963
   sprockets (4.2.2) sha256=761e5a49f1c288704763f73139763564c845a8f856d52fba013458f8af1b59b1
   sprockets-rails (3.5.2) sha256=a9e88e6ce9f8c912d349aa5401509165ec42326baf9e942a85de4b76dbc4119e
   stringio (3.1.9) sha256=c111af13d3a73eab96a3bc2655ecf93788d13d28cb8e25c1dcbff89ace885121

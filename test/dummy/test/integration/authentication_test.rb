@@ -26,7 +26,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     follow_redirect!
 
     assert_response :success
-    assert_includes response.body, "Moveable demo"
+    assert_includes response.body, "Studio Workspace"
     refute_includes response.body, "Log in"
   end
 end

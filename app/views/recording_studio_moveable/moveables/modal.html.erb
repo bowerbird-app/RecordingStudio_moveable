@@ -1,0 +1,15 @@
+<div data-recording-studio-moveable-modal-root="true">
+  <%= render FlatPack::Modal::Component.new(
+    id: "recording-studio-moveable-modal",
+    size: :lg,
+    body_height_mode: :fixed,
+    body_height: "70vh",
+    data: { recording_studio_moveable_modal_element: true }
+  ) do |modal| %>
+    <% modal.body do %>
+      <div data-recording-studio-moveable-modal-body="true">
+        <%= render "move_ui", title: "#{moveable_title_for(@recording)} to..." %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

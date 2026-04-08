@@ -4,7 +4,7 @@ require "test_helper"
 
 class ConfigurationTest < Minitest::Test
   def setup
-    @configuration = GemTemplate::Configuration.new
+    @configuration = RecordingStudioMoveable::Configuration.new
   end
 
   def test_merge_updates_known_attributes
@@ -28,9 +28,10 @@ class ConfigurationTest < Minitest::Test
   end
 
   def test_merge_ignores_unknown_keys
-    @configuration.merge!(unknown_key: "ignored", timeout: 7)
+    updates = { unknown_key: "ignored", timeout: 7 }
+    @configuration.merge!(updates)
 
-    refute_respond_to @configuration, :unknown_key
+    assert_equal false, @configuration.respond_to?(:unknown_key)
     assert_equal 7, @configuration.timeout
   end
 
@@ -64,8 +65,8 @@ class ConfigurationTest < Minitest::Test
   end
 
   def test_configure_without_block_is_safe
-    GemTemplate.configure
+    RecordingStudioMoveable.configure
 
-    assert_kind_of GemTemplate::Configuration, GemTemplate.configuration
+    assert_kind_of RecordingStudioMoveable::Configuration, RecordingStudioMoveable.configuration
   end
 end

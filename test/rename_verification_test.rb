@@ -90,13 +90,13 @@ class RenameVerificationTest < Minitest::Test
   end
 
   def test_controllers_directory_exists
-    controllers_dir = File.join(@root, "app", "controllers", @gem_name)
+    controllers_dir = File.join(@root, "app", "controllers", implementation_name)
     assert Dir.exist?(controllers_dir),
            "Expected controllers directory at #{controllers_dir}"
   end
 
   def test_views_directory_exists
-    views_dir = File.join(@root, "app", "views", @gem_name)
+    views_dir = File.join(@root, "app", "views", implementation_name)
     assert Dir.exist?(views_dir),
            "Expected views directory at #{views_dir}"
   end
@@ -130,8 +130,14 @@ class RenameVerificationTest < Minitest::Test
 
   def test_main_lib_defines_correct_module
     content = read_main_lib
-    assert_match(/^module #{@pascal_name}$/, content,
-                 "Main lib should define module #{@pascal_name}")
+
+    if compatibility_layer?
+      assert_match(/require\s+["']gem_template["']/, content,
+                   "Main lib should load the GemTemplate compatibility layer")
+    else
+      assert_match(/^module #{@pascal_name}$/, content,
+                   "Main lib should define module #{@pascal_name}")
+    end
   end
 
   def test_main_lib_requires_version
@@ -174,8 +180,14 @@ class RenameVerificationTest < Minitest::Test
 
   def test_engine_isolates_correct_namespace
     content = read_engine_file
-    assert_match(/isolate_namespace\s+#{@pascal_name}/, content,
-                 "Engine should isolate_namespace #{@pascal_name}")
+
+    if compatibility_layer?
+      assert_match(/Engine\s*=\s*GemTemplate::Engine/, content,
+                   "Engine should alias GemTemplate::Engine")
+    else
+      assert_match(/isolate_namespace\s+#{@pascal_name}/, content,
+                   "Engine should isolate_namespace #{@pascal_name}")
+    end
   end
 
   # ============================================================
@@ -184,8 +196,10 @@ class RenameVerificationTest < Minitest::Test
 
   def test_routes_references_correct_engine
     content = read_routes_file
-    assert_match(/#{@pascal_name}::Engine\.routes\.draw/, content,
-                 "Routes should reference #{@pascal_name}::Engine")
+    expected_engine = compatibility_layer? ? "GemTemplate" : @pascal_name
+
+    assert_match(/#{expected_engine}::Engine\.routes\.draw/, content,
+                 "Routes should reference #{expected_engine}::Engine")
   end
 
   # ============================================================
@@ -193,29 +207,29 @@ class RenameVerificationTest < Minitest::Test
   # ============================================================
 
   def test_application_controller_exists
-    path = File.join(@root, "app", "controllers", @gem_name, "application_controller.rb")
+    path = File.join(@root, "app", "controllers", implementation_name, "application_controller.rb")
     assert File.exist?(path),
            "Application controller should exist at #{path}"
   end
 
   def test_application_controller_has_correct_module
-    path = File.join(@root, "app", "controllers", @gem_name, "application_controller.rb")
+    path = File.join(@root, "app", "controllers", implementation_name, "application_controller.rb")
     content = File.read(path)
-    assert_match(/^module #{@pascal_name}$/, content,
-                 "Application controller should be in module #{@pascal_name}")
+    assert_match(/^module #{implementation_pascal_name}$/, content,
+                 "Application controller should be in module #{implementation_pascal_name}")
   end
 
   def test_home_controller_exists
-    path = File.join(@root, "app", "controllers", @gem_name, "home_controller.rb")
+    path = File.join(@root, "app", "controllers", implementation_name, "home_controller.rb")
     assert File.exist?(path),
            "Home controller should exist at #{path}"
   end
 
   def test_home_controller_has_correct_module
-    path = File.join(@root, "app", "controllers", @gem_name, "home_controller.rb")
+    path = File.join(@root, "app", "controllers", implementation_name, "home_controller.rb")
     content = File.read(path)
-    assert_match(/^module #{@pascal_name}$/, content,
-                 "Home controller should be in module #{@pascal_name}")
+    assert_match(/^module #{implementation_pascal_name}$/, content,
+                 "Home controller should be in module #{implementation_pascal_name}")
   end
 
   # ============================================================
@@ -227,17 +241,10 @@ class RenameVerificationTest < Minitest::Test
 
   def test_no_old_gem_template_references_in_ruby_files
     # Skip if current name IS gem_template (nothing to check - hasn't been renamed yet)
-    skip if @gem_name == "gem_template"
+    skip if skip_old_name_cleanup_checks?
 
-    ruby_files = Dir.glob(File.join(@root, "**", "*.rb"))
-    # Exclude test files and this verification test itself
-    ruby_files.reject! { |f| f.include?("test/dummy") || f.include?("rename_verification_test.rb") }
-
-    files_with_old_refs = []
-
-    ruby_files.each do |file|
-      content = File.read(file)
-      files_with_old_refs << file if content.include?("gem_template") || content.include?("GemTemplate")
+    files_with_old_refs = ruby_files_for_old_name_scan.select do |file|
+      old_template_reference?(File.read(file))
     end
 
     assert files_with_old_refs.empty?,
@@ -245,7 +252,7 @@ class RenameVerificationTest < Minitest::Test
   end
 
   def test_no_old_gem_template_directories
-    skip if @gem_name == "gem_template"
+    skip if skip_old_name_cleanup_checks?
 
     old_dirs = [
       File.join(@root, "lib", "gem_template"),
@@ -263,16 +270,16 @@ class RenameVerificationTest < Minitest::Test
     skip if @gem_name == "gem_template"
 
     old_gemspec = File.join(@root, "gem_template.gemspec")
-    refute File.exist?(old_gemspec),
-           "Old gemspec file should not exist: #{old_gemspec}"
+    assert_not File.exist?(old_gemspec),
+               "Old gemspec file should not exist: #{old_gemspec}"
   end
 
   def test_no_old_main_lib_file
-    skip if @gem_name == "gem_template"
+    skip if skip_old_name_cleanup_checks?
 
     old_lib = File.join(@root, "lib", "gem_template.rb")
-    refute File.exist?(old_lib),
-           "Old main lib file should not exist: #{old_lib}"
+    assert_not File.exist?(old_lib),
+               "Old main lib file should not exist: #{old_lib}"
   end
 
   # ============================================================
@@ -300,7 +307,7 @@ class RenameVerificationTest < Minitest::Test
     begin
       require "#{@gem_name}/version"
       mod = Object.const_get(@pascal_name)
-      refute_nil mod::VERSION, "#{@pascal_name}::VERSION should be defined"
+      assert_not_nil mod::VERSION, "#{@pascal_name}::VERSION should be defined"
     rescue LoadError, NameError => e
       flunk "Could not access VERSION: #{e.message}"
     end
@@ -328,24 +335,24 @@ class RenameVerificationTest < Minitest::Test
   # ============================================================
 
   def test_generator_directory_exists
-    generator_dir = File.join(@root, "lib", "generators", @gem_name)
+    generator_dir = File.join(@root, "lib", "generators", implementation_name)
     assert Dir.exist?(generator_dir),
            "Expected generator directory at #{generator_dir}"
   end
 
   def test_install_generator_exists
-    generator_path = File.join(@root, "lib", "generators", @gem_name, "install", "install_generator.rb")
+    generator_path = File.join(@root, "lib", "generators", implementation_name, "install", "install_generator.rb")
     assert File.exist?(generator_path),
            "Expected install generator at #{generator_path}"
   end
 
   def test_install_generator_has_correct_module
-    generator_path = File.join(@root, "lib", "generators", @gem_name, "install", "install_generator.rb")
+    generator_path = File.join(@root, "lib", "generators", implementation_name, "install", "install_generator.rb")
     skip unless File.exist?(generator_path)
 
     content = File.read(generator_path)
-    assert_match(/^module #{@pascal_name}$/, content,
-                 "Install generator should be in module #{@pascal_name}")
+    assert_match(/^module #{implementation_pascal_name}$/, content,
+                 "Install generator should be in module #{implementation_pascal_name}")
   end
 
   # ============================================================
@@ -353,6 +360,16 @@ class RenameVerificationTest < Minitest::Test
   # ============================================================
 
   private
+
+  def assert_not(value, message = nil)
+    message ||= "Expected #{value.inspect} to be falsy"
+    assert(!value, message)
+  end
+
+  def assert_not_nil(value, message = nil)
+    message ||= "Expected value to not be nil"
+    refute_nil(value, message)
+  end
 
   def detect_gem_name
     # Priority 1: Read from .gem_identity.yml if it exists
@@ -380,6 +397,32 @@ class RenameVerificationTest < Minitest::Test
 
   def to_kebab_case(str)
     str.tr("_", "-")
+  end
+
+  def compatibility_layer?
+    read_main_lib.include?('require "gem_template"')
+  end
+
+  def implementation_name
+    compatibility_layer? ? "gem_template" : @gem_name
+  end
+
+  def implementation_pascal_name
+    compatibility_layer? ? "GemTemplate" : @pascal_name
+  end
+
+  def skip_old_name_cleanup_checks?
+    @gem_name == "gem_template" || compatibility_layer?
+  end
+
+  def ruby_files_for_old_name_scan
+    Dir.glob(File.join(@root, "**", "*.rb")).reject do |file|
+      file.include?("test/dummy") || file.include?("rename_verification_test.rb")
+    end
+  end
+
+  def old_template_reference?(content)
+    content.include?("gem_template") || content.include?("GemTemplate")
   end
 
   def read_gemspec
