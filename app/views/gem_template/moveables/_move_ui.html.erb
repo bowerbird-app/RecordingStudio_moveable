@@ -13,54 +13,31 @@
 </div>
 
 <div class="mt-4 max-w-3xl">
-    <div class="space-y-4" data-controller="move-search"
-         data-action="submit->move-search#submit input->move-search#queueSubmit"
-         data-move-search-delay-value="250">
-      <%= form_with url: move_recording_path_for(recording_id: @recording.id), method: :get, local: true,
-                    data: { move_search_target: "form" } do |form| %>
-      <%= hidden_field_tag :display, @display == :modal ? "modal" : "full_page" %>
-      <%= hidden_field_tag :redirect_to, @redirect_to %>
-
-      <%= render FlatPack::SearchInput::Component.new(
-        name: :q,
-        value: @query,
-        placeholder: "Search destinations"
-      ) %>
-    <% end %>
-
-    <div data-move-search-target="results">
-      <% if @destinations.empty? %>
-        <%= render FlatPack::EmptyState::Component.new(
-          title: "No allowed destinations found.",
-          description: "Try a different search term or review your move permissions.",
-          icon: :search,
-          class: "py-6"
-        ) %>
-      <% else %>
-        <%= render FlatPack::List::Component.new do %>
-          <% @destinations.each do |destination| %>
-            <%= render FlatPack::List::Item.new(class: "items-center", hover: true) do %>
-              <div class="flex w-full items-center justify-between gap-4">
-                <div class="min-w-0 flex-1">
-                  <p class="font-medium text-(--surface-content-color)"><%= moveable_label_for(destination) %></p>
-                </div>
-
-                <%= form_with url: move_recording_path_for(recording_id: @recording.id), method: :post, local: true, class: "shrink-0" do %>
-                  <%= hidden_field_tag :destination_id, destination.id %>
-                  <%= hidden_field_tag :display, @display == :modal ? "modal" : "full_page" %>
-                  <%= hidden_field_tag :redirect_to, @redirect_to %>
-                  <%= render FlatPack::Button::Component.new(
-                    text: "Move",
-                    style: :default,
-                    size: :sm,
-                    type: "submit"
-                  ) %>
-                <% end %>
-              </div>
-            <% end %>
-          <% end %>
-        <% end %>
-      <% end %>
-    </div>
-  </div>
+  <%= render FlatPack::Picker::Component.new(
+    id: "move-destination-picker-#{@recording.id}",
+    items: moveable_picker_items_for(@destinations),
+    title: "",
+    selection_mode: :single,
+    accepted_kinds: ["record"],
+    searchable: true,
+    search_placeholder: "Search destinations",
+    search_mode: :local,
+    results_layout: :list,
+    output_mode: :field,
+    confirm_text: "Move here",
+    close_text: "Clear selection",
+    modal: false,
+    empty_state_text: "No allowed destinations found. Try a different search term or review your move permissions.",
+    form: {
+      url: move_recording_path_for(
+        recording_id: @recording.id,
+        display: @display == :modal ? "modal" : "full_page",
+        redirect_to: @redirect_to,
+        q: @query.presence
+      ),
+      method: :post,
+      field: "destination_id",
+      value_mode: :id
+    }
+  ) %>
 </div>

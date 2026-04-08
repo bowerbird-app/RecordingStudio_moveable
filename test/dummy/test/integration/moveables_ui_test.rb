@@ -39,9 +39,8 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Main navigation"
     assert_includes response.body, "Toggle sidebar"
     assert_includes response.body, "Search destinations"
-    assert_includes response.body, %(data-controller="move-search")
-    assert_includes response.body, %(input->move-search#queueSubmit)
-    assert_includes response.body, %(class="mt-4 max-w-3xl")
+    assert_includes response.body, %(data-controller="flat-pack--picker")
+    assert_includes response.body, %(id="move-destination-picker-#{@page.id}")
     refute_includes response.body, "container mx-auto max-w-6xl px-4 pb-10 pt-6"
     refute_includes response.body, "Move item"
     refute_includes response.body, "Current location"
@@ -56,13 +55,14 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'data-recording-studio-moveable-modal-body="true"'
     assert_includes response.body, 'data-recording-studio-moveable-modal-element="true"'
     assert_includes response.body, "Move Move Me to..."
+    assert_includes response.body, %(data-controller="flat-pack--picker")
     refute_includes response.body, "Main navigation"
 
     get recording_studio_moveable.move_recording_path(recording_id: @page.id, display: "modal")
     assert_response :success
-  refute_includes response.body, "Choose a destination for Move Me"
+    refute_includes response.body, "Choose a destination for Move Me"
     refute_includes response.body, "aria-label=\"Breadcrumb\""
-    assert_includes response.body, %(class="mt-4 max-w-3xl")
+    assert_includes response.body, %(data-controller="flat-pack--picker")
     refute_includes response.body, "Main navigation"
   end
 
@@ -73,8 +73,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, %(href="#{referer}")
-    assert_includes response.body, %(name="redirect_to")
-    assert_includes response.body, %(value="#{referer}")
+    assert_includes response.body, "redirect_to=#{ERB::Util.url_encode(referer)}"
 
     post recording_studio_moveable.move_recording_path(recording_id: @page.id), params: {
       destination_id: @target_folder.id,
@@ -91,8 +90,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     get recording_studio_moveable.move_recording_path(recording_id: @page.id, display: "modal"), headers: { "HTTP_REFERER" => referer }
 
     assert_response :success
-    assert_includes response.body, %(name="redirect_to")
-    assert_includes response.body, %(value="#{referer}")
+    assert_includes response.body, "redirect_to=#{ERB::Util.url_encode(referer)}"
 
     post recording_studio_moveable.move_recording_path(recording_id: @page.id), params: {
       destination_id: @target_folder.id,
@@ -120,11 +118,8 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, %(action="/recording_studio_moveable/move/#{@page.id}")
-    assert_includes response.body, %(name="destination_id")
-    assert_includes response.body, %(value="#{@target_folder.id}")
-    assert_includes response.body, %(type="submit")
-    refute_includes response.body, %(data-turbo-method="post")
-    refute_includes response.body, "/recording_studio_moveable/cable"
+    assert_includes response.body, %(data-flat-pack--picker-form-value=)
+    assert_includes response.body, @target_folder.id.to_s
     assert_includes response.body, @target_folder.recordable.name
     refute_includes response.body, @archive.recordable.name
   end
@@ -138,7 +133,6 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_includes response.body, @target_folder.recordable.name
     refute_includes response.body, other_folder.recordable.name
     refute_includes response.body, @archive.recordable.name
-    assert_includes response.body, %(value="Target")
   end
 
   def test_destination_search_finds_matches_beyond_initial_result_window

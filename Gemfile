@@ -6,6 +6,7 @@ source "https://rubygems.org"
 gemspec
 
 gem "recording_studio", github: "bowerbird-app/RecordingStudio"
+gem "flat_pack", github: "bowerbird-app/flatpack"
 
 gem "puma"
 gem "sprockets-rails"

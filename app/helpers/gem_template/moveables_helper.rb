@@ -48,8 +48,21 @@ module GemTemplate
       moveable_label_for(parent)
     end
 
-    def flat_pack_search_available?
-      defined?(FlatPack::SearchInput::Component)
+    def moveable_picker_items_for(destinations)
+      destinations.map { |destination| moveable_picker_item_for(destination) }
+    end
+
+    def moveable_picker_item_for(recording)
+      {
+        id: recording.id,
+        kind: "record",
+        name: moveable_label_for(recording),
+        label: moveable_label_for(recording),
+        description: moveable_parent_label_for(recording),
+        badge: moveable_type_for(recording),
+        meta: "ID #{recording.id}",
+        payload: { id: recording.id }
+      }
     end
   end
 end

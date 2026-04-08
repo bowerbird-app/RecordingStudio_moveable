@@ -19,7 +19,7 @@
 - Gem-provided reusable move UI:
   - full-page mode
   - modal mode
-  - destination search (uses `FlatPack::SearchInput::Component` when available, plain input fallback)
+  - destination picker powered by `FlatPack::Picker::Component`
   - only shows destinations that pass gem-owned move visibility checks
   - returns not found for inaccessible source recordings
   - move action redirects to root page with success flash
@@ -30,6 +30,7 @@ Add to your Gemfile:
 
 ```ruby
 gem "recording_studio_moveable"
+gem "flat_pack", github: "bowerbird-app/flatpack"
 ```
 
 Then bundle install and mount the engine UI routes:
