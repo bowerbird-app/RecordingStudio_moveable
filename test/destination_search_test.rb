@@ -450,6 +450,7 @@ class DestinationSearchTest < Minitest::Test
 
     assert_equal [titled, named, typed], search.send(:filter_by_query, [titled, named, typed], nil)
     assert_equal [titled], search.send(:filter_by_query, [titled, named, typed], "mix")
+    assert_equal [named], search.send(:filter_by_query, [titled, named, typed], "client")
     assert_equal [named], search.send(:filter_by_query, [titled, named, typed], "📁 client")
     assert_equal [typed], search.send(:filter_by_query, [titled, named, typed], "archive box")
     assert_equal [typed], search.send(:filter_by_query, [titled, named, typed], "abc-123")
