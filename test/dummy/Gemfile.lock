@@ -12,10 +12,8 @@ GIT
     recording_studio_icons (0.1.0)
       rails (>= 8.1.0)
 
-GIT
-  remote: https://github.com/bowerbird-app/flatpack.git
-  revision: 075bc9d5a998ac7fd1ad8997297e14a6b90374a5
-  ref: 075bc9d5a998ac7fd1ad8997297e14a6b90374a5
+PATH
+  remote: ../../flatpack
   specs:
     flat_pack (0.1.12)
       pagy (~> 9.0)

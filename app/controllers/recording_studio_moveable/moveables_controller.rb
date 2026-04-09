@@ -5,7 +5,9 @@ module RecordingStudioMoveable
   class MoveablesController < ApplicationController
     include RecordingStudioMoveable::MoveablesHelper
 
-    helper_method :move_recording_path_for, :move_back_path
+    helper RecordingStudioMoveable::MoveablesHelper
+
+    helper_method :move_recording_path_for, :move_back_path, :move_workspaces_path_for, :moveable_root_label
 
     before_action :ensure_actor!
     before_action :load_recording
@@ -21,6 +23,14 @@ module RecordingStudioMoveable
       render :modal, layout: false
     end
 
+    def workspaces
+      prepare_shared_state(display: :full_page)
+      @back_path = workspace_recording_path
+      @workspace_roots = filtered_workspace_roots
+
+      render layout: full_page_layout
+    end
+
     def update
       destination = find_destination!(params[:destination_id])
       move_recording!(destination)
@@ -29,14 +39,26 @@ module RecordingStudioMoveable
       redirect_to failed_move_path, alert: e.message
     end
 
+    def moveable_root_label(count: 1)
+      RecordingStudioMoveable::RootLabel.resolve(helpers, count: count)
+    end
+
     private
 
     def prepare_show_state
-      @display = params[:display] == "modal" ? :modal : :full_page
+      prepare_shared_state(display: params[:display] == "modal" ? :modal : :full_page)
+      @current_root = current_root_recording
+      @target_root = selected_target_root
+      @back_path = target_root_back_path
+      @workspace_selection_path = workspace_selection_path
+      @destinations = filtered_destinations
+    end
+
+    def prepare_shared_state(display:)
+      @display = display
       @query = params[:q].to_s.strip
       @redirect_to = form_redirect_target
       @redirect_mode = requested_redirect_mode
-      @destinations = filtered_destinations
     end
 
     def move_recording!(destination)
@@ -52,6 +74,7 @@ module RecordingStudioMoveable
       move_recording_path_for(
         recording_id: @recording.id,
         display: params[:display],
+        target_root_id: params[:target_root_id].presence,
         redirect_to: explicit_redirect_target,
         redirect_mode: requested_redirect_mode
       )
@@ -70,8 +93,15 @@ module RecordingStudioMoveable
       return [] unless source_allowed_for_destinations?
 
       destination_search.results(
-        query: @query
+        query: @query,
+        root: @target_root
       )
+    end
+
+    def filtered_workspace_roots
+      return [] unless source_allowed_for_destinations?
+
+      destination_search.workspace_results(query: @query)
     end
 
     def source_allowed_for_destinations?
@@ -147,8 +177,58 @@ module RecordingStudioMoveable
       RecordingStudioMoveable::Engine.routes.url_helpers.move_recording_path(...)
     end
 
+    def move_workspaces_path_for(...)
+      RecordingStudioMoveable::Engine.routes.url_helpers.move_recording_workspaces_path(...)
+    end
+
+    def workspace_recording_path
+      move_recording_path_for(
+        recording_id: @recording.id,
+        redirect_to: form_redirect_target,
+        redirect_mode: requested_redirect_mode
+      )
+    end
+
     def move_back_path
-      normalize_redirect_target(request&.referer) || redirect_path
+      explicit_redirect_target || normalize_redirect_target(request&.referer) || redirect_path
+    end
+
+    def target_root_back_path
+      return move_back_path unless @target_root.present?
+
+      move_workspaces_path_for(
+        recording_id: @recording.id,
+        redirect_to: form_redirect_target,
+        redirect_mode: requested_redirect_mode
+      )
+    end
+
+    def workspace_selection_path
+      return unless source_allowed_for_cross_root_destinations?
+
+      move_workspaces_path_for(
+        recording_id: @recording.id,
+        redirect_to: form_redirect_target,
+        redirect_mode: requested_redirect_mode
+      )
+    end
+
+    def source_allowed_for_cross_root_destinations?
+      filtered_workspace_roots.any?
+    end
+
+    def selected_target_root
+      return if params[:target_root_id].blank?
+
+      root = RecordingStudio::Recording.find(params[:target_root_id])
+      raise ActiveRecord::RecordNotFound unless destination_search.allowed_workspace_root?(root)
+
+      root
+    end
+
+    def current_root_recording
+      root_id = @recording.root_recording_id.presence || @recording.id
+      RecordingStudio::Recording.find_by(id: root_id) || @recording
     end
 
     def explicit_redirect_target
@@ -250,9 +330,8 @@ module RecordingStudioMoveable
 
     def full_page_layout
       return false unless @display == :full_page
-      return "flat_pack_sidebar" if lookup_context.exists?("layouts/flat_pack_sidebar", [], false)
 
-      true
+      RecordingStudioMoveable.configuration.full_page_layout.presence || "recording_studio_moveable"
     end
   end
   # rubocop:enable Metrics/ClassLength

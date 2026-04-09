@@ -37,6 +37,8 @@ class MoveableCapabilityTest < ActiveSupport::TestCase
   end
 
   def test_move_to_blocks_cross_root_moves
+    disable_cross_root_for(RecordingStudioPage)
+
     _, other_root = create_workspace_root
     other_parent = other_root.record(RecordingStudioFolder, actor: @actor, parent_recording: other_root) { |f| f.name = "Other" }
 
@@ -45,6 +47,26 @@ class MoveableCapabilityTest < ActiveSupport::TestCase
     end
 
     assert_match(/must belong to this root recording/, error.message)
+  end
+
+  def test_move_to_can_transfer_a_subtree_across_roots_when_enabled
+    enable_cross_root_for(RecordingStudioFolder)
+
+    _, other_root = create_workspace_root
+    grant_root_access(root: other_root, actor: @actor, role: :admin)
+    other_parent = other_root.record(RecordingStudioFolder, actor: @actor, parent_recording: other_root) { |f| f.name = "Other" }
+
+    @source_folder.move_to!(new_parent: other_parent, actor: @actor, metadata: { "reason" => "workspace transfer" })
+
+    assert_equal other_parent.id, @source_folder.reload.parent_recording_id
+    assert_equal other_root.id, @source_folder.root_recording_id
+    assert_equal other_root.id, @child_folder.reload.root_recording_id
+    assert_equal other_root.id, @page.reload.root_recording_id
+
+    event = @source_folder.events.first
+    assert_equal @root.id, event.metadata["from_root_id"]
+    assert_equal other_root.id, event.metadata["to_root_id"]
+    assert_equal "workspace transfer", event.metadata["reason"]
   end
 
   def test_move_to_blocks_self_and_descendant_destinations
@@ -86,5 +108,31 @@ class MoveableCapabilityTest < ActiveSupport::TestCase
 
     @page.move_to!(new_parent: @target_folder, actor: @actor)
     assert_equal @target_folder.id, @page.reload.parent_recording_id
+  end
+
+  private
+
+  def enable_cross_root_for(*recordable_types)
+    recordable_types.each do |recordable_type|
+      set_cross_root_for(recordable_type, true)
+    end
+  end
+
+  def disable_cross_root_for(*recordable_types)
+    recordable_types.each do |recordable_type|
+      set_cross_root_for(recordable_type, false)
+    end
+  end
+
+  def set_cross_root_for(recordable_type, value)
+    options = RecordingStudio.capability_options(:movable, for_type: recordable_type.name) || {}
+    allowed_parent_types = Array(options[:allowed_parent_types] || options["allowed_parent_types"])
+
+    RecordingStudio.set_capability_options(
+      :movable,
+      on: recordable_type.name,
+      allowed_parent_types: allowed_parent_types,
+      allow_cross_root: value
+    )
   end
 end

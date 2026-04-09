@@ -7,6 +7,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     super
 
     @user = create_user(email: "admin@admin.com")
+    bootstrap_demo_for(@user)
   end
 
   def test_user_can_sign_in_with_valid_credentials

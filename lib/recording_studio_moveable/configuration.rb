@@ -4,9 +4,21 @@ require_relative "hooks"
 
 module RecordingStudioMoveable
   class Configuration
+    SERIALIZABLE_ATTRIBUTES = %i[
+      api_key
+      enable_feature_x
+      timeout
+      move_modal_prefetch_enabled
+      move_modal_prefetch_delay_ms
+      move_modal_prefetch_ttl_ms
+      move_modal_reuse_shell
+      full_page_layout
+    ].freeze
+
     attr_accessor :api_key, :enable_feature_x, :timeout,
                   :move_modal_prefetch_enabled, :move_modal_prefetch_delay_ms,
-                  :move_modal_prefetch_ttl_ms, :move_modal_reuse_shell
+                  :move_modal_prefetch_ttl_ms, :move_modal_reuse_shell,
+                  :full_page_layout
     attr_reader :hooks
 
     def initialize
@@ -17,20 +29,13 @@ module RecordingStudioMoveable
       @move_modal_prefetch_delay_ms = 80
       @move_modal_prefetch_ttl_ms = 10_000
       @move_modal_reuse_shell = true
+      @full_page_layout = "recording_studio_moveable"
       @hooks = Hooks.new
     end
 
     def to_h
-      {
-        api_key: api_key,
-        enable_feature_x: enable_feature_x,
-        timeout: timeout,
-        move_modal_prefetch_enabled: move_modal_prefetch_enabled,
-        move_modal_prefetch_delay_ms: move_modal_prefetch_delay_ms,
-        move_modal_prefetch_ttl_ms: move_modal_prefetch_ttl_ms,
-        move_modal_reuse_shell: move_modal_reuse_shell,
-        hooks_registered: hooks.instance_variable_get(:@registry).transform_values(&:size)
-      }
+      SERIALIZABLE_ATTRIBUTES.index_with { |attribute| public_send(attribute) }
+                             .merge(hooks_registered: hooks.instance_variable_get(:@registry).transform_values(&:size))
     end
 
     def merge!(hash)

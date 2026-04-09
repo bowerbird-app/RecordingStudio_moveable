@@ -13,7 +13,7 @@
           code: <<~CODE
             class RecordingStudioPage < ApplicationRecord
               # This page can move to a workspace or a folder.
-              include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder")
+              include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder", allow_cross_root: true)
             end
           CODE
         }
@@ -28,7 +28,7 @@
         <strong>RecordingStudioFolder</strong> means pages can also be moved into folders.
       <% end %>
       <%= render FlatPack::List::Item.new do %>
-        <strong>Same root only:</strong> Moves stay inside the same root recording tree.
+        <strong>Same root by default:</strong> Add <code>allow_cross_root: true</code> to opt into cross-workspace transfers.
       <% end %>
       <%= render FlatPack::List::Item.new do %>
         <strong>No self or descendants:</strong> A recording cannot be moved under itself or any of its descendants.

@@ -24,10 +24,10 @@
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Moveable Docs",
-        href: moveable_docs_path,
-        icon: "question",
-        active: current_page?(moveable_docs_path)
+        label: "Data",
+        href: data_path,
+        icon: "circle-stack",
+        active: current_page?(data_path)
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(

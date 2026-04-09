@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Move" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Move">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%= stylesheet_link_tag "flat_pack/variables", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "flat_pack/application", "data-turbo-track": "reload" %>
+    <% if !Rails.env.test? && recording_studio_moveable_asset_available?("tailwind.css") %>
+      <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <% end %>
+    <%= recording_studio_moveable_meta_tags %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-screen bg-white text-slate-950">
+    <main class="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
+      <% if notice.present? %>
+        <p class="mb-4 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"><%= notice %></p>
+      <% end %>
+
+      <% if alert.present? %>
+        <p class="mb-4 rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800"><%= alert %></p>
+      <% end %>
+
+      <%= yield %>
+    </main>
+
+    <%= recording_studio_moveable_modal_template %>
+  </body>
+</html>

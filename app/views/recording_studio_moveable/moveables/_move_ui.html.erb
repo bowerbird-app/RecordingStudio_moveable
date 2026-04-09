@@ -1,18 +1,26 @@
 <div class="space-y-4">
   <% if @display == :full_page %>
     <%= render FlatPack::Breadcrumb::Component.new(
-      items: [{ text: "Back", href: move_back_path, icon: "chevron-left" }],
+      items: [{ text: "Back", href: @back_path || move_back_path, icon: "chevron-left" }],
       class: "mb-3"
     ) %>
   <% end %>
 
   <%= render FlatPack::PageTitle::Component.new(
     title: title,
+    subtitle: "Search or choose a destination below.",
     class: "pb-0 mb-0"
   ) %>
 </div>
 
 <div class="mt-4 max-w-3xl">
+  <% if @workspace_selection_path.present? %>
+    <div class="mb-4 flex flex-wrap items-center gap-2 text-sm text-slate-700">
+      <strong><%= moveable_label_for(@target_root || @current_root) %></strong>
+      <%= link_to "Change", @workspace_selection_path, class: "font-medium text-primary hover:underline" %>
+    </div>
+  <% end %>
+
   <%= render FlatPack::Picker::Component.new(
     id: "move-destination-picker-#{@recording.id}",
     items: moveable_picker_items_for(@destinations),
@@ -32,6 +40,7 @@
       url: move_recording_path_for(
         recording_id: @recording.id,
         display: @display == :modal ? "modal" : "full_page",
+        target_root_id: @target_root&.id,
         redirect_to: @redirect_to,
         redirect_mode: @redirect_mode,
         q: @query.presence

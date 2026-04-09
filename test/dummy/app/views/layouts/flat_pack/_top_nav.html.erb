@@ -1,4 +1,7 @@
 <%= render FlatPack::TopNav::Component.new do |nav| %>
+  <% workspace_roots = respond_to?(:accessible_workspace_roots) ? accessible_workspace_roots : [] %>
+  <% selected_workspace_root = respond_to?(:current_workspace_root) ? current_workspace_root : nil %>
+
   <% nav.left do %>
     <%= render FlatPack::Button::Component.new(
       icon: "menu",
@@ -18,6 +21,18 @@
 
   <% nav.right do %>
     <div class="ml-auto flex items-center gap-3">
+      <% if workspace_roots.many? %>
+        <%= form_with url: workspace_selection_path, method: :patch, class: "hidden sm:block" do %>
+          <%= hidden_field_tag :return_to, request.fullpath %>
+          <label class="sr-only" for="workspace-switcher">Workspace</label>
+          <%= select_tag :root_recording_id,
+                         options_for_select(workspace_roots.map { |root_recording| [workspace_label_for(root_recording), root_recording.id] }, selected_workspace_root&.id),
+                         id: "workspace-switcher",
+                         class: "min-w-56 rounded-md border border-[var(--top-nav-item-hover-background-color)] bg-[var(--top-nav-background-color)] px-3 py-2 text-sm text-(--surface-content-color) focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[var(--button-focus-ring-color)]",
+                         onchange: "this.form.requestSubmit()" %>
+        <% end %>
+      <% end %>
+
       <% if user_signed_in? %>
         <%= render FlatPack::Avatar::Component.new(
           name: current_user.try(:name).presence || current_user.email,

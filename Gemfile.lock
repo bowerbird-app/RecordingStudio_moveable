@@ -12,17 +12,6 @@ GIT
     recording_studio_icons (0.1.0)
       rails (>= 8.1.0)
 
-GIT
-  remote: https://github.com/bowerbird-app/flatpack.git
-  revision: 075bc9d5a998ac7fd1ad8997297e14a6b90374a5
-  branch: main
-  specs:
-    flat_pack (0.1.12)
-      pagy (~> 9.0)
-      rails (>= 7.1, < 9)
-      tailwind_merge (~> 0.13)
-      view_component (~> 3.0)
-
 PATH
   remote: .
   specs:
@@ -30,6 +19,15 @@ PATH
       rails (>= 7.0.0)
       recording_studio (>= 0.1.0)
       recording_studio_icons (>= 0.1.0)
+
+PATH
+  remote: flatpack
+  specs:
+    flat_pack (0.1.12)
+      pagy (~> 9.0)
+      rails (>= 7.1, < 9)
+      tailwind_merge (~> 0.13)
+      view_component (~> 3.0)
 
 GEM
   remote: https://rubygems.org/

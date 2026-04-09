@@ -9,13 +9,6 @@
     subtitle: @children.one? ? "1 item in this folder" : "#{@children.count} items in this folder"
   ) %>
 
-  <div class="-mt-8 flex items-center gap-3 text-(--surface-muted-content-color)">
-    <span class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-(--surface-border-color) bg-(--surface-subtle-background-color)">
-      <%= moveable_demo_recordable_icon(@folder, size: :lg) %>
-    </span>
-    <span class="text-sm font-medium">Folder</span>
-  </div>
-
   <section>
     <% if @children.any? %>
       <%= render FlatPack::Grid::Component.new(cols: 3, gap: :lg, align: :stretch) do %>

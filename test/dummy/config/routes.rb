@@ -20,7 +20,10 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "home#index"
 
-  get "docs/moveable", to: "moveable_docs#show", as: :moveable_docs
+  patch "workspace_selection", to: "workspace_selections#update", as: :workspace_selection
+
+  get "data", to: "data#index", as: :data
+
   get "docs/access", to: "moveable_docs#access", as: :access_docs
   get "docs/setup", to: "moveable_docs#setup", as: :setup_docs
   get "docs/methods", to: "moveable_docs#methods", as: :methods_docs

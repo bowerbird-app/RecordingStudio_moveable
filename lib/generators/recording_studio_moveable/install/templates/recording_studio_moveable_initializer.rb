@@ -21,6 +21,10 @@ RecordingStudioMoveable.configure do |config|
 
   # Reuse a single gem-owned modal shell between openings.
   # config.move_modal_reuse_shell = true
+
+  # Full-page move screens use the gem's blank layout by default.
+  # Set this to a host-app layout name to embed move screens in your shell.
+  # config.full_page_layout = "recording_studio_moveable"
 end
 
 RecordingStudio::Moveable.configure do |config|

@@ -37,6 +37,10 @@ module RecordingStudioMoveable
       "Move #{moveable_label_for(recording)}"
     end
 
+    def moveable_root_label(count: 1)
+      RecordingStudioMoveable::RootLabel.resolve(self, count: count)
+    end
+
     def moveable_label_for(recording)
       recordable = recording.recordable
 
@@ -47,23 +51,25 @@ module RecordingStudioMoveable
     end
 
     def moveable_type_for(recording)
-      recording.recordable_type.demodulize.titleize
-    end
-
-    def moveable_parent_label_for(recording)
-      parent = recording.parent_recording
-      return "Workspace root" if parent.blank?
-
-      moveable_label_for(parent)
+      recording.recordable_type.to_s.demodulize.sub(/^RecordingStudio/, "").underscore.humanize
     end
 
     def moveable_picker_items_for(destinations)
       destinations.map { |destination| moveable_picker_item_for(destination) }
     end
 
+    def moveable_workspace_picker_items_for(workspace_roots)
+      workspace_roots.map do |workspace_root|
+        moveable_picker_item_attributes(workspace_root).merge(
+          kind: "workspace",
+          description: "Choose destinations in #{moveable_label_for(workspace_root)}"
+        )
+      end
+    end
+
     def moveable_picker_item_for(recording)
       moveable_picker_item_attributes(recording).merge(
-        description: moveable_parent_label_for(recording)
+        description: moveable_type_for(recording)
       )
     end
 

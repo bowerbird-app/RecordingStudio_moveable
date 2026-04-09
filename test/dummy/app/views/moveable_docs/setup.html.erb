@@ -14,13 +14,17 @@
       language: "ruby",
       code: <<~CODE
         class RecordingStudioPage < ApplicationRecord
-          include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder")
+          include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder", allow_cross_root: true)
         end
 
         class RecordingStudioFolder < ApplicationRecord
-          include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder")
+          include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder", allow_cross_root: true)
         end
       CODE
     ) %>
+
+    <p class="text-sm text-(--surface-muted-content-color)">
+      Leave <code>allow_cross_root</code> off to keep the default same-workspace-only behavior.
+    </p>
   </div>
 </div>

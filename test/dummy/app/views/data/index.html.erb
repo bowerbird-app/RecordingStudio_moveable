@@ -1,0 +1,37 @@
+<div class="space-y-8">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Data",
+    subtitle: "Browse the demo records for each primary data type."
+  ) %>
+
+  <% @data_sections.each do |section| %>
+    <section class="space-y-4">
+      <%= render FlatPack::SectionTitle::Component.new(
+        title: section[:title],
+        class: "my-0"
+      ) %>
+
+      <% if section[:records].any? %>
+        <%= render FlatPack::Table::Component.new(data: section[:records]) do |table| %>
+          <% if section[:columns].present? %>
+            <% section[:columns].each do |column| %>
+              <% table.column(title: column[:title], html: ->(record) {
+                   content_tag(:div, record.fetch(column[:key]), class: "font-medium text-(--surface-content-color)")
+                 }) %>
+            <% end %>
+          <% else %>
+            <% table.column(title: "Name", html: ->(record_name) {
+                 content_tag(:div, record_name, class: "font-medium text-(--surface-content-color)")
+               }) %>
+          <% end %>
+        <% end %>
+      <% else %>
+        <%= render FlatPack::EmptyState::Component.new(
+          title: "No records yet",
+          description: "This section does not have any records yet.",
+          icon: :inbox
+        ) %>
+      <% end %>
+    </section>
+  <% end %>
+</div>

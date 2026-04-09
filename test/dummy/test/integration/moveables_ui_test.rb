@@ -11,9 +11,12 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
 
     @workspace, @root = create_workspace_root
     grant_root_access(root: @root, actor: @user, role: :admin)
+    @other_workspace, @other_root = create_workspace_root
+    grant_root_access(root: @other_root, actor: @user, role: :admin)
 
     @source_folder = @root.record(RecordingStudioFolder, actor: @user, parent_recording: @root) { |f| f.name = "Source" }
     @target_folder = @root.record(RecordingStudioFolder, actor: @user, parent_recording: @root) { |f| f.name = "Target" }
+    @other_target_folder = @other_root.record(RecordingStudioFolder, actor: @user, parent_recording: @other_root) { |f| f.name = "Shared Across Workspaces" }
     @page = @root.record(RecordingStudioPage, actor: @user, parent_recording: @source_folder) { |p| p.title = "Move Me" }
     @archive = @root.record(RecordingStudioArchiveBox, actor: @user, parent_recording: @root) { |a| a.name = "Archive" }
   end
@@ -30,19 +33,28 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
   def test_full_page_and_modal_render
     get recording_studio_moveable.move_recording_path(recording_id: @page.id)
     assert_response :success
+    root_index = response.body.index(@workspace.name)
+    change_index = response.body.index(">Change<")
+    picker_index = response.body.index(%(id="move-destination-picker-#{@page.id}"))
+
     assert_includes response.body, "Move Move Me to..."
+    assert_includes response.body, "Search or choose a destination below."
     refute_includes response.body, "Choose a destination for Move Me"
     assert_includes response.body, "aria-label=\"Breadcrumb\""
-    assert_includes response.body, "Back"
+    assert_includes response.body, ">Back<"
     assert_includes response.body, %(href="/")
     assert_includes response.body, %(data-flat-pack--icon-name-value="chevron-left")
-    assert_includes response.body, "Main navigation"
-    assert_includes response.body, "Toggle sidebar"
     assert_includes response.body, "Search destinations"
+    assert_includes response.body, @workspace.name
+    assert_includes response.body, ">Change<"
     assert_includes response.body, %(data-controller="flat-pack--picker")
     assert_includes response.body, %(id="move-destination-picker-#{@page.id}")
+    assert_operator root_index, :<, change_index
+    assert_operator change_index, :<, picker_index
     assert_includes response.body, "!border-0 !bg-transparent !shadow-none !rounded-none !p-0 sm:!p-0"
     refute_includes response.body, "container mx-auto max-w-6xl px-4 pb-10 pt-6"
+    refute_includes response.body, "Main navigation"
+    refute_includes response.body, "Toggle sidebar"
     refute_includes response.body, "Move item"
     refute_includes response.body, "Current location"
     refute_includes response.body, "What happens next"
@@ -56,6 +68,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'data-recording-studio-moveable-modal-body="true"'
     assert_includes response.body, 'data-recording-studio-moveable-modal-element="true"'
     assert_includes response.body, "Move Move Me to..."
+    assert_includes response.body, "Search or choose a destination below."
     assert_includes response.body, %(data-controller="flat-pack--picker")
     assert_includes response.body, "!border-0 !bg-transparent !shadow-none !rounded-none !p-0 sm:!p-0"
     refute_includes response.body, "Main navigation"
@@ -64,6 +77,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_response :success
     refute_includes response.body, "Choose a destination for Move Me"
     refute_includes response.body, "aria-label=\"Breadcrumb\""
+    refute_includes response.body, ">Back<"
     assert_includes response.body, %(data-controller="flat-pack--picker")
     refute_includes response.body, "Main navigation"
   end
@@ -190,6 +204,8 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert workspace_index.present?, "Expected workspace root to be rendered as a destination"
     assert target_index.present?, "Expected target folder to be rendered as a destination"
     assert_operator workspace_index, :<, target_index, "Expected workspace root to appear before nested destinations"
+    assert_includes response.body, %(&quot;description&quot;:&quot;Folder&quot;)
+    refute_includes response.body, %(&quot;description&quot;:&quot;#{@workspace.name}&quot;)
   end
 
   def test_destination_search_filters_allowed_destinations
@@ -216,6 +232,109 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_includes response.body, @target_folder.recordable.name
   end
 
+  def test_root_level_folder_does_not_offer_current_workspace_as_destination
+    get recording_studio_moveable.move_recording_path(recording_id: @target_folder.id)
+
+    assert_response :success
+    assert_includes response.body, @workspace.name
+    assert_includes response.body, @source_folder.recordable.name
+    assert_equal 1, response.body.scan(@workspace.name).count
+  end
+
+  def test_workspace_picker_lists_other_workspaces_only
+    get recording_studio_moveable.move_recording_workspaces_path(recording_id: @page.id)
+
+    assert_response :success
+    assert_includes response.body, "Change workspace"
+    assert_includes response.body, @other_workspace.name
+    refute_includes response.body, @workspace.name
+    assert_includes response.body, %(id="move-workspace-picker-#{@page.id}")
+  end
+
+  def test_workspace_picker_back_returns_to_move_view_while_move_view_keeps_launch_origin
+    launch_origin = recording_studio_folder_path(@source_folder.recordable)
+    workspace_path = recording_studio_moveable.move_recording_workspaces_path(
+      recording_id: @page.id,
+      redirect_to: launch_origin,
+      redirect_mode: "previous_page"
+    )
+    move_path = recording_studio_moveable.move_recording_path(
+      recording_id: @page.id,
+      redirect_to: launch_origin,
+      redirect_mode: "previous_page"
+    )
+    workspace_href = workspace_path.gsub("&", "&amp;")
+    move_href = move_path.gsub("&", "&amp;")
+
+    get recording_studio_moveable.move_recording_path(recording_id: @page.id), headers: { "HTTP_REFERER" => launch_origin }
+
+    assert_response :success
+    assert_includes response.body, %(href="#{launch_origin}")
+    assert_includes response.body, %(href="#{workspace_href}")
+
+    get workspace_path
+
+    assert_response :success
+    assert_includes response.body, %(href="#{move_href}")
+    refute_includes response.body, %(href="#{launch_origin}")
+
+    get move_path
+
+    assert_response :success
+    assert_includes response.body, %(href="#{launch_origin}")
+  end
+
+  def test_cross_workspace_selection_scopes_destinations_to_selected_root
+    get recording_studio_moveable.move_recording_path(recording_id: @page.id, target_root_id: @other_root.id)
+
+    assert_response :success
+    assert_includes response.body, @other_workspace.name
+    assert_includes response.body, ">Change<"
+    assert_includes response.body, @other_target_folder.recordable.name
+    refute_includes response.body, @target_folder.recordable.name
+  end
+
+  def test_cross_workspace_move_failure_preserves_selected_workspace_for_retry
+    other_archive = @other_root.record(RecordingStudioArchiveBox, actor: @user, parent_recording: @other_root) do |box|
+      box.name = "Cross Workspace Archive"
+    end
+
+    get recording_studio_moveable.move_recording_path(recording_id: @page.id, target_root_id: @other_root.id)
+
+    assert_response :success
+    assert_includes response.body, "target_root_id=#{@other_root.id}"
+
+    post recording_studio_moveable.move_recording_path(recording_id: @page.id), params: {
+      destination_id: other_archive.id,
+      target_root_id: @other_root.id,
+      redirect_mode: "root"
+    }
+
+    assert_redirected_to recording_studio_moveable.move_recording_path(
+      recording_id: @page.id,
+      target_root_id: @other_root.id,
+      redirect_mode: "root"
+    )
+
+    follow_redirect!
+
+    assert_response :success
+    assert_includes response.body, @other_workspace.name
+    assert_includes response.body, @other_target_folder.recordable.name
+    refute_includes response.body, @target_folder.recordable.name
+  end
+
+  def test_cross_workspace_move_updates_the_record_root
+    post recording_studio_moveable.move_recording_path(recording_id: @page.id), params: {
+      destination_id: @other_target_folder.id,
+      redirect_mode: "root"
+    }
+
+    assert_redirected_to "/"
+    assert_equal @other_target_folder.id, @page.reload.parent_recording_id
+    assert_equal @other_root.id, @page.root_recording_id
+  end
+
   def test_move_screen_returns_not_found_when_actor_cannot_access_source
     sign_out @user
 
@@ -233,7 +352,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     RecordingStudio::Moveable.configure do |config|
       config.use_builtin_access = false
       config.authorization_hook = lambda do |actor:, source:, destination:, **|
-        actor == @user && source == @page && [@page, @target_folder].include?(destination)
+        actor == @user && source == @page && [ @page, @target_folder ].include?(destination)
       end
     end
 

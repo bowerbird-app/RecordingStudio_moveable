@@ -5,13 +5,6 @@
     variant: :h1
   ) %>
 
-  <div class="-mt-8 flex items-center gap-3 text-(--surface-muted-content-color)">
-    <span class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-(--surface-border-color) bg-(--surface-subtle-background-color)">
-      <%= moveable_demo_recordable_icon(@workspace, size: :lg) %>
-    </span>
-    <span class="text-sm font-medium">Workspace</span>
-  </div>
-
   <section class="space-y-6">
     <% if @items.any? %>
       <%= render FlatPack::Grid::Component.new(cols: 3, gap: :lg, align: :stretch) do %>
