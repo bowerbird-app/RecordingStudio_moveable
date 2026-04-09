@@ -35,8 +35,11 @@ module RecordingStudioMoveable
     end
 
     def resolver
-      if defined?(RecordingStudio::Labels)
-        RecordingStudio::Labels
+      parent_labels = defined?(RecordingStudio::Labels) ? RecordingStudio::Labels : nil
+      required_methods = %i[name_for type_label_for title_for]
+
+      if parent_labels && required_methods.all? { |method_name| parent_labels.respond_to?(method_name) }
+        parent_labels
       else
         self
       end

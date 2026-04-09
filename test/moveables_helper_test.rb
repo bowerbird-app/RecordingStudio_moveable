@@ -29,8 +29,7 @@ class MoveablesHelperTest < Minitest::Test
     end
   end
 
-  NamelessRecordable = Class.new do
-  end
+  NamelessRecordable = Class.new
 
   class TagBuilder
     def meta(name:, content:)
