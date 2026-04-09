@@ -29,6 +29,9 @@ class MoveablesHelperTest < Minitest::Test
     end
   end
 
+  NamelessRecordable = Class.new do
+  end
+
   class TagBuilder
     def meta(name:, content:)
       %(<meta name="#{name}" content="#{content}">)
@@ -233,6 +236,16 @@ class MoveablesHelperTest < Minitest::Test
     assert_equal "Move 📁 Tracking Folder", helper.moveable_title_for(named_recording)
     assert_equal "MoveablesHelperTest::ArchiveRecordable #box-3", helper.moveable_label_for(fallback_recording)
     assert_equal "Archive box", helper.moveable_type_for(fallback_recording)
+  end
+
+  def test_moveable_label_falls_back_to_class_name_when_recordable_has_no_identifier
+    recording = Struct.new(:id, :recordable, :recordable_type).new(
+      "rec-4",
+      NamelessRecordable.new,
+      "NamelessRecordable"
+    )
+
+    assert_equal "MoveablesHelperTest::NamelessRecordable", helper.moveable_label_for(recording)
   end
 
   def test_picker_item_collection_helpers_return_expected_shapes

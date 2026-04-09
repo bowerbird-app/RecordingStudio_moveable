@@ -43,22 +43,12 @@ module RecordingStudioMoveable
     end
 
     def explicit_name_for(recordable)
-      return normalize_label(recordable.recordable_name) if recordable.respond_to?(:recordable_name)
-
-      return unless recordable.respond_to?(:recording_studio_label)
-
-      normalize_label(recordable.recording_studio_label)
+      call_first_present(recordable, :recordable_name, :recording_studio_label)
     end
     private_class_method :explicit_name_for
 
     def explicit_type_label_for(recordable_class)
-      if recordable_class.respond_to?(:recordable_type_label)
-        return normalize_label(recordable_class.recordable_type_label)
-      end
-
-      return unless recordable_class.respond_to?(:recording_studio_type_label)
-
-      normalize_label(recordable_class.recording_studio_type_label)
+      call_first_present(recordable_class, :recordable_type_label, :recording_studio_type_label)
     end
     private_class_method :explicit_type_label_for
 
@@ -72,8 +62,7 @@ module RecordingStudioMoveable
 
     def fallback_type_label_for(type_name)
       demodulized = type_name.demodulize
-      normalized = demodulized.sub(/\ARecordingStudio/, "")
-      normalized = demodulized if normalized.blank?
+      normalized = demodulized.sub(/\ARecordingStudio/, "").presence || demodulized
       normalized.underscore.humanize
     end
     private_class_method :fallback_type_label_for
@@ -96,6 +85,18 @@ module RecordingStudioMoveable
       normalize_label(recordable.public_send(method_name))
     end
     private_class_method :squished_value
+
+    def call_first_present(target, *method_names)
+      method_names.each do |method_name|
+        next unless target.respond_to?(method_name)
+
+        value = normalize_label(target.public_send(method_name))
+        return value if value.present?
+      end
+
+      nil
+    end
+    private_class_method :call_first_present
 
     def normalize_label(value)
       text = value.to_s.squish
