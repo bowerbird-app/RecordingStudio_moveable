@@ -42,16 +42,11 @@ module RecordingStudioMoveable
     end
 
     def moveable_label_for(recording)
-      recordable = recording.recordable
-
-      return recordable.title if recordable.respond_to?(:title) && recordable.title.present?
-      return recordable.name if recordable.respond_to?(:name) && recordable.name.present?
-
-      "#{moveable_type_for(recording)} ##{recording.id}"
+      recordable_labels.name_for(recording.recordable)
     end
 
     def moveable_type_for(recording)
-      recording.recordable_type.to_s.demodulize.sub(/^RecordingStudio/, "").underscore.humanize
+      recordable_labels.type_label_for(recording.recordable)
     end
 
     def moveable_picker_items_for(destinations)
@@ -85,6 +80,10 @@ module RecordingStudioMoveable
         label: label,
         payload: { id: recording.id }
       }
+    end
+
+    def recordable_labels
+      RecordingStudioMoveable::Labels.resolver
     end
   end
 end

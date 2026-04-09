@@ -193,13 +193,13 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_includes response.body, %(data-flat-pack--picker-form-value=)
     assert_includes response.body, %(data-flat-pack--picker-auto-confirm-value="true")
     assert_includes response.body, @target_folder.id.to_s
-    assert_includes response.body, @target_folder.recordable.name
+    assert_includes response.body, @target_folder.recordable.recordable_name
     refute_includes response.body, "Move here"
     refute_includes response.body, "Clear selection"
     refute_includes response.body, @archive.recordable.name
 
     workspace_index = response.body.index(@workspace.name)
-    target_index = response.body.index(@target_folder.recordable.name)
+    target_index = response.body.index(@target_folder.recordable.recordable_name)
 
     assert workspace_index.present?, "Expected workspace root to be rendered as a destination"
     assert target_index.present?, "Expected target folder to be rendered as a destination"
@@ -214,8 +214,8 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     get recording_studio_moveable.move_recording_path(recording_id: @page.id), params: { q: "Target" }
 
     assert_response :success
-    assert_includes response.body, @target_folder.recordable.name
-    refute_includes response.body, other_folder.recordable.name
+    assert_includes response.body, @target_folder.recordable.recordable_name
+    refute_includes response.body, other_folder.recordable.recordable_name
     refute_includes response.body, @archive.recordable.name
   end
 
@@ -229,7 +229,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     get recording_studio_moveable.move_recording_path(recording_id: @page.id), params: { q: "Target" }
 
     assert_response :success
-    assert_includes response.body, @target_folder.recordable.name
+    assert_includes response.body, @target_folder.recordable.recordable_name
   end
 
   def test_root_level_folder_does_not_offer_current_workspace_as_destination
@@ -237,7 +237,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, @workspace.name
-    assert_includes response.body, @source_folder.recordable.name
+    assert_includes response.body, @source_folder.recordable.recordable_name
     assert_equal 1, response.body.scan(@workspace.name).count
   end
 
@@ -290,8 +290,8 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, @other_workspace.name
     assert_includes response.body, ">Change<"
-    assert_includes response.body, @other_target_folder.recordable.name
-    refute_includes response.body, @target_folder.recordable.name
+    assert_includes response.body, @other_target_folder.recordable.recordable_name
+    refute_includes response.body, @target_folder.recordable.recordable_name
   end
 
   def test_cross_workspace_move_failure_preserves_selected_workspace_for_retry
@@ -320,8 +320,8 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, @other_workspace.name
-    assert_includes response.body, @other_target_folder.recordable.name
-    refute_includes response.body, @target_folder.recordable.name
+    assert_includes response.body, @other_target_folder.recordable.recordable_name
+    refute_includes response.body, @target_folder.recordable.recordable_name
   end
 
   def test_cross_workspace_move_updates_the_record_root
@@ -359,8 +359,8 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     get recording_studio_moveable.move_recording_path(recording_id: @page.id)
 
     assert_response :success
-    assert_includes response.body, @target_folder.recordable.name
-    refute_includes response.body, hidden_folder.recordable.name
+    assert_includes response.body, @target_folder.recordable.recordable_name
+    refute_includes response.body, hidden_folder.recordable.recordable_name
   end
 
   def test_client_feedback_page_uses_shared_move_view

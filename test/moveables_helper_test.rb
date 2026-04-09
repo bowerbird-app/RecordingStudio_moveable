@@ -3,6 +3,32 @@
 require "test_helper"
 
 class MoveablesHelperTest < Minitest::Test
+  HookedFolderRecordable = Struct.new(:name, keyword_init: true) do
+    def self.recordable_type_label
+      "Folder"
+    end
+
+    class << self
+      alias_method :recording_studio_type_label, :recordable_type_label
+    end
+
+    def recordable_name
+      "📁 #{name}"
+    end
+
+    alias_method :recording_studio_label, :recordable_name
+  end
+
+  ArchiveRecordable = Struct.new(:id, keyword_init: true) do
+    def self.recordable_type_label
+      "Archive box"
+    end
+
+    class << self
+      alias_method :recording_studio_type_label, :recordable_type_label
+    end
+  end
+
   class TagBuilder
     def meta(name:, content:)
       %(<meta name="#{name}" content="#{content}">)
@@ -157,29 +183,56 @@ class MoveablesHelperTest < Minitest::Test
   end
 
   def test_moveable_title_for_wraps_moveable_label
-    recording = Struct.new(:id, :recordable, :recordable_type).new(
-      "rec-1",
-      Struct.new(:title).new("Mix Notes"),
-      "RecordingStudioPage"
-    )
+    recordable = Struct.new(:title).new("Mix Notes")
+    recording = Struct.new(:id, :recordable, :recordable_type).new("rec-1", recordable, "RecordingStudioPage")
+    recording_studio_labels = Module.new
+    recording_studio_labels.define_singleton_method(:name_for) { |candidate| "stubbed #{candidate.title}" }
+    recording_studio_labels.define_singleton_method(:type_label_for) { |_candidate| "Page" }
 
-    assert_equal "Move Mix Notes", helper.moveable_title_for(recording)
+    RecordingStudioMoveable::Labels.stub(:resolver, recording_studio_labels) do
+      assert_equal "Move stubbed Mix Notes", helper.moveable_title_for(recording)
+    end
   end
 
-  def test_moveable_label_falls_back_to_name_then_type_and_id
+  def test_moveable_label_and_type_delegate_to_recording_studio_labels
+    recordable = Struct.new(:title).new("Tracking Folder")
+    recording = Struct.new(:id, :recordable, :recordable_type).new("rec-2", recordable, "RecordingStudioFolder")
+    received = []
+    recording_studio_labels = Module.new
+    recording_studio_labels.define_singleton_method(:name_for) do |candidate|
+      received << [ :name_for, candidate ]
+      "resolved name"
+    end
+    recording_studio_labels.define_singleton_method(:type_label_for) do |candidate|
+      received << [ :type_label_for, candidate ]
+      "resolved type"
+    end
+
+    RecordingStudioMoveable::Labels.stub(:resolver, recording_studio_labels) do
+      assert_equal "resolved name", helper.moveable_label_for(recording)
+      assert_equal "resolved type", helper.moveable_type_for(recording)
+    end
+
+    assert_equal [ [ :name_for, recordable ], [ :type_label_for, recordable ] ], received
+  end
+
+  def test_moveable_label_follows_parent_hook_contract_without_parent_labels
     named_recording = Struct.new(:id, :recordable, :recordable_type).new(
       "rec-2",
-      Struct.new(:name).new("Tracking Folder"),
+      HookedFolderRecordable.new(name: "Tracking Folder"),
       "RecordingStudioFolder"
     )
     fallback_recording = Struct.new(:id, :recordable, :recordable_type).new(
       "rec-3",
-      Struct.new(:title, :name).new(nil, nil),
+      ArchiveRecordable.new(id: "box-3"),
       "RecordingStudioArchiveBox"
     )
 
-    assert_equal "Tracking Folder", helper.moveable_label_for(named_recording)
-    assert_equal "Archive box #rec-3", helper.moveable_label_for(fallback_recording)
+    assert_equal "📁 Tracking Folder", helper.moveable_label_for(named_recording)
+    assert_equal "Folder", helper.moveable_type_for(named_recording)
+    assert_equal "Move 📁 Tracking Folder", helper.moveable_title_for(named_recording)
+    assert_equal "MoveablesHelperTest::ArchiveRecordable #box-3", helper.moveable_label_for(fallback_recording)
+    assert_equal "Archive box", helper.moveable_type_for(fallback_recording)
   end
 
   def test_picker_item_collection_helpers_return_expected_shapes
@@ -204,7 +257,7 @@ class MoveablesHelperTest < Minitest::Test
   end
 
   def test_moveable_picker_item_omits_badge_and_meta
-    recordable = Struct.new(:title).new("Studio Workspace")
+    recordable = HookedFolderRecordable.new(name: "Studio Workspace")
     parent_recordable = Struct.new(:title).new("Root")
     parent = Struct.new(:recordable, :recordable_type, :id, :parent_recording).new(
       parent_recordable,
@@ -221,7 +274,7 @@ class MoveablesHelperTest < Minitest::Test
 
     item = helper.moveable_picker_item_for(recording)
 
-    assert_equal "Studio Workspace", item[:label]
+    assert_equal "📁 Studio Workspace", item[:label]
     assert_equal "Folder", item[:description]
     assert_not item.key?(:badge)
     assert_not item.key?(:meta)

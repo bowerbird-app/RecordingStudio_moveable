@@ -9,7 +9,31 @@ class DestinationSearchTest < Minitest::Test
   )
   TitleRecordable = Struct.new(:title, keyword_init: true)
   NameRecordable = Struct.new(:name, keyword_init: true)
-  BlankRecordable = Struct.new(:title, :name, keyword_init: true)
+  BlankRecordable = Struct.new(:title, :name, :id, keyword_init: true)
+  HookedFolderRecordable = Struct.new(:name, :id, keyword_init: true) do
+    def self.recordable_type_label
+      "Folder"
+    end
+
+    class << self
+      alias_method :recording_studio_type_label, :recordable_type_label
+    end
+
+    def recordable_name
+      "📁 #{name}"
+    end
+
+    alias_method :recording_studio_label, :recordable_name
+  end
+  ArchiveRecordable = Struct.new(:id, keyword_init: true) do
+    def self.recordable_type_label
+      "Archive box"
+    end
+
+    class << self
+      alias_method :recording_studio_type_label, :recordable_type_label
+    end
+  end
 
   class FakePolicy
     attr_reader :destinations_seen, :destination_checked
@@ -414,19 +438,19 @@ class DestinationSearchTest < Minitest::Test
     )
     named = recording(
       id: "workspace-7",
-      recordable_type: "Workspace",
-      recordable: NameRecordable.new(name: "Client Space")
+      recordable_type: "RecordingStudioFolder",
+      recordable: HookedFolderRecordable.new(name: "Client Space", id: "folder-7")
     )
     typed = recording(
       id: "abc-123",
       recordable_type: "RecordingStudioArchiveBox",
-      recordable: BlankRecordable.new(title: nil, name: nil)
+      recordable: ArchiveRecordable.new(id: "archive-9")
     )
     search = build_search
 
     assert_equal [titled, named, typed], search.send(:filter_by_query, [titled, named, typed], nil)
     assert_equal [titled], search.send(:filter_by_query, [titled, named, typed], "mix")
-    assert_equal [named], search.send(:filter_by_query, [titled, named, typed], "client")
+    assert_equal [named], search.send(:filter_by_query, [titled, named, typed], "📁 client")
     assert_equal [typed], search.send(:filter_by_query, [titled, named, typed], "archive box")
     assert_equal [typed], search.send(:filter_by_query, [titled, named, typed], "abc-123")
   end
@@ -442,18 +466,32 @@ class DestinationSearchTest < Minitest::Test
     assert_equal [root_recording, second_root, nested_recording], promoted
   end
 
-  def test_recordable_title_name_and_resolved_root_id_handle_missing_values
+  def test_searchable_terms_and_resolved_root_id_follow_label_contract
     search = build_search
     titled = TitleRecordable.new(title: "Song Draft")
-    named = NameRecordable.new(name: "Workspace A")
-    blank = BlankRecordable.new(title: "", name: nil)
+    named = HookedFolderRecordable.new(name: "Workspace A", id: "folder-a")
+    blank = ArchiveRecordable.new(id: "archive-a")
+    recording = self.recording(id: "searchable", recordable_type: "RecordingStudioFolder", recordable: named)
 
-    assert_equal "Song Draft", search.send(:recordable_title, titled)
-    assert_nil search.send(:recordable_title, named)
-    assert_equal "Workspace A", search.send(:recordable_name, named)
-    assert_nil search.send(:recordable_name, blank)
+    assert_includes search.send(:searchable_terms, self.recording(id: "titled", recordable: titled)), "song draft"
+    assert_includes search.send(:searchable_terms, recording), "📁 workspace a"
+    assert_includes search.send(:searchable_terms, recording), "folder"
+    assert_includes search.send(:searchable_terms, self.recording(id: "archive", recordable_type: "RecordingStudioArchiveBox", recordable: blank)), "archive box"
     assert_equal "root-1", search.send(:resolved_root_id, recording(id: "child", root_recording_id: "root-1"))
     assert_equal "direct-root", search.send(:resolved_root_id, recording(id: "direct-root"))
+  end
+
+  def test_searchable_terms_delegate_to_recording_studio_labels
+    recordable = TitleRecordable.new(title: "Source")
+    recording = self.recording(id: "delegated-id", recordable: recordable)
+    recording_studio_labels = Module.new
+    recording_studio_labels.define_singleton_method(:title_for) { |candidate| "title:#{candidate.title}" }
+    recording_studio_labels.define_singleton_method(:name_for) { |candidate| "name:#{candidate.title}" }
+    recording_studio_labels.define_singleton_method(:type_label_for) { |_candidate| "Page" }
+
+    RecordingStudioMoveable::Labels.stub(:resolver, recording_studio_labels) do
+      assert_equal ["title:source", "name:source", "page", "delegated-id"], search.send(:searchable_terms, recording)
+    end
   end
 
   private
@@ -491,7 +529,7 @@ class DestinationSearchTest < Minitest::Test
       parent_recording_id: parent_recording_id,
       root_recording_id: root_recording_id,
       recordable_type: recordable_type,
-      recordable: recordable || BlankRecordable.new(title: nil, name: nil)
+      recordable: recordable || BlankRecordable.new(title: nil, name: nil, id: nil)
     )
   end
 end
