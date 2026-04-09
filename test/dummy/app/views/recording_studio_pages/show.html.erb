@@ -4,21 +4,21 @@
 ) %>
 
 <%= render FlatPack::ButtonGroup::Component.new(class: "mt-4") do |group| %>
-  <% group.with_button(
-       render(FlatPack::Button::Component.new(
+  <% group.button(
+       FlatPack::Button::Component.new(
          text: "Move (full page)",
          style: :primary,
          size: :sm,
          url: recording_studio_moveable.move_recording_path(recording_id: @recording.id)
-       ))
+       )
      ) %>
-  <% group.with_button(
-       render(FlatPack::Button::Component.new(
+  <% group.button(
+       FlatPack::Button::Component.new(
          text: "Move (modal mode)",
          style: :ghost,
          size: :sm,
          url: recording_studio_moveable.move_recording_path(recording_id: @recording.id),
          data: { recording_studio_moveable_modal: true }
-       ))
+       )
      ) %>
 <% end %>

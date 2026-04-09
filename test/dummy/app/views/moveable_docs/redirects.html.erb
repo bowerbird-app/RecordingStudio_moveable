@@ -1,0 +1,88 @@
+<div class="space-y-8">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Redirects",
+    subtitle: "How move redirects work in this demo."
+  ) %>
+
+  <section class="space-y-4">
+    <%= render FlatPack::SectionTitle::Component.new(
+      title: "Default Redirect",
+      anchor_link: true,
+      anchor_id: "default-redirect",
+      class: "my-0"
+    ) %>
+
+    <%= render FlatPack::CodeBlock::Component.new(
+      title: "Ruby",
+      language: "ruby",
+      code: <<~CODE
+        # test/dummy/config/initializers/recording_studio_moveable.rb
+        RecordingStudio::Moveable.configure do |config|
+          config.default_redirect_mode = :moved_record
+        end
+      CODE
+    ) %>
+  </section>
+
+  <section class="space-y-4">
+    <%= render FlatPack::SectionTitle::Component.new(
+      title: "Redirect In Link",
+      anchor_link: true,
+      anchor_id: "redirect-in-link",
+      class: "my-0"
+    ) %>
+
+    <%= render FlatPack::CodeBlock::Component.new(
+      title: "Ruby",
+      language: "ruby",
+      code: <<~CODE
+        # test/dummy/app/views/recording_studio_pages/show.html.erb
+        recording_studio_moveable.move_recording_path(
+          recording_id: @recording.id,
+          redirect_mode: "destination"
+        )
+      CODE
+    ) %>
+  </section>
+
+  <% redirect_rows = [
+       {
+         option: "redirect_to",
+         description: "Explicit same-origin URL. If present, it wins over every redirect_mode setting."
+       },
+       {
+         option: "previous_page",
+         description: "Returns to the page that launched the move flow, using the referer when available."
+       },
+       {
+         option: "moved_record",
+         description: "Follows the record that was moved by resolving its host-app show path."
+       },
+       {
+         option: "destination",
+         description: "Redirects to the folder or record that received the moved item."
+       },
+       {
+         option: "root",
+         description: "Skips record-specific routing and goes to the configured fallback root path."
+       }
+     ] %>
+
+  <section class="space-y-4">
+    <%= render FlatPack::SectionTitle::Component.new(
+      title: "Redirect Options",
+      anchor_link: true,
+      anchor_id: "redirect-options",
+      class: "my-0"
+    ) %>
+
+    <%= render FlatPack::Table::Component.new(data: redirect_rows) do |table| %>
+      <% table.column(title: "Option", html: ->(row) {
+           content_tag(:div, row[:option], class: "font-medium text-(--surface-content-color)")
+         }) %>
+      <% table.column(title: "Description", html: ->(row) {
+           content_tag(:div, row[:description], class: "text-(--surface-muted-content-color)")
+         }) %>
+    <% end %>
+  </section>
+</div>

@@ -8,10 +8,11 @@
   - `RecordingStudio::Capabilities::Moveable.to(*types)` (preferred)
   - `RecordingStudio::Capabilities::Movable.to(*types)` (compat alias)
 - `move_to!` behavior equivalent to legacy `movable` behavior:
-  - must remain in same root
+  - remains in the same root by default
+  - can transfer across roots when `allow_cross_root: true`
   - cannot move under itself or descendants
   - destination type must be in `allowed_parent_types`
-  - logs event metadata with `from_parent_id` and `to_parent_id`
+  - logs event metadata with parent ids and root ids
   - supports `actor`, optional `impersonator`, optional `metadata`
 - Authorization modes:
   - **Built-in mode (default):** uses `RecordingStudio::Services::AccessCheck` and raises `RecordingStudio::AccessDenied` on failures
@@ -19,7 +20,7 @@
 - Gem-provided reusable move UI:
   - full-page mode
   - modal mode
-  - destination search (uses `FlatPack::SearchInput::Component` when available, plain input fallback)
+  - destination picker powered by `FlatPack::Picker::Component`
   - only shows destinations that pass gem-owned move visibility checks
   - returns not found for inaccessible source recordings
   - move action redirects to root page with success flash
@@ -30,6 +31,7 @@ Add to your Gemfile:
 
 ```ruby
 gem "recording_studio_moveable"
+gem "flat_pack", github: "bowerbird-app/flatpack"
 ```
 
 Then bundle install and mount the engine UI routes:
@@ -55,9 +57,11 @@ class RecordingStudioFolder < ApplicationRecord
 end
 
 class RecordingStudioPage < ApplicationRecord
-  include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder")
+  include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder", allow_cross_root: true)
 end
 ```
+
+Set `allow_cross_root: true` only for recordables that should be transferable between workspace roots.
 
 ### Migration note from legacy built-in gate
 
@@ -126,7 +130,7 @@ The dummy app includes:
 - `Workspace` root recordable
 - `RecordingStudioFolder` and `RecordingStudioPage` (move-enabled)
 - `RecordingStudioArchiveBox` (disallowed destination type demo)
-- routes/controllers/views to demonstrate move full-page and modal flows
+- routes/controllers/views to demonstrate same-workspace and cross-workspace move flows
 
 ### Seed reset instructions
 
@@ -149,6 +153,7 @@ Seeds are idempotent and create substantial folders/pages for destination search
 - capability behavior
   - allowed/disallowed destination
   - same-root enforcement
+  - opt-in cross-root transfer with subtree root updates
   - self/descendant protection
   - move event metadata
 - authorization modes
@@ -157,4 +162,5 @@ Seeds are idempotent and create substantial folders/pages for destination search
 - UI behavior
   - full page and modal rendering
   - destination filtering
+  - workspace picker flow for cross-root moves
   - move action redirect + flash

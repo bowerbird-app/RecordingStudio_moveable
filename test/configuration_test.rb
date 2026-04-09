@@ -4,7 +4,7 @@ require "test_helper"
 
 class ConfigurationTest < Minitest::Test
   def setup
-    @configuration = GemTemplate::Configuration.new
+    @configuration = RecordingStudioMoveable::Configuration.new
   end
 
   def test_merge_updates_known_attributes
@@ -15,7 +15,8 @@ class ConfigurationTest < Minitest::Test
       move_modal_prefetch_enabled: false,
       move_modal_prefetch_delay_ms: 150,
       move_modal_prefetch_ttl_ms: 20_000,
-      move_modal_reuse_shell: false
+      move_modal_reuse_shell: false,
+      full_page_layout: "custom_layout"
     )
 
     assert_equal "abc123", @configuration.api_key
@@ -25,12 +26,14 @@ class ConfigurationTest < Minitest::Test
     assert_equal 150, @configuration.move_modal_prefetch_delay_ms
     assert_equal 20_000, @configuration.move_modal_prefetch_ttl_ms
     assert_equal false, @configuration.move_modal_reuse_shell
+    assert_equal "custom_layout", @configuration.full_page_layout
   end
 
   def test_merge_ignores_unknown_keys
-    @configuration.merge!(unknown_key: "ignored", timeout: 7)
+    updates = { unknown_key: "ignored", timeout: 7 }
+    @configuration.merge!(updates)
 
-    refute_respond_to @configuration, :unknown_key
+    assert_equal false, @configuration.respond_to?(:unknown_key)
     assert_equal 7, @configuration.timeout
   end
 
@@ -61,11 +64,12 @@ class ConfigurationTest < Minitest::Test
     assert_equal 80, @configuration.move_modal_prefetch_delay_ms
     assert_equal 10_000, @configuration.move_modal_prefetch_ttl_ms
     assert_equal true, @configuration.move_modal_reuse_shell
+    assert_equal "recording_studio_moveable", @configuration.full_page_layout
   end
 
   def test_configure_without_block_is_safe
-    GemTemplate.configure
+    RecordingStudioMoveable.configure
 
-    assert_kind_of GemTemplate::Configuration, GemTemplate.configuration
+    assert_kind_of RecordingStudioMoveable::Configuration, RecordingStudioMoveable.configuration
   end
 end

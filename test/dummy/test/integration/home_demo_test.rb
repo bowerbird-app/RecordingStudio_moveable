@@ -7,6 +7,7 @@ class HomeDemoTest < ActionDispatch::IntegrationTest
     super
 
     @user = create_user(email: "demo@example.com")
+    bootstrap_demo_for(@user)
     sign_in @user
   end
 
@@ -14,14 +15,18 @@ class HomeDemoTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_response :success
+    assert_includes response.body, "Studio Workspace"
+    refute_includes response.body, 'data-icon-name="rectangle-stack"'
     assert_includes response.body, "Songwriting"
     assert_includes response.body, "Folder"
+    assert_includes response.body, 'data-icon-name="folder"'
     assert_includes response.body, "Move"
-    assert_includes response.body, "Move modal"
+    assert_includes response.body, "Modal"
     refute_includes response.body, "Lyric Draft"
     refute_includes response.body, "Move page"
     refute_includes response.body, "Open folder"
     refute_includes response.body, "Archive Box A"
+    refute_includes response.body, "Restricted Workspace"
     assert_includes response.body, 'data-recording-studio-moveable-modal="true"'
 
     root = RecordingStudio::Recording.unscoped.find_by!(recordable: Workspace.find_by!(name: "Studio Workspace"), parent_recording_id: nil)
@@ -77,12 +82,12 @@ class HomeDemoTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "4 items in this folder"
     assert_includes response.body, "Chorus Ideas"
     assert_includes response.body, "Open this folder to browse its nested folders and pages."
-    assert_includes response.body, "Folder"
     assert_includes response.body, "Lyric Draft"
     assert_includes response.body, "Page"
+    assert_includes response.body, 'data-icon-name="document"'
     assert_includes response.body, "Demo Arrangement"
     assert_includes response.body, "Move"
-    assert_includes response.body, "Move modal"
+    assert_includes response.body, "Modal"
     refute_includes response.body, "Open page"
     refute_includes response.body, "Move page"
     assert_includes response.body, 'data-recording-studio-moveable-modal="true"'

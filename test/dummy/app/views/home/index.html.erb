@@ -1,6 +1,6 @@
 <div class="space-y-8">
   <%= render FlatPack::PageTitle::Component.new(
-    title: "Moveable demo",
+    title: @workspace.name,
     subtitle: "Browse folders and pages at the root, then drill into folders for nested content.",
     variant: :h1
   ) %>
@@ -30,8 +30,11 @@
             <% card.body do %>
               <div class="flex h-full flex-col gap-4">
                 <div class="space-y-3 min-w-0">
-                  <%= render(FlatPack::Link::Component.new(href: item_href, class: "block text-base font-semibold")) do %>
-                    <%= item_title %>
+                  <%= render(FlatPack::Link::Component.new(href: item_href, class: "flex items-center gap-2 text-base font-semibold")) do %>
+                    <span class="inline-flex shrink-0 text-(--surface-muted-content-color)">
+                      <%= moveable_demo_recordable_icon(item_recording.recordable, css_class: "h-5 w-5") %>
+                    </span>
+                    <span class="min-w-0 truncate"><%= item_title %></span>
                   <% end %>
 
                   <%= render FlatPack::Badge::Component.new(
@@ -45,23 +48,20 @@
                   </p>
                 </div>
 
-                <div class="mt-auto pt-2">
-                  <%= render FlatPack::Button::Dropdown::Component.new(
+                <div class="mt-auto flex flex-wrap gap-2 pt-2">
+                  <%= render FlatPack::Button::Component.new(
                     text: "Move",
                     style: :secondary,
                     size: :sm,
-                    position: :bottom_right
-                  ) do |dropdown| %>
-                    <% dropdown.with_menu_item(
-                         text: "Move",
-                         href: recording_studio_moveable.move_recording_path(recording_id: item_recording.id)
-                       ) %>
-                    <% dropdown.with_menu_item(
-                         text: "Move modal",
-                      href: recording_studio_moveable.move_recording_path(recording_id: item_recording.id),
-                      data: { recording_studio_moveable_modal: true }
-                       ) %>
-                  <% end %>
+                    url: recording_studio_moveable.move_recording_path(recording_id: item_recording.id)
+                  ) %>
+                  <%= render FlatPack::Button::Component.new(
+                    text: "Modal",
+                    style: :secondary,
+                    size: :sm,
+                    url: recording_studio_moveable.move_recording_path(recording_id: item_recording.id),
+                    data: { recording_studio_moveable_modal: true }
+                  ) %>
                 </div>
               </div>
             <% end %>

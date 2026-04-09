@@ -1,5 +1,13 @@
 class MoveableDocsController < ApplicationController
-  def show
-    MoveableDemo::Bootstrap.call(actor: Current.actor)
+  def access
+  end
+
+  def setup
+  end
+
+  def methods
+  end
+
+  def redirects
   end
 end

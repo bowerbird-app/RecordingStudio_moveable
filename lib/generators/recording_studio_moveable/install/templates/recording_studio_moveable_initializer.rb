@@ -1,0 +1,39 @@
+# frozen_string_literal: true
+
+RecordingStudioMoveable.configure do |config|
+  # Set your API key (recommended to use ENV or Rails credentials)
+  # config.api_key = ENV["RECORDING_STUDIO_MOVEABLE_API_KEY"]
+
+  # Enable optional feature X
+  # config.enable_feature_x = false
+
+  # Timeout in seconds for external calls
+  # config.timeout = 5
+
+  # Prefetch move modal responses when users hover or focus a modal trigger link.
+  # config.move_modal_prefetch_enabled = true
+
+  # Delay before hover/focus prefetch begins.
+  # config.move_modal_prefetch_delay_ms = 80
+
+  # How long prefetched move modal responses stay warm in the client cache.
+  # config.move_modal_prefetch_ttl_ms = 10_000
+
+  # Reuse a single gem-owned modal shell between openings.
+  # config.move_modal_reuse_shell = true
+
+  # Full-page move screens use the gem's blank layout by default.
+  # Set this to a host-app layout name to embed move screens in your shell.
+  # config.full_page_layout = "recording_studio_moveable"
+end
+
+RecordingStudio::Moveable.configure do |config|
+  # Redirect back to the launcher, the moved record, the chosen destination, or the fallback root.
+  # config.default_redirect_mode = :previous_page
+
+  # Final fallback when no referer or resolvable record path is available.
+  # config.default_redirect_path = "/"
+
+  # Override how host-app URLs are generated for moved records and destinations.
+  # config.redirect_resolver = ->(recording:, helpers:, fallback:, mode:) { fallback }
+end

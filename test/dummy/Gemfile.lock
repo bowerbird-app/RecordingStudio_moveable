@@ -6,12 +6,19 @@ GIT
       rails (>= 8.1.0)
 
 GIT
-  remote: https://github.com/bowerbird-app/flatpack.git
-  revision: af0e318c47786f6aea363e1ddadf50646597734e
+  remote: https://github.com/bowerbird-app/RecordingStudio_icons.git
+  revision: 7c32c08d4c0a28dca5cfcb624d1beb03632f79b0
   specs:
-    flat_pack (0.1.2)
+    recording_studio_icons (0.1.0)
+      rails (>= 8.1.0)
+
+GIT
+  remote: https://github.com/bowerbird-app/flatpack.git
+  revision: 2770a7b6e09f20fc6ab7b68447a083fb00806065
+  specs:
+    flat_pack (0.1.15)
       pagy (~> 9.0)
-      rails (~> 8.0)
+      rails (>= 7.1, < 9)
       tailwind_merge (~> 0.13)
       view_component (~> 3.0)
 
@@ -21,6 +28,7 @@ PATH
     recording_studio_moveable (0.1.0)
       rails (>= 7.0.0)
       recording_studio (>= 0.1.0)
+      recording_studio_icons (>= 0.1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -443,6 +451,7 @@ DEPENDENCIES
   puma (>= 5.0)
   rails (~> 8.1.1)
   recording_studio!
+  recording_studio_icons!
   recording_studio_moveable!
   rubocop-rails-omakase
   solid_cable
@@ -500,7 +509,7 @@ CHECKSUMS
   ffi (1.17.2-x86_64-darwin) sha256=981f2d4e32ea03712beb26e55e972797c2c5a7b0257955d8667ba58f2da6440e
   ffi (1.17.2-x86_64-linux-gnu) sha256=05d2026fc9dbb7cfd21a5934559f16293815b7ce0314846fee2ac8efbdb823ea
   ffi (1.17.2-x86_64-linux-musl) sha256=97c0eb3981414309285a64dc4d466bd149e981c279a56371ef811395d68cb95c
-  flat_pack (0.1.2)
+  flat_pack (0.1.15)
   fugit (1.12.1) sha256=5898f478ede9b415f0804e42b8f3fd53f814bd85eebffceebdbc34e1107aaf68
   globalid (1.3.0) sha256=05c639ad6eb4594522a0b07983022f04aa7254626ab69445a0e493aa3786ff11
   i18n (1.14.8) sha256=285778639134865c5e0f6269e0b818256017e8cde89993fdfcbfb64d088824a5
@@ -570,6 +579,7 @@ CHECKSUMS
   rake (13.3.1) sha256=8c9e89d09f66a26a01264e7e3480ec0607f0c497a861ef16063604b1b08eb19c
   rdoc (7.2.0) sha256=8650f76cd4009c3b54955eb5d7e3a075c60a57276766ebf36f9085e8c9f23192
   recording_studio (0.1.0)
+  recording_studio_icons (0.1.0)
   recording_studio_moveable (0.1.0)
   regexp_parser (2.11.3) sha256=ca13f381a173b7a93450e53459075c9b76a10433caadcb2f1180f2c741fc55a4
   reline (0.6.3) sha256=1198b04973565b36ec0f11542ab3f5cfeeec34823f4e54cebde90968092b1835

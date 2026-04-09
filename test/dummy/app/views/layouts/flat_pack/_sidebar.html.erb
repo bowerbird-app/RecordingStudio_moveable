@@ -17,27 +17,6 @@
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Recordings",
-        href: recordings_path,
-        icon: "rectangle-stack",
-        active: current_page?(recordings_path)
-      ) %>
-
-      <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Folder Recordables",
-        href: folder_recordables_path,
-        icon: "folder",
-        active: current_page?(folder_recordables_path)
-      ) %>
-
-      <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Pages Recordables",
-        href: page_recordables_path,
-        icon: "document-text",
-        active: current_page?(page_recordables_path)
-      ) %>
-
-      <%= render FlatPack::Sidebar::Item::Component.new(
         label: "Events",
         href: events_path,
         icon: "calendar-days",
@@ -45,10 +24,38 @@
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Moveable Docs",
-        href: moveable_docs_path,
-        icon: "question",
-        active: current_page?(moveable_docs_path)
+        label: "Data",
+        href: data_path,
+        icon: "circle-stack",
+        active: current_page?(data_path)
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Destinations",
+        href: access_docs_path,
+        icon: "lock-closed",
+        active: current_page?(access_docs_path)
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Setup",
+        href: setup_docs_path,
+        icon: "wrench-screwdriver",
+        active: current_page?(setup_docs_path)
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Methods",
+        href: methods_docs_path,
+        icon: "code-bracket-square",
+        active: current_page?(methods_docs_path)
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Redirects",
+        href: redirects_docs_path,
+        icon: "arrow-right-on-rectangle",
+        active: current_page?(redirects_docs_path)
       ) %>
 
     </nav>

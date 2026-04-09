@@ -4,4 +4,4 @@ import { eagerLoadControllersFrom } from "@hotwired/stimulus-loading"
 eagerLoadControllersFrom("controllers", application)
 
 // Eager load FlatPack controllers
-eagerLoadControllersFrom("controllers/flat_pack", application)
+eagerLoadControllersFrom("controllers", application)

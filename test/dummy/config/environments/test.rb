@@ -39,8 +39,9 @@ Rails.application.configure do
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "example.com" }
 
-  # Print deprecation notices to the stderr.
-  config.active_support.deprecation = :stderr
+  # The current ViewComponent release still emits a Rails 8.1 deprecation during boot.
+  # Keep test output clean until that dependency is updated.
+  config.active_support.report_deprecations = false
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true

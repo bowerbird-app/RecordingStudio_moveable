@@ -1,0 +1,30 @@
+<div class="space-y-8">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Setup",
+    subtitle: "How to mark a recordable model as moveable in your app."
+  ) %>
+
+  <div class="space-y-4">
+    <p class="text-sm text-[var(--surface-muted-content-color)]">
+      Add the moveable capability to any recordable model and list the destination recordable types it can move into.
+    </p>
+
+    <%= render FlatPack::CodeBlock::Component.new(
+      title: "Model setup",
+      language: "ruby",
+      code: <<~CODE
+        class RecordingStudioPage < ApplicationRecord
+          include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder", allow_cross_root: true)
+        end
+
+        class RecordingStudioFolder < ApplicationRecord
+          include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder", allow_cross_root: true)
+        end
+      CODE
+    ) %>
+
+    <p class="text-sm text-(--surface-muted-content-color)">
+      Leave <code>allow_cross_root</code> off to keep the default same-workspace-only behavior.
+    </p>
+  </div>
+</div>

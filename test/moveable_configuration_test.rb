@@ -15,6 +15,51 @@ class MoveableConfigurationTest < Minitest::Test
     assert RecordingStudio::Moveable.configuration.use_builtin_access
   end
 
+  def test_default_redirect_mode_defaults_to_previous_page
+    assert_equal "previous_page", RecordingStudio::Moveable.configuration.default_redirect_mode
+  end
+
+  def test_custom_redirect_resolver_falls_back_when_blank
+    RecordingStudio::Moveable.configure do |config|
+      config.redirect_resolver = ->(**) {}
+    end
+
+    resolved = RecordingStudio::Moveable.configuration.resolve_redirect(
+      recording: :recording,
+      helpers: :helpers,
+      fallback: "/fallback",
+      mode: "moved_record"
+    )
+
+    assert_equal "/fallback", resolved
+  end
+
+  def test_custom_redirect_resolver_receives_context
+    received = nil
+
+    RecordingStudio::Moveable.configure do |config|
+      config.redirect_resolver = lambda do |recording:, helpers:, fallback:, mode:|
+        received = { recording: recording, helpers: helpers, fallback: fallback, mode: mode }
+        "/custom-destination"
+      end
+    end
+
+    resolved = RecordingStudio::Moveable.configuration.resolve_redirect(
+      recording: :recording,
+      helpers: :helpers,
+      fallback: "/fallback",
+      mode: "destination"
+    )
+
+    assert_equal "/custom-destination", resolved
+    assert_equal({
+                   recording: :recording,
+                   helpers: :helpers,
+                   fallback: "/fallback",
+                   mode: "destination"
+                 }, received)
+  end
+
   def test_custom_authorization_hook_is_invoked
     called = false
     RecordingStudio::Moveable.configure do |config|

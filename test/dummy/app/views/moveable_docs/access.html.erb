@@ -1,0 +1,41 @@
+<div class="space-y-8">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Destinations",
+    subtitle: "Where something can be moved in your app."
+  ) %>
+
+  <div class="space-y-4">
+    <%= render FlatPack::CodeBlock::Component.new(
+      snippets: [
+        {
+          label: "Ruby",
+          language: "ruby",
+          code: <<~CODE
+            class RecordingStudioPage < ApplicationRecord
+              # This page can move to a workspace or a folder.
+              include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder", allow_cross_root: true)
+            end
+          CODE
+        }
+      ]
+    ) %>
+
+    <%= render FlatPack::List::Component.new(divider: true, spacing: :dense) do %>
+      <%= render FlatPack::List::Item.new do %>
+        <strong>Workspace</strong> means pages can be moved to the workspace root.
+      <% end %>
+      <%= render FlatPack::List::Item.new do %>
+        <strong>RecordingStudioFolder</strong> means pages can also be moved into folders.
+      <% end %>
+      <%= render FlatPack::List::Item.new do %>
+        <strong>Same root by default:</strong> Add <code>allow_cross_root: true</code> to opt into cross-workspace transfers.
+      <% end %>
+      <%= render FlatPack::List::Item.new do %>
+        <strong>No self or descendants:</strong> A recording cannot be moved under itself or any of its descendants.
+      <% end %>
+      <%= render FlatPack::List::Item.new do %>
+        Any recordable type not listed in <code>Moveable.to(...)</code> is excluded from the destination picker and rejected by the move operation.
+      <% end %>
+    <% end %>
+  </div>
+</div>

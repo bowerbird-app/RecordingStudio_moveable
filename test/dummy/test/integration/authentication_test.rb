@@ -7,6 +7,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     super
 
     @user = create_user(email: "admin@admin.com")
+    bootstrap_demo_for(@user)
   end
 
   def test_user_can_sign_in_with_valid_credentials
@@ -26,7 +27,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     follow_redirect!
 
     assert_response :success
-    assert_includes response.body, "Moveable demo"
+    assert_includes response.body, "Studio Workspace"
     refute_includes response.body, "Log in"
   end
 end

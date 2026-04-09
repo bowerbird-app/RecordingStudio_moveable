@@ -1,0 +1,69 @@
+<div class="space-y-8">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Methods",
+    subtitle: "Reference links and helper methods you can use to launch and support the move flow."
+  ) %>
+
+  <% method_rows = [
+       {
+         method: "recording_studio_moveable.move_recording_path(recording_id: recording.id)",
+         usage: "Links to the full-page move flow for a recording.",
+         example: 'link_to "Move", recording_studio_moveable.move_recording_path(recording_id: recording.id)'
+       },
+       {
+         method: "recording_studio_moveable.move_recording_modal_path(recording_id: recording.id)",
+         usage: "Links directly to the modal endpoint when you need the modal response URL itself.",
+         example: 'recording_studio_moveable.move_recording_modal_path(recording_id: recording.id)'
+       },
+       {
+         method: "recording_studio_moveable_meta_tags",
+         usage: "Adds the meta tag the frontend uses to detect that moveable UI support is present on the page.",
+         example: 'recording_studio_moveable_meta_tags'
+       },
+       {
+         method: "recording_studio_moveable_modal_template",
+         usage: "Renders the shared FlatPack modal shell used by move links with modal behavior.",
+         example: 'recording_studio_moveable_modal_template'
+       },
+       {
+         method: "recording_studio_moveable_asset_available?(\"tailwind.css\")",
+         usage: "Lets the host layout guard optional asset tags when the moveable stylesheet is only available in some environments.",
+         example: 'recording_studio_moveable_asset_available?("tailwind.css")'
+       }
+     ] %>
+
+  <section class="space-y-4">
+    <%= render FlatPack::SectionTitle::Component.new(
+      title: "Link To A Move Page",
+      anchor_link: true,
+      anchor_id: "link-to-a-move-page",
+      class: "my-0"
+    ) %>
+
+    <%= render FlatPack::CodeBlock::Component.new(
+      title: "ERB",
+      language: "erb",
+      code: <<~CODE
+        link_to "Move", recording_studio_moveable.move_recording_path(recording_id: recording.id)
+
+        link_to "Move in modal",
+                recording_studio_moveable.move_recording_path(recording_id: recording.id),
+                data: { recording_studio_moveable_modal: true }
+      CODE
+    ) %>
+  </section>
+
+  <section class="space-y-4">
+    <%= render FlatPack::Table::Component.new(data: method_rows) do |table| %>
+      <% table.column(title: "Method", html: ->(row) {
+           content_tag(:code, row[:method], class: "text-xs sm:text-sm text-(--surface-content-color) break-all")
+         }) %>
+      <% table.column(title: "Use", html: ->(row) {
+           content_tag(:div, row[:usage], class: "text-(--surface-muted-content-color)")
+         }) %>
+      <% table.column(title: "Example", html: ->(row) {
+           content_tag(:code, row[:example], class: "text-xs sm:text-sm text-(--surface-content-color) whitespace-pre-wrap break-words")
+         }) %>
+    <% end %>
+  </section>
+</div>
