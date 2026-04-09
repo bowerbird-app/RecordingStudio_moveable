@@ -11,7 +11,6 @@ require "recording_studio"
 begin
   require "recording_studio/labels"
 rescue LoadError
-  nil
 end
 require "recording_studio/moveable"
 require "recording_studio_moveable/engine"
