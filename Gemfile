@@ -5,7 +5,7 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in recording_studio_moveable.gemspec
 gemspec
 
-gem "flat_pack", path: "flatpack"
+gem "flat_pack", github: "bowerbird-app/flatpack"
 gem "recording_studio", github: "bowerbird-app/RecordingStudio"
 gem "recording_studio_icons", github: "bowerbird-app/RecordingStudio_icons"
 

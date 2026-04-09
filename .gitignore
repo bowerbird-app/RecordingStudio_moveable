@@ -43,5 +43,8 @@ test/dummy/config/credentials/*.key
 *.gem
 pkg/
 
+# Nested repositories
+flatpack/
+
 # Rename script state
 .rename_state.yml
