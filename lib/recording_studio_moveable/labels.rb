@@ -99,8 +99,7 @@ module RecordingStudioMoveable
     private_class_method :call_first_present
 
     def normalize_label(value)
-      text = value.to_s.squish
-      text.presence
+      value.to_s.squish.presence
     end
     private_class_method :normalize_label
   end
