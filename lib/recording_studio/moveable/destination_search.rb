@@ -154,23 +154,15 @@ module RecordingStudio
         recordable = recording.recordable
 
         [
-          recordable_title(recordable),
-          recordable_name(recordable),
-          recording.recordable_type.to_s.demodulize.titleize,
+          recordable_labels.title_for(recordable),
+          recordable_labels.name_for(recordable),
+          recordable_labels.type_label_for(recordable),
           recording.id.to_s
         ].compact.map { |term| term.to_s.downcase }
       end
 
-      def recordable_title(recordable)
-        return unless recordable.respond_to?(:title)
-
-        recordable.title.presence
-      end
-
-      def recordable_name(recordable)
-        return unless recordable.respond_to?(:name)
-
-        recordable.name.presence
+      def recordable_labels
+        RecordingStudioMoveable::Labels.resolver
       end
 
       def resolved_root_id(recording)

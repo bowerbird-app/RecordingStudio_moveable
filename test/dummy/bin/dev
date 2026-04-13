@@ -13,4 +13,10 @@ export PORT="${PORT:-3000}"
 export RUBY_DEBUG_OPEN="true"
 export RUBY_DEBUG_LAZY="true"
 
+echo "Building Tailwind CSS before starting the development processes..."
+bin/rails tailwindcss:build || exit 1
+
+echo "Preparing database and seeding demo data before starting the development processes..."
+bin/rails db:prepare db:seed || exit 1
+
 exec foreman start -f Procfile.dev "$@"

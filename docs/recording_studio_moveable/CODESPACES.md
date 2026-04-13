@@ -31,18 +31,31 @@ This document covers how the devcontainer is configured and how to work in GitHu
 The `postCreateCommand` in `.devcontainer/devcontainer.json` executes:
 
 ```bash
+bash .devcontainer/post-create.sh
+```
+
+That script runs:
+
+```bash
+cd /workspace && \
 git lfs install && \
-bundle config set --local path '/usr/local/bundle' && \
-bundle install && \
+npm install -g playwright && \
+playwright install --with-deps && \
+bundle config set --local path /usr/local/bundle && \
+bundle check || bundle install && \
 cd test/dummy && \
-bundle exec rails db:prepare && \
-bundle exec rails tailwindcss:build
+bundle config set --local path /usr/local/bundle && \
+bundle check || bundle install && \
+bin/rails db:prepare db:seed && \
+bin/rails tailwindcss:build
 ```
 
 This:
 - Installs Git LFS (if needed)
-- Installs gem dependencies
-- Prepares the PostgreSQL database (creates, migrates, seeds)
+- Installs Playwright and browser dependencies
+- Installs root workspace gem dependencies
+- Installs dummy app gem dependencies
+- Prepares the PostgreSQL database and applies the idempotent demo seeds
 - Builds TailwindCSS assets
 
 ---
@@ -147,7 +160,8 @@ If you change `.devcontainer/` files:
 |-------|----------|
 | Container fails to start | Check Docker Compose logs in the terminal. |
 | Database connection refused | Ensure `db` service is healthy (`docker ps`). |
-| Tailwind not rebuilding | Restart `bin/dev` or run `bin/rails tailwindcss:build`. |
+| Missing seed data after rebuild | Re-run `bash .devcontainer/post-create.sh` inside the container. |
+| Tailwind styles missing after rebuild | Re-run `bash .devcontainer/post-create.sh` or restart `bin/dev`. |
 | Port already in use | Use a different port: `PORT=3001 bin/dev`. |
 
 ---
@@ -157,6 +171,7 @@ If you change `.devcontainer/` files:
 | File | Purpose |
 |------|---------|
 | `.devcontainer/devcontainer.json` | Codespaces/VS Code configuration |
+| `.devcontainer/post-create.sh` | Deterministic Codespaces bootstrap |
 | `.devcontainer/docker-compose.yml` | Service definitions |
 | `.devcontainer/Dockerfile` | Ruby container build |
 | `test/dummy/Procfile.dev` | Foreman process definitions |

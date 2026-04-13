@@ -5,4 +5,12 @@ class RecordingStudioArchiveBox < ApplicationRecord
     variant: :outline
 
   validates :name, presence: true
+
+  def self.recordable_type_label
+    "Archive box"
+  end
+
+  class << self
+    alias_method :recording_studio_type_label, :recordable_type_label
+  end
 end
