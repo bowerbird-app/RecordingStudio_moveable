@@ -137,7 +137,7 @@ The dummy app includes:
 From `test/dummy`:
 
 ```bash
-bin/rails db:seed
+bin/rails db:prepare db:seed
 ```
 
 Optional hard reset:

@@ -36,8 +36,8 @@
   },
   "remoteUser": "root",
   "features": {},
-  "postCreateCommand": "git lfs install && npm install -g playwright && playwright install --with-deps && cd test/dummy && bundle install && bundle exec rails db:prepare && bundle exec rails tailwindcss:build",
-  "env": {
+  "postCreateCommand": "cd /workspace && bash .devcontainer/post-create.sh",
+  "remoteEnv": {
     "CODESPACES": "true"
   }
 }

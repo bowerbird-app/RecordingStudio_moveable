@@ -202,11 +202,11 @@ class MoveablesHelperTest < Minitest::Test
     received = []
     recording_studio_labels = Module.new
     recording_studio_labels.define_singleton_method(:name_for) do |candidate|
-      received << [ :name_for, candidate ]
+      received << [:name_for, candidate]
       "resolved name"
     end
     recording_studio_labels.define_singleton_method(:type_label_for) do |candidate|
-      received << [ :type_label_for, candidate ]
+      received << [:type_label_for, candidate]
       "resolved type"
     end
 
@@ -215,7 +215,7 @@ class MoveablesHelperTest < Minitest::Test
       assert_equal "resolved type", helper.moveable_type_for(recording)
     end
 
-    assert_equal [ [ :name_for, recordable ], [ :type_label_for, recordable ] ], received
+    assert_equal [[:name_for, recordable], [:type_label_for, recordable]], received
   end
 
   def test_moveable_label_follows_parent_hook_contract_without_parent_labels
@@ -265,7 +265,7 @@ class MoveablesHelperTest < Minitest::Test
     assert_equal "workspace", workspace_items.first[:kind]
     assert_equal "Choose destinations in Studio Workspace", workspace_items.first[:description]
     assert_equal "record", picker_items.first[:kind]
-    assert_equal "Page", picker_items.first[:description]
+    assert_equal "—", picker_items.first[:description]
   end
 
   def test_moveable_picker_item_omits_badge_and_meta

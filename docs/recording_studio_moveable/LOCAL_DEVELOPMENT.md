@@ -83,10 +83,10 @@ export DB_PASSWORD=your_password
 
 ```bash
 cd test/dummy
-bin/rails db:prepare
+bin/rails db:prepare db:seed
 ```
 
-This creates the database, runs migrations (including enabling `pgcrypto` for UUIDs), and seeds data.
+This creates the database if needed, runs migrations (including enabling `pgcrypto` for UUIDs), and applies the idempotent demo seeds.
 
 ### 6. Build TailwindCSS
 

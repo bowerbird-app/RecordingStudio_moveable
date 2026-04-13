@@ -477,7 +477,13 @@ class DestinationSearchTest < Minitest::Test
     assert_includes search.send(:searchable_terms, self.recording(id: "titled", recordable: titled)), "song draft"
     assert_includes search.send(:searchable_terms, recording), "📁 workspace a"
     assert_includes search.send(:searchable_terms, recording), "folder"
-    assert_includes search.send(:searchable_terms, self.recording(id: "archive", recordable_type: "RecordingStudioArchiveBox", recordable: blank)), "archive box"
+    archive_recording = self.recording(
+      id: "archive",
+      recordable_type: "RecordingStudioArchiveBox",
+      recordable: blank
+    )
+
+    assert_includes search.send(:searchable_terms, archive_recording), "archive box"
     assert_equal "root-1", search.send(:resolved_root_id, recording(id: "child", root_recording_id: "root-1"))
     assert_equal "direct-root", search.send(:resolved_root_id, recording(id: "direct-root"))
   end
@@ -491,7 +497,9 @@ class DestinationSearchTest < Minitest::Test
     recording_studio_labels.define_singleton_method(:type_label_for) { |_candidate| "Page" }
 
     RecordingStudioMoveable::Labels.stub(:resolver, recording_studio_labels) do
-      assert_equal ["title:source", "name:source", "page", "delegated-id"], search.send(:searchable_terms, recording)
+      expected_terms = ["title:source", "name:source", "page", "delegated-id"]
+
+      assert_equal expected_terms, build_search.send(:searchable_terms, recording)
     end
   end
 

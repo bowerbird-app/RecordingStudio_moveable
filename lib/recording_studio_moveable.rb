@@ -10,7 +10,8 @@ require "recording_studio_moveable/services/example_service"
 require "recording_studio"
 begin
   require "recording_studio/labels"
-rescue LoadError
+rescue LoadError => e
+  warn(e.message) if ENV["RECORDING_STUDIO_MOVEABLE_DEBUG"] == "true"
 end
 require "recording_studio/moveable"
 require "recording_studio_moveable/engine"
