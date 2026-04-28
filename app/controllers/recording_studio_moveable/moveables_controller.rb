@@ -9,6 +9,8 @@ module RecordingStudioMoveable
 
     helper_method :move_recording_path_for, :move_back_path, :move_workspaces_path_for, :moveable_root_label
 
+    rescue_from LoadError, with: :handle_missing_access_dependency
+
     before_action :ensure_actor!
     before_action :load_recording
 
@@ -64,8 +66,8 @@ module RecordingStudioMoveable
     def move_recording!(destination)
       @recording.move_to!(
         new_parent: destination,
-        actor: Current.actor,
-        impersonator: resolve_impersonator,
+        actor: current_recording_studio_actor,
+        impersonator: current_recording_studio_impersonator,
         metadata: move_metadata
       )
     end
@@ -80,13 +82,25 @@ module RecordingStudioMoveable
       )
     end
 
+    def failed_dependency_path
+      return redirect_path unless defined?(@recording) && @recording.present?
+
+      move_back_path
+    end
+
+    def handle_missing_access_dependency(error)
+      redirect_to failed_dependency_path, alert: error.message
+    end
+
     def load_recording
       @recording = RecordingStudio::Recording.find(params[:recording_id])
       raise ActiveRecord::RecordNotFound unless source_visible?
     end
 
     def ensure_actor!
-      raise RecordingStudio::AccessDenied, "A current actor is required to move recordings" if Current.actor.blank?
+      return if current_recording_studio_actor.present?
+
+      raise RecordingStudio::AccessDenied, "A current actor is required to move recordings"
     end
 
     def filtered_destinations
@@ -119,9 +133,9 @@ module RecordingStudioMoveable
 
     def destination_search
       @destination_search ||= RecordingStudio::Moveable::DestinationSearch.new(
-        actor: Current.actor,
+        actor: current_recording_studio_actor,
         source: @recording,
-        impersonator: resolve_impersonator,
+        impersonator: current_recording_studio_impersonator,
         metadata: move_metadata,
         policy: move_policy
       )
@@ -140,19 +154,15 @@ module RecordingStudioMoveable
       metadata_hash.stringify_keys
     end
 
-    def resolve_impersonator
-      Current.respond_to?(:impersonator) ? Current.impersonator : nil
-    end
-
     def source_visible?
       move_policy.source_visible?
     end
 
     def move_policy
       @move_policy ||= RecordingStudio::Moveable::Policy.new(
-        actor: Current.actor,
+        actor: current_recording_studio_actor,
         source: @recording,
-        impersonator: resolve_impersonator,
+        impersonator: current_recording_studio_impersonator,
         metadata: move_metadata
       )
     end

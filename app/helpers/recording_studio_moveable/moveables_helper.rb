@@ -34,7 +34,7 @@ module RecordingStudioMoveable
     end
 
     def moveable_title_for(recording)
-      "Move #{moveable_label_for(recording)}"
+      "Move #{moveable_label_for(recording).delete_prefix('📁 ')}"
     end
 
     def moveable_root_label(count: 1)

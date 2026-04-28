@@ -15,7 +15,7 @@
   - logs event metadata with parent ids and root ids
   - supports `actor`, optional `impersonator`, optional `metadata`
 - Authorization modes:
-  - **Built-in mode (default):** uses `RecordingStudio::Services::AccessCheck` and raises `RecordingStudio::AccessDenied` on failures
+  - **Built-in mode (default):** uses `recording_studio_accessible` query and grant APIs to resolve access roles and raises `RecordingStudio::AccessDenied` on failures
   - **Custom hook mode:** disable built-in mode and provide your own `authorization_hook`
 - Gem-provided reusable move UI:
   - full-page mode
@@ -31,10 +31,11 @@ Add to your Gemfile:
 
 ```ruby
 gem "recording_studio_moveable"
+gem "recording_studio_accessible"
 gem "flat_pack", github: "bowerbird-app/flatpack"
 ```
 
-Then bundle install and mount the engine UI routes:
+Then bundle install and mount the moveable engine UI routes:
 
 ```ruby
 # config/routes.rb
@@ -71,13 +72,43 @@ This addon registers `:movable` without a legacy feature gate so it can continue
 
 ### Default (built-in) mode
 
-No extra setup required. In this mode:
+Install `recording_studio_accessible` and configure your root recordables to allow access children. In this mode:
 
 - source requires `:edit`
 - destination requires `:edit`
 - move UI source visibility requires `:edit`
 - move UI only lists destinations the actor can move into
 - failures raise `RecordingStudio::AccessDenied`
+
+Under the hood, move authorization is resolved through `RecordingStudioAccessible::DirectAccessQuery`, and the dummy app grants access with `RecordingStudioAccessible::Services::GrantRecordingAccess`.
+
+Example root recordable setup:
+
+```ruby
+class Workspace < ApplicationRecord
+  include RecordingStudioAccessible::AllowsAccessibleChildren
+
+  recording_studio_accessible_children :access, :boundary
+end
+```
+
+If your app is adopting the extracted access addon directly, run the accessible setup as part of installation:
+
+```bash
+bin/rails generate recording_studio_accessible:install
+bin/rails generate recording_studio_accessible:migrations
+bin/rails db:migrate
+```
+
+Mount `RecordingStudioAccessible::Engine` as well if you want the addon-owned access management pages in your host app. On current `recording_studio` releases that still ship access tables/constants, `recording_studio_accessible` runs in compatibility mode, so your existing access migrations may already satisfy the database setup. In that setup, runtime authorization still flows through the Accessible gem's public APIs rather than legacy `recording_studio` access-check helpers.
+
+Move screens read the acting principal from `Current.actor` by default. If your host app uses a different controller-level source, configure it explicitly:
+
+```ruby
+RecordingStudioMoveable.configure do |config|
+  config.current_actor_resolver = ->(controller:) { controller.current_user }
+end
+```
 
 ### Custom authorization hook mode
 
@@ -125,12 +156,13 @@ The addon enforces access checks inside the gem-owned move controller.
 
 ## Dummy app demo
 
-The dummy app includes:
+The dummy app explicitly installs both `recording_studio_accessible` and `recording_studio_moveable`. It includes:
 
 - `Workspace` root recordable
 - `RecordingStudioFolder` and `RecordingStudioPage` (move-enabled)
 - `RecordingStudioArchiveBox` (disallowed destination type demo)
 - routes/controllers/views to demonstrate same-workspace and cross-workspace move flows
+- Recording Studio Accessible integration for workspace discovery, access management pages, and seeded access grants
 
 ### Seed reset instructions
 

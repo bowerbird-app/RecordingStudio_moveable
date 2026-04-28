@@ -46,7 +46,8 @@ def dummy_test_launcher
     command_env = ["env", "-i", *env_pairs.map { |key, value| "#{key}=#{value}" }]
 
     Dir.chdir(dummy_dir) do
-      success = system(*command_env, "bundle", "exec", "rails", "db:prepare", "RAILS_ENV=test")
+      success = system(*command_env, "bundle", "exec", "rails", "tailwindcss:build", "RAILS_ENV=test")
+      success &&= system(*command_env, "bundle", "exec", "rails", "db:prepare", "RAILS_ENV=test")
       success &&= system(*command_env, "bundle", "exec", "rails", "test")
       exit(success ? 0 : 1)
     end

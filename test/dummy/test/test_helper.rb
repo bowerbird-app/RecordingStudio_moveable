@@ -5,6 +5,13 @@ require_relative "../../dummy/config/environment"
 require "rails/test_help"
 
 module DummyMoveableTestHelpers
+  def compatible_access_model
+    return RecordingStudioAccessible::Access if defined?(RecordingStudioAccessible::Access)
+    return RecordingStudio.const_get(:Access) if defined?(RecordingStudio) && RecordingStudio.const_defined?(:Access)
+
+    nil
+  end
+
   def restore_dummy_moveable_capabilities!
     [ RecordingStudioFolder, RecordingStudioPage ].each do |recordable_type|
       RecordingStudio.set_capability_options(
@@ -31,10 +38,12 @@ module DummyMoveableTestHelpers
   end
 
   def grant_root_access(root:, actor:, role: :admin)
-    root.record(RecordingStudio::Access, actor: actor, parent_recording: root) do |access|
-      access.actor = actor
-      access.role = role
-    end
+    RecordingStudioAccessible::Services::GrantRecordingAccess.call(
+      recording: root,
+      actor: actor,
+      role: role,
+      manager_actor: actor
+    ).value!
   end
 end
 
@@ -46,7 +55,7 @@ class ActiveSupport::TestCase
     RecordingStudio::Event.delete_all
     RecordingStudio::DeviceSession.delete_all
     RecordingStudio::Recording.delete_all
-    RecordingStudio::Access.delete_all
+    compatible_access_model&.delete_all
     RecordingStudioFolder.delete_all
     RecordingStudioPage.delete_all
     RecordingStudioArchiveBox.delete_all

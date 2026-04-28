@@ -13,12 +13,20 @@ module RecordingStudioMoveable
       move_modal_prefetch_ttl_ms
       move_modal_reuse_shell
       full_page_layout
+      current_actor_resolver
+      current_impersonator_resolver
     ].freeze
 
-    attr_accessor :api_key, :enable_feature_x, :timeout,
-                  :move_modal_prefetch_enabled, :move_modal_prefetch_delay_ms,
-                  :move_modal_prefetch_ttl_ms, :move_modal_reuse_shell,
-                  :full_page_layout
+    attr_accessor :api_key,
+                  :enable_feature_x,
+                  :timeout,
+                  :move_modal_prefetch_enabled,
+                  :move_modal_prefetch_delay_ms,
+                  :move_modal_prefetch_ttl_ms,
+                  :move_modal_reuse_shell,
+                  :full_page_layout,
+                  :current_actor_resolver,
+                  :current_impersonator_resolver
     attr_reader :hooks
 
     def initialize
@@ -30,6 +38,7 @@ module RecordingStudioMoveable
       @move_modal_prefetch_ttl_ms = 10_000
       @move_modal_reuse_shell = true
       @full_page_layout = "recording_studio_moveable"
+      initialize_context_resolvers
       @hooks = Hooks.new
     end
 
@@ -46,6 +55,11 @@ module RecordingStudioMoveable
         setter = "#{key}="
         public_send(setter, v) if respond_to?(setter)
       end
+    end
+
+    def initialize_context_resolvers
+      @current_actor_resolver = nil
+      @current_impersonator_resolver = nil
     end
   end
 end

@@ -25,6 +25,12 @@ RecordingStudioMoveable.configure do |config|
   # Full-page move screens use the gem's blank layout by default.
   # Set this to a host-app layout name to embed move screens in your shell.
   # config.full_page_layout = "recording_studio_moveable"
+
+  # If your app does not populate Current.actor, resolve the acting principal here.
+  # config.current_actor_resolver = ->(controller:) { controller.current_user }
+
+  # Optionally resolve impersonation context when you do not use Current.impersonator.
+  # config.current_impersonator_resolver = ->(controller:) { nil }
 end
 
 RecordingStudio::Moveable.configure do |config|

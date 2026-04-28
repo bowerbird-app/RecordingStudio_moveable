@@ -33,7 +33,10 @@ class HomeDemoTest < ActionDispatch::IntegrationTest
     assert_equal 3, RecordingStudio::Recording.where(parent_recording_id: root.id, recordable_type: "RecordingStudioFolder").count
     assert_equal 2, RecordingStudio::Recording.where(parent_recording_id: root.id, recordable_type: "RecordingStudioArchiveBox").count
     assert_equal 9, RecordingStudio::Recording.where(root_recording_id: root.id, recordable_type: "RecordingStudioPage").count
-    assert_equal :admin, RecordingStudio::Access.find_by!(actor: @user).role.to_sym
+    assert_equal :admin, RecordingStudioAccessible::DirectAccessQuery.access_recordings_for_actor(
+      recording: root,
+      actor: @user
+    ).first.recordable.role.to_sym
   end
 
   def test_home_bootstrap_does_not_recreate_moved_page_in_original_folder

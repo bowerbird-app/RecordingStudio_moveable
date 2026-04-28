@@ -107,3 +107,7 @@ module RecordingStudioMoveable
     private_class_method :normalize_label
   end
 end
+
+module RecordingStudio
+  Labels = RecordingStudioMoveable::Labels unless const_defined?(:Labels, false)
+end

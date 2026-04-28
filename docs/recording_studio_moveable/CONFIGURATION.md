@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** April 8, 2026
+> *   **Last Updated:** April 28, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -13,6 +13,8 @@ This document explains how to configure **RecordingStudioMoveable** in your host
 ---
 
 ## Quick Start
+
+RecordingStudioMoveable owns move behavior. In built-in authorization mode, access resolution comes from `recording_studio_accessible`, not from legacy `recording_studio` access-check helpers.
 
 After installing the gem, run the install generator:
 
@@ -131,6 +133,19 @@ end
 ```
 
 This approach is flexible and allows dynamic values, environment variables, and Rails credentials.
+
+## Access Integration
+
+Built-in move authorization expects `recording_studio_accessible` to be installed and configured for your root recordables.
+
+In that mode:
+
+- move source visibility requires `:edit`
+- move destination visibility requires `:edit`
+- access roles are resolved through `RecordingStudioAccessible::DirectAccessQuery`
+- hosts should seed or manage grants through Accessible APIs such as `RecordingStudioAccessible::Services::GrantRecordingAccess`
+
+If your app is still on a `recording_studio` release that ships access tables or constants, Accessible can run in compatibility mode. That compatibility layer does not change the public integration point for move authorization: RecordingStudioMoveable still queries access through Accessible.
 
 ### 2. YAML Configuration
 

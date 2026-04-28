@@ -52,12 +52,7 @@ class DataController < ApplicationController
   end
 
   def workspace_access_emails(root_recording)
-    RecordingStudio::Recording.unscoped
-      .where(
-        root_recording_id: root_recording.id,
-        parent_recording_id: root_recording.id,
-        recordable_type: "RecordingStudio::Access"
-      )
+    RecordingStudioAccessible::DirectAccessQuery.access_recordings_for(root_recording)
       .filter_map { |access_recording| access_recording.recordable.actor&.email }
       .sort
       .join(", ")

@@ -1,6 +1,6 @@
 class RecordingStudioPagesController < ApplicationController
   def show
     @page = RecordingStudioPage.find(params[:id])
-    @recording = RecordingStudio::Recording.find_by!(recordable: @page)
+    @recording = require_recording_view_access!(RecordingStudio::Recording.find_by!(recordable: @page))
   end
 end

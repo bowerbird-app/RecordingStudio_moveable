@@ -66,7 +66,7 @@ module RecordingStudio
       end
 
       def editable_recording?(recording)
-        RecordingStudio::Services::AccessCheck.allowed?(actor: actor, recording: recording, role: :edit)
+        RecordingStudio::Moveable::Access.allowed?(actor: actor, recording: recording, role: :edit)
       end
 
       def built_in_access?

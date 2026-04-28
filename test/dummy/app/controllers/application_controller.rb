@@ -38,20 +38,13 @@ class ApplicationController < ActionController::Base
     return [] if Current.actor.blank?
 
     @accessible_workspace_roots ||= begin
-      access = RecordingStudio::Access.find_by(actor: Current.actor)
-      if access.blank?
-        []
-      else
-        root_ids = RecordingStudio::Recording.where(recordable: access)
-                                             .where.not(parent_recording_id: nil)
-                                             .pluck(:root_recording_id)
-                                             .uniq
+      roots_by_id = RecordingStudio::Recording.where(id: accessible_workspace_root_ids)
+                                              .includes(:recordable)
+                                              .index_by(&:id)
 
-        RecordingStudio::Recording.where(id: root_ids)
-                                  .includes(:recordable)
-                                  .to_a
-                                  .sort_by { |root_recording| workspace_label_for(root_recording).downcase }
-      end
+      accessible_workspace_root_ids.filter_map { |root_id| roots_by_id[root_id] }
+                                   .uniq
+                                   .sort_by { |root_recording| workspace_label_for(root_recording).downcase }
     end
   end
 
@@ -91,5 +84,38 @@ class ApplicationController < ActionController::Base
     end
 
     nil
+  end
+
+  def accessible_workspace_root_ids
+    @accessible_workspace_root_ids ||= begin
+      accessible_query = RecordingStudioAccessible::DirectAccessQuery.access_recordings_for_actor_in(
+        recordings: workspace_roots_scope,
+        actor: Current.actor
+      )
+
+      accessible_query.unscope(:order).distinct.pluck(:parent_recording_id)
+    end
+  end
+
+  def workspace_roots_scope
+    RecordingStudio::Recording.where(recordable_type: "Workspace", parent_recording_id: nil)
+  end
+
+  def require_recording_view_access!(recording)
+    raise ActiveRecord::RecordNotFound unless recording_viewable?(recording)
+
+    recording
+  end
+
+  def filter_viewable_recordings(recordings)
+    Array(recordings).select { |recording| recording_viewable?(recording) }
+  end
+
+  def recording_viewable?(recording)
+    RecordingStudio::Moveable::Access.allowed?(
+      actor: Current.actor,
+      recording: recording,
+      role: :view
+    )
   end
 end
