@@ -1,7 +1,7 @@
 {
   "Unit Tests": {
     "coverage": {
-      "/workspace/lib/recording_studio_moveable.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio_moveable.rb": {
         "lines": [
           null,
           null,
@@ -44,7 +44,7 @@
           }
         }
       },
-      "/workspace/lib/recording_studio_moveable/configuration.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio_moveable/configuration.rb": {
         "lines": [
           null,
           null,
@@ -63,26 +63,35 @@
           null,
           null,
           null,
-          1,
-          null,
-          null,
-          null,
-          1,
-          null,
-          1,
-          12,
-          12,
-          12,
-          12,
-          12,
-          12,
-          12,
-          12,
-          12,
           null,
           null,
           1,
-          18,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          1,
+          null,
+          1,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          12,
+          null,
+          null,
+          1,
+          22,
           null,
           null,
           null,
@@ -96,20 +105,25 @@
           null,
           null,
           null,
+          1,
+          12,
+          12,
+          null,
+          null,
           null
         ],
         "branches": {
-          "[:unless, 0, 42, 6, 42, 43]": {
-            "[:else, 1, 42, 6, 42, 43]": 6,
-            "[:then, 2, 42, 6, 42, 12]": 1
+          "[:unless, 0, 51, 6, 51, 43]": {
+            "[:else, 1, 51, 6, 51, 43]": 6,
+            "[:then, 2, 51, 6, 51, 12]": 1
           },
-          "[:if, 3, 47, 8, 47, 53]": {
-            "[:then, 4, 47, 8, 47, 30]": 14,
-            "[:else, 5, 47, 8, 47, 53]": 1
+          "[:if, 3, 56, 8, 56, 53]": {
+            "[:then, 4, 56, 8, 56, 30]": 14,
+            "[:else, 5, 56, 8, 56, 53]": 1
           }
         }
       },
-      "/workspace/lib/recording_studio_moveable/hooks.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio_moveable/hooks.rb": {
         "lines": [
           null,
           null,
@@ -423,7 +437,7 @@
           }
         }
       },
-      "/workspace/lib/recording_studio_moveable/labels.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio_moveable/labels.rb": {
         "lines": [
           null,
           null,
@@ -587,7 +601,7 @@
           }
         }
       },
-      "/workspace/lib/recording_studio_moveable/root_label.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio_moveable/root_label.rb": {
         "lines": [
           null,
           null,
@@ -620,7 +634,7 @@
           }
         }
       },
-      "/workspace/lib/recording_studio_moveable/services/base_service.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio_moveable/services/base_service.rb": {
         "lines": [
           null,
           null,
@@ -826,7 +840,7 @@
           }
         }
       },
-      "/workspace/lib/recording_studio_moveable/services/example_service.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio_moveable/services/example_service.rb": {
         "lines": [
           null,
           null,
@@ -865,7 +879,7 @@
           }
         }
       },
-      "/workspace/lib/recording_studio/moveable.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio/moveable.rb": {
         "lines": [
           null,
           null,
@@ -906,7 +920,7 @@
           }
         }
       },
-      "/workspace/lib/recording_studio/moveable/configuration.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio/moveable/configuration.rb": {
         "lines": [
           null,
           null,
@@ -989,7 +1003,7 @@
           }
         }
       },
-      "/workspace/lib/recording_studio/moveable/policy.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio/moveable/policy.rb": {
         "lines": [
           null,
           null,
@@ -1060,6 +1074,7 @@
           null,
           1,
           13,
+          13,
           null,
           null,
           1,
@@ -1069,6 +1084,19 @@
           1,
           4,
           null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          1,
+          13,
+          null,
+          0,
+          null,
+          0,
           null,
           null,
           null,
@@ -1099,10 +1127,14 @@
           "[:if, 12, 63, 8, 63, 48]": {
             "[:then, 13, 63, 8, 63, 14]": 1,
             "[:else, 14, 63, 8, 63, 48]": 2
+          },
+          "[:if, 15, 88, 8, 88, 66]": {
+            "[:then, 16, 88, 8, 88, 14]": 13,
+            "[:else, 17, 88, 8, 88, 66]": 0
           }
         }
       },
-      "/workspace/lib/recording_studio/moveable/authorization.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio/moveable/authorization.rb": {
         "lines": [
           null,
           null,
@@ -1153,7 +1185,7 @@
         ],
         "branches": {}
       },
-      "/workspace/lib/recording_studio/moveable/destination_search.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio/moveable/destination_search.rb": {
         "lines": [
           null,
           null,
@@ -1364,7 +1396,7 @@
           }
         }
       },
-      "/workspace/lib/recording_studio/moveable/capabilities/moveable.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio/moveable/capabilities/moveable.rb": {
         "lines": [
           null,
           null,
@@ -1579,7 +1611,7 @@
           }
         }
       },
-      "/workspace/lib/recording_studio_moveable/engine.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio_moveable/engine.rb": {
         "lines": [
           null,
           null,
@@ -1706,7 +1738,7 @@
           }
         }
       },
-      "/workspace/app/helpers/recording_studio_moveable/moveables_helper.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/app/helpers/recording_studio_moveable/moveables_helper.rb": {
         "lines": [
           null,
           null,
@@ -1806,7 +1838,7 @@
         }
       }
     },
-    "timestamp": 1776057389
+    "timestamp": 1777346316
   },
   "Integration Tests": {
     "coverage": {
