@@ -35,6 +35,27 @@ class MoveablePolicyTest < Minitest::Test
     end
   end
 
+  def test_builtin_access_loads_recording_studio_accessible_before_using_access_check
+    script = <<~RUBY
+      require "test_helper"
+
+      raise "expected RecordingStudioAccessible to be unloaded" if defined?(RecordingStudioAccessible)
+
+      RecordingStudio::Services::AccessCheck.stub(:allowed?, ->(**) { true }) do
+        policy = RecordingStudio::Moveable::Policy.new(
+          actor: Object.new,
+          source: Struct.new(:id).new("source")
+        )
+
+        raise "expected source to be editable" unless policy.source_editable?
+      end
+
+      raise "expected RecordingStudioAccessible to be loaded" unless defined?(RecordingStudioAccessible)
+    RUBY
+
+    assert system(RbConfig.ruby, "-Itest", "-e", script)
+  end
+
   def test_destination_selectable_returns_false_when_destination_is_not_editable
     allowed = lambda do |actor:, recording:, role:|
       assert_same @actor, actor

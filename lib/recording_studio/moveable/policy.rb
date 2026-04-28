@@ -85,9 +85,10 @@ module RecordingStudio
       end
 
       def ensure_access_check_available!
+        require "recording_studio_accessible" unless defined?(RecordingStudioAccessible::Compatibility)
         return if defined?(RecordingStudio::Services::AccessCheck)
 
-        require "recording_studio_accessible"
+        raise LoadError, "RecordingStudio::Services::AccessCheck is unavailable"
       rescue LoadError => e
         raise LoadError, <<~MESSAGE.squish
           RecordingStudio Moveable built-in authorization requires the recording_studio_accessible gem.

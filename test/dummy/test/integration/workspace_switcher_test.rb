@@ -21,6 +21,30 @@ class WorkspaceSwitcherTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Restricted Workspace"
   end
 
+  def test_top_nav_uses_access_check_root_lookup_for_workspace_roots
+    expected_roots = RecordingStudio::Recording.where(
+      id: Workspace.where(name: ["Studio Workspace", "Client Workspace"]).map do |workspace|
+        RecordingStudio::Recording.find_by!(recordable: workspace, parent_recording_id: nil).id
+      end
+    )
+    called = false
+
+    RecordingStudio::Services::AccessCheck.stub(:root_recordings_for, lambda { |actor:, minimum_role:|
+      called = true
+      assert_equal @user, actor
+      assert_equal :view, minimum_role
+      expected_roots
+    }) do
+      get root_path
+    end
+
+    assert called
+    assert_response :success
+    assert_includes response.body, "Studio Workspace"
+    assert_includes response.body, "Client Workspace"
+    refute_includes response.body, "Restricted Workspace"
+  end
+
   def test_switcher_changes_the_active_workspace
     get root_path
 
