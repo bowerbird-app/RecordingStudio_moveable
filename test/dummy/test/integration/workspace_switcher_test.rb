@@ -3,6 +3,16 @@
 require_relative "../test_helper"
 
 class WorkspaceSwitcherTest < ActionDispatch::IntegrationTest
+  FakeAccessibleWorkspaceQuery = Struct.new(:root_ids) do
+    def distinct
+      self
+    end
+
+    def pluck(_column_name)
+      root_ids
+    end
+  end
+
   def setup
     super
 
@@ -25,15 +35,7 @@ class WorkspaceSwitcherTest < ActionDispatch::IntegrationTest
     accessible_root_ids = Workspace.where(name: ["Studio Workspace", "Client Workspace"]).map do |workspace|
       RecordingStudio::Recording.find_by!(recordable: workspace, parent_recording_id: nil).id
     end
-    query_result = Struct.new(:root_ids) do
-      def distinct
-        self
-      end
-
-      def pluck(_column_name)
-        root_ids
-      end
-    end.new(accessible_root_ids)
+    query_result = FakeAccessibleWorkspaceQuery.new(accessible_root_ids)
 
     RecordingStudioAccessible::DirectAccessQuery.stub(:access_recordings_for_actor_in, lambda { |recordings:, actor:|
       assert_equal @user, actor

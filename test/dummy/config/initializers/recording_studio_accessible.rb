@@ -15,7 +15,5 @@ end
 
 RecordingStudioAccessible.configure do |config|
   config.access_management_authorizer = dummy_access_authorizer
-  config.mounted_page_authorizer = lambda do |controller:, actor:, recording:|
-    dummy_access_authorizer.call(controller: controller, actor: actor, recording: recording)
-  end
+  config.mounted_page_authorizer = dummy_access_authorizer
 end
