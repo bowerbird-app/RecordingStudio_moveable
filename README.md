@@ -35,11 +35,10 @@ gem "recording_studio_accessible"
 gem "flat_pack", github: "bowerbird-app/flatpack"
 ```
 
-Then bundle install and mount the engine UI routes:
+Then bundle install and mount the moveable engine UI routes:
 
 ```ruby
 # config/routes.rb
-mount RecordingStudioAccessible::Engine, at: "/recording_studio_accessible"
 mount RecordingStudioMoveable::Engine, at: "/recording_studio_moveable", as: :recording_studio_moveable
 ```
 
@@ -88,6 +87,24 @@ class Workspace < ApplicationRecord
   include RecordingStudioAccessible::AllowsAccessibleChildren
 
   recording_studio_accessible_children :access, :boundary
+end
+```
+
+If your app is adopting the extracted access addon directly, run the accessible setup as part of installation:
+
+```bash
+bin/rails generate recording_studio_accessible:install
+bin/rails generate recording_studio_accessible:migrations
+bin/rails db:migrate
+```
+
+Mount `RecordingStudioAccessible::Engine` as well if you want the addon-owned access management pages in your host app. On current `recording_studio` releases that still ship access tables/constants, `recording_studio_accessible` runs in compatibility mode, so your existing access migrations may already satisfy the database setup.
+
+Move screens read the acting principal from `Current.actor` by default. If your host app uses a different controller-level source, configure it explicitly:
+
+```ruby
+RecordingStudioMoveable.configure do |config|
+  config.current_actor_resolver = ->(controller:) { controller.current_user }
 end
 ```
 
