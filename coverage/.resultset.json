@@ -901,7 +901,7 @@
           null,
           null,
           1,
-          22,
+          24,
           null,
           null,
           null,
@@ -932,12 +932,12 @@
           null,
           1,
           null,
-          22,
+          24,
           null,
-          22,
-          22,
-          22,
-          22,
+          24,
+          24,
+          24,
+          24,
           null,
           null,
           1,
@@ -1093,6 +1093,7 @@
           null,
           1,
           13,
+          13,
           null,
           0,
           null,
@@ -1128,9 +1129,13 @@
             "[:then, 13, 63, 8, 63, 14]": 1,
             "[:else, 14, 63, 8, 63, 48]": 2
           },
-          "[:if, 15, 88, 8, 88, 66]": {
-            "[:then, 16, 88, 8, 88, 14]": 13,
-            "[:else, 17, 88, 8, 88, 66]": 0
+          "[:unless, 15, 88, 8, 88, 103]": {
+            "[:else, 16, 88, 8, 88, 103]": 12,
+            "[:then, 17, 88, 8, 88, 45]": 1
+          },
+          "[:if, 18, 89, 8, 89, 66]": {
+            "[:then, 19, 89, 8, 89, 14]": 13,
+            "[:else, 20, 89, 8, 89, 66]": 0
           }
         }
       },
@@ -1838,7 +1843,7 @@
         }
       }
     },
-    "timestamp": 1777346316
+    "timestamp": 1777346741
   },
   "Integration Tests": {
     "coverage": {
@@ -3198,7 +3203,7 @@
   },
   "Minitest": {
     "coverage": {
-      "/workspace/lib/recording_studio_moveable.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio_moveable.rb": {
         "lines": [
           null,
           null,
@@ -3209,6 +3214,12 @@
           1,
           1,
           1,
+          1,
+          null,
+          1,
+          null,
+          1,
+          null,
           1,
           1,
           null,
@@ -3225,78 +3236,96 @@
           null
         ],
         "branches": {
-          "[:if, 0, 20, 6, 20, 42]": {
-            "[:then, 1, 20, 6, 20, 26]": 0,
-            "[:else, 2, 20, 6, 20, 42]": 0
-          }
-        }
-      },
-      "/workspace/lib/recording_studio_moveable/configuration.rb": {
-        "lines": [
-          null,
-          null,
-          1,
-          null,
-          1,
-          1,
-          1,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          1,
-          null,
-          null,
-          null,
-          1,
-          null,
-          1,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          null,
-          null,
-          1,
-          0,
-          null,
-          null,
-          null,
-          1,
-          0,
-          null,
-          0,
-          0,
-          0,
-          0,
-          null,
-          null,
-          null,
-          null
-        ],
-        "branches": {
-          "[:unless, 0, 42, 6, 42, 43]": {
-            "[:else, 1, 42, 6, 42, 43]": 0,
-            "[:then, 2, 42, 6, 42, 12]": 0
+          "[:if, 0, 14, 2, 14, 69]": {
+            "[:then, 1, 14, 2, 14, 17]": 0,
+            "[:else, 2, 14, 2, 14, 69]": 1
           },
-          "[:if, 3, 47, 8, 47, 53]": {
-            "[:then, 4, 47, 8, 47, 30]": 0,
-            "[:else, 5, 47, 8, 47, 53]": 0
+          "[:if, 3, 26, 6, 26, 42]": {
+            "[:then, 4, 26, 6, 26, 26]": 0,
+            "[:else, 5, 26, 6, 26, 42]": 0
           }
         }
       },
-      "/workspace/lib/recording_studio_moveable/hooks.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio_moveable/configuration.rb": {
+        "lines": [
+          null,
+          null,
+          1,
+          null,
+          1,
+          1,
+          1,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          1,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          1,
+          null,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          null,
+          null,
+          1,
+          0,
+          null,
+          null,
+          null,
+          1,
+          0,
+          null,
+          0,
+          0,
+          0,
+          0,
+          null,
+          null,
+          null,
+          1,
+          0,
+          0,
+          null,
+          null,
+          null
+        ],
+        "branches": {
+          "[:unless, 0, 51, 6, 51, 43]": {
+            "[:else, 1, 51, 6, 51, 43]": 0,
+            "[:then, 2, 51, 6, 51, 12]": 0
+          },
+          "[:if, 3, 56, 8, 56, 53]": {
+            "[:then, 4, 56, 8, 56, 30]": 0,
+            "[:else, 5, 56, 8, 56, 53]": 0
+          }
+        }
+      },
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio_moveable/hooks.rb": {
         "lines": [
           null,
           null,
@@ -3610,7 +3639,171 @@
           }
         }
       },
-      "/workspace/lib/recording_studio_moveable/root_label.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio_moveable/labels.rb": {
+        "lines": [
+          null,
+          null,
+          1,
+          1,
+          1,
+          null,
+          1,
+          null,
+          1,
+          0,
+          null,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          1,
+          0,
+          null,
+          0,
+          0,
+          null,
+          0,
+          null,
+          0,
+          null,
+          null,
+          1,
+          0,
+          null,
+          0,
+          null,
+          null,
+          null,
+          null,
+          1,
+          0,
+          0,
+          null,
+          0,
+          0,
+          null,
+          0,
+          null,
+          null,
+          null,
+          1,
+          0,
+          null,
+          1,
+          null,
+          1,
+          0,
+          null,
+          1,
+          null,
+          1,
+          0,
+          0,
+          null,
+          0,
+          null,
+          1,
+          null,
+          1,
+          0,
+          0,
+          0,
+          null,
+          1,
+          null,
+          1,
+          0,
+          null,
+          0,
+          null,
+          0,
+          null,
+          0,
+          null,
+          null,
+          1,
+          null,
+          1,
+          0,
+          null,
+          0,
+          null,
+          1,
+          null,
+          1,
+          0,
+          0,
+          null,
+          0,
+          0,
+          null,
+          null,
+          null,
+          null,
+          1,
+          null,
+          1,
+          0,
+          null,
+          1,
+          null,
+          null
+        ],
+        "branches": {
+          "[:unless, 0, 10, 6, 10, 42]": {
+            "[:else, 1, 10, 6, 10, 42]": 0,
+            "[:then, 2, 10, 6, 10, 24]": 0
+          },
+          "[:if, 3, 19, 6, 19, 53]": {
+            "[:then, 4, 19, 6, 19, 24]": 0,
+            "[:else, 5, 19, 6, 19, 53]": 0
+          },
+          "[:if, 6, 22, 6, 22, 44]": {
+            "[:then, 7, 22, 6, 22, 24]": 0,
+            "[:else, 8, 22, 6, 22, 44]": 0
+          },
+          "[:unless, 9, 30, 6, 30, 42]": {
+            "[:else, 10, 30, 6, 30, 42]": 0,
+            "[:then, 11, 30, 6, 30, 24]": 0
+          },
+          "[:if, 12, 38, 22, 38, 87]": {
+            "[:then, 13, 38, 58, 38, 81]": 0,
+            "[:else, 14, 38, 84, 38, 87]": 0
+          },
+          "[:if, 15, 41, 6, 45, 9]": {
+            "[:then, 16, 42, 8, 42, 21]": 0,
+            "[:else, 17, 44, 8, 44, 12]": 0
+          },
+          "[:if, 18, 60, 19, 60, 68]": {
+            "[:then, 19, 60, 49, 60, 62]": 0,
+            "[:else, 20, 60, 65, 60, 68]": 0
+          },
+          "[:if, 21, 62, 6, 62, 71]": {
+            "[:then, 22, 62, 28, 62, 58]": 0,
+            "[:else, 23, 62, 61, 62, 71]": 0
+          },
+          "[:case, 24, 74, 6, 81, 9]": {
+            "[:when, 25, 76, 8, 76, 26]": 0,
+            "[:when, 26, 78, 8, 78, 31]": 0,
+            "[:else, 27, 80, 8, 80, 37]": 0
+          },
+          "[:unless, 28, 86, 6, 86, 55]": {
+            "[:else, 29, 86, 6, 86, 55]": 0,
+            "[:then, 30, 86, 6, 86, 12]": 0
+          },
+          "[:unless, 31, 94, 8, 94, 51]": {
+            "[:else, 32, 94, 8, 94, 51]": 0,
+            "[:then, 33, 94, 8, 94, 12]": 0
+          },
+          "[:if, 34, 97, 8, 97, 38]": {
+            "[:then, 35, 97, 8, 97, 20]": 0,
+            "[:else, 36, 97, 8, 97, 38]": 0
+          }
+        }
+      },
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio_moveable/root_label.rb": {
         "lines": [
           null,
           null,
@@ -3643,7 +3836,7 @@
           }
         }
       },
-      "/workspace/lib/recording_studio_moveable/services/base_service.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio_moveable/services/base_service.rb": {
         "lines": [
           null,
           null,
@@ -3849,7 +4042,7 @@
           }
         }
       },
-      "/workspace/lib/recording_studio_moveable/services/example_service.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio_moveable/services/example_service.rb": {
         "lines": [
           null,
           null,
@@ -3888,7 +4081,7 @@
           }
         }
       },
-      "/workspace/lib/recording_studio/moveable.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio/moveable.rb": {
         "lines": [
           null,
           null,
@@ -3902,7 +4095,7 @@
           1,
           1,
           1,
-          0,
+          1,
           null,
           null,
           1,
@@ -3929,7 +4122,7 @@
           }
         }
       },
-      "/workspace/lib/recording_studio/moveable/configuration.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio/moveable/configuration.rb": {
         "lines": [
           null,
           null,
@@ -3941,12 +4134,12 @@
           null,
           1,
           null,
-          0,
+          1,
           null,
-          0,
-          0,
-          0,
-          0,
+          1,
+          1,
+          1,
+          1,
           null,
           null,
           1,
@@ -4012,7 +4205,7 @@
           }
         }
       },
-      "/workspace/lib/recording_studio/moveable/policy.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio/moveable/policy.rb": {
         "lines": [
           null,
           null,
@@ -4022,10 +4215,20 @@
           1,
           null,
           1,
+          1,
+          1,
+          1,
+          1,
+          null,
+          null,
+          1,
           0,
-          0,
-          0,
-          0,
+          null,
+          null,
+          1,
+          1,
+          null,
+          1,
           null,
           null,
           1,
@@ -4040,16 +4243,6 @@
           null,
           1,
           0,
-          null,
-          null,
-          1,
-          0,
-          null,
-          0,
-          null,
-          null,
-          1,
-          0,
           0,
           null,
           null,
@@ -4082,16 +4275,31 @@
           null,
           null,
           1,
-          0,
+          1,
+          1,
+          null,
+          null,
+          1,
+          1,
           null,
           null,
           1,
           0,
           null,
           null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
           1,
+          1,
+          1,
+          null,
           0,
           null,
+          0,
           null,
           null,
           null,
@@ -4104,7 +4312,7 @@
         ],
         "branches": {
           "[:unless, 0, 20, 8, 20, 75]": {
-            "[:else, 1, 20, 8, 20, 75]": 0,
+            "[:else, 1, 20, 8, 20, 75]": 1,
             "[:then, 2, 20, 8, 20, 51]": 0
           },
           "[:unless, 3, 30, 8, 30, 80]": {
@@ -4122,10 +4330,18 @@
           "[:if, 12, 63, 8, 63, 48]": {
             "[:then, 13, 63, 8, 63, 14]": 0,
             "[:else, 14, 63, 8, 63, 48]": 0
+          },
+          "[:unless, 15, 88, 8, 88, 103]": {
+            "[:else, 16, 88, 8, 88, 103]": 0,
+            "[:then, 17, 88, 8, 88, 45]": 1
+          },
+          "[:if, 18, 89, 8, 89, 66]": {
+            "[:then, 19, 89, 8, 89, 14]": 1,
+            "[:else, 20, 89, 8, 89, 66]": 0
           }
         }
       },
-      "/workspace/lib/recording_studio/moveable/authorization.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio/moveable/authorization.rb": {
         "lines": [
           null,
           null,
@@ -4176,7 +4392,7 @@
         ],
         "branches": {}
       },
-      "/workspace/lib/recording_studio/moveable/destination_search.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio/moveable/destination_search.rb": {
         "lines": [
           null,
           null,
@@ -4342,14 +4558,6 @@
           null,
           null,
           1,
-          0,
-          null,
-          0,
-          null,
-          null,
-          1,
-          0,
-          null,
           0,
           null,
           null,
@@ -4392,18 +4600,10 @@
           "[:if, 20, 139, 8, 139, 54]": {
             "[:then, 21, 139, 8, 139, 27]": 0,
             "[:else, 22, 139, 8, 139, 54]": 0
-          },
-          "[:unless, 23, 165, 8, 165, 52]": {
-            "[:else, 24, 165, 8, 165, 52]": 0,
-            "[:then, 25, 165, 8, 165, 14]": 0
-          },
-          "[:unless, 26, 171, 8, 171, 51]": {
-            "[:else, 27, 171, 8, 171, 51]": 0,
-            "[:then, 28, 171, 8, 171, 14]": 0
           }
         }
       },
-      "/workspace/lib/recording_studio/moveable/capabilities/moveable.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio/moveable/capabilities/moveable.rb": {
         "lines": [
           null,
           null,
@@ -4562,6 +4762,8 @@
           1,
           null,
           1,
+          1,
+          null,
           1,
           0,
           null,
@@ -4609,10 +4811,14 @@
           "[:if, 23, 144, 12, 144, 108]": {
             "[:then, 24, 144, 12, 144, 88]": 0,
             "[:else, 25, 144, 12, 144, 108]": 0
+          },
+          "[:if, 26, 158, 6, 158, 87]": {
+            "[:then, 27, 158, 6, 158, 47]": 1,
+            "[:else, 28, 158, 6, 158, 87]": 0
           }
         }
       },
-      "/workspace/lib/recording_studio_moveable/engine.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/lib/recording_studio_moveable/engine.rb": {
         "lines": [
           null,
           null,
@@ -4739,7 +4945,7 @@
           }
         }
       },
-      "/workspace/app/helpers/recording_studio_moveable/moveables_helper.rb": {
+      "/home/runner/work/RecordingStudio_moveable/RecordingStudio_moveable/app/helpers/recording_studio_moveable/moveables_helper.rb": {
         "lines": [
           null,
           null,
@@ -4787,11 +4993,6 @@
           1,
           0,
           null,
-          0,
-          0,
-          null,
-          0,
-          null,
           null,
           1,
           0,
@@ -4828,6 +5029,10 @@
           null,
           null,
           null,
+          null,
+          null,
+          1,
+          0,
           null,
           null,
           null
@@ -4836,18 +5041,10 @@
           "[:unless, 0, 11, 6, 11, 56]": {
             "[:else, 1, 11, 6, 11, 56]": 0,
             "[:then, 2, 11, 6, 11, 18]": 0
-          },
-          "[:if, 3, 47, 6, 47, 92]": {
-            "[:then, 4, 47, 6, 47, 29]": 0,
-            "[:else, 5, 47, 6, 47, 92]": 0
-          },
-          "[:if, 6, 48, 6, 48, 89]": {
-            "[:then, 7, 48, 6, 48, 28]": 0,
-            "[:else, 8, 48, 6, 48, 89]": 0
           }
         }
       }
     },
-    "timestamp": 1775720119
+    "timestamp": 1777346740
   }
 }

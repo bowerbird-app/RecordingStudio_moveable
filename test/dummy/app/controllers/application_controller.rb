@@ -42,8 +42,8 @@ class ApplicationController < ActionController::Base
         actor: Current.actor,
         minimum_role: :view
       ).includes(:recordable)
-       .to_a
-       .sort_by { |root_recording| workspace_label_for(root_recording).downcase }
+        .to_a
+        .sort_by { |root_recording| workspace_label_for(root_recording).downcase }
     end
   end
 
