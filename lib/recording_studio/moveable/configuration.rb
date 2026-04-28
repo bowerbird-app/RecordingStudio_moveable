@@ -7,7 +7,7 @@ module RecordingStudio
       attr_writer :default_redirect_path, :default_redirect_mode
 
       def initialize
-        # Safe default: rely on RecordingStudio's built-in access checks.
+        # Safe default: rely on RecordingStudio Accessible's extracted access checks.
         @use_builtin_access = true
         # Safe default: custom mode denies unless the host app explicitly allows.
         @authorization_hook = ->(**) { false }

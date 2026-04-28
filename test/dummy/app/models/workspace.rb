@@ -1,4 +1,8 @@
 class Workspace < ApplicationRecord
+  include RecordingStudioAccessible::AllowsAccessibleChildren
+
+  recording_studio_accessible_children :access, :boundary
+
   RecordingStudioIcons.register_default_icon self,
     library: :heroicons,
     name: "rectangle-stack",

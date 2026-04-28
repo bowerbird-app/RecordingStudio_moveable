@@ -5,6 +5,7 @@ gem "recording_studio_moveable", path: "../.."
 
 # RecordingStudio engine
 gem "recording_studio", github: "bowerbird-app/RecordingStudio"
+gem "recording_studio_accessible", github: "bowerbird-app/RecordingStudio_accessible"
 
 # Devise authentication
 gem "devise"

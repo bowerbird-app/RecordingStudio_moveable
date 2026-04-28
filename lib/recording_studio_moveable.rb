@@ -8,6 +8,7 @@ require "recording_studio_moveable/root_label"
 require "recording_studio_moveable/services/base_service"
 require "recording_studio_moveable/services/example_service"
 require "recording_studio"
+require "recording_studio_accessible"
 begin
   require "recording_studio/labels"
 rescue LoadError => e

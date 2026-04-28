@@ -15,7 +15,7 @@
   - logs event metadata with parent ids and root ids
   - supports `actor`, optional `impersonator`, optional `metadata`
 - Authorization modes:
-  - **Built-in mode (default):** uses `RecordingStudio::Services::AccessCheck` and raises `RecordingStudio::AccessDenied` on failures
+  - **Built-in mode (default):** uses `recording_studio_accessible` for `RecordingStudio::Services::AccessCheck` and raises `RecordingStudio::AccessDenied` on failures
   - **Custom hook mode:** disable built-in mode and provide your own `authorization_hook`
 - Gem-provided reusable move UI:
   - full-page mode
@@ -31,6 +31,7 @@ Add to your Gemfile:
 
 ```ruby
 gem "recording_studio_moveable"
+gem "recording_studio_accessible"
 gem "flat_pack", github: "bowerbird-app/flatpack"
 ```
 
@@ -38,6 +39,7 @@ Then bundle install and mount the engine UI routes:
 
 ```ruby
 # config/routes.rb
+mount RecordingStudioAccessible::Engine, at: "/recording_studio_accessible"
 mount RecordingStudioMoveable::Engine, at: "/recording_studio_moveable", as: :recording_studio_moveable
 ```
 
@@ -71,13 +73,23 @@ This addon registers `:movable` without a legacy feature gate so it can continue
 
 ### Default (built-in) mode
 
-No extra setup required. In this mode:
+Install `recording_studio_accessible` and configure your root recordables to allow access children. In this mode:
 
 - source requires `:edit`
 - destination requires `:edit`
 - move UI source visibility requires `:edit`
 - move UI only lists destinations the actor can move into
 - failures raise `RecordingStudio::AccessDenied`
+
+Example root recordable setup:
+
+```ruby
+class Workspace < ApplicationRecord
+  include RecordingStudioAccessible::AllowsAccessibleChildren
+
+  recording_studio_accessible_children :access, :boundary
+end
+```
 
 ### Custom authorization hook mode
 
@@ -125,7 +137,7 @@ The addon enforces access checks inside the gem-owned move controller.
 
 ## Dummy app demo
 
-The dummy app includes:
+The dummy app explicitly installs both `recording_studio_accessible` and `recording_studio_moveable`. It includes:
 
 - `Workspace` root recordable
 - `RecordingStudioFolder` and `RecordingStudioPage` (move-enabled)

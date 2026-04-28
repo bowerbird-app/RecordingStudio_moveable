@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.email       = ["your.email@example.com"]
   spec.homepage    = "https://github.com/bowerbird-app/RecordingStudio_moveable"
   spec.summary     = "RecordingStudio move capability addon with reusable move UI"
-  spec.description = "Addon for RecordingStudio that provides moveable capability extraction, authorization " \
-                     "modes, and reusable full-page/modal move UI."
+  spec.description = "Addon for RecordingStudio that provides moveable capability extraction, integration " \
+                     "with RecordingStudio Accessible authorization, and reusable full-page/modal move UI."
   spec.license     = "MIT"
   spec.required_ruby_version = ">= 3.3.0"
 
@@ -27,5 +27,6 @@ Gem::Specification.new do |spec|
   # Host applications must declare: gem "flat_pack", github: "bowerbird-app/flatpack"
   spec.add_dependency "rails", ">= 7.0.0"
   spec.add_dependency "recording_studio", ">= 0.1.0"
+  spec.add_dependency "recording_studio_accessible", ">= 0.1.0"
   spec.add_dependency "recording_studio_icons", ">= 0.1.0"
 end
