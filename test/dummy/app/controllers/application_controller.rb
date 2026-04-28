@@ -38,12 +38,13 @@ class ApplicationController < ActionController::Base
     return [] if Current.actor.blank?
 
     @accessible_workspace_roots ||= begin
-      RecordingStudio::Services::AccessCheck.root_recordings_for(
-        actor: Current.actor,
-        minimum_role: :view
-      ).includes(:recordable)
-        .to_a
-        .sort_by { |root_recording| workspace_label_for(root_recording).downcase }
+      roots_by_id = RecordingStudio::Recording.where(id: accessible_workspace_root_ids)
+                                              .includes(:recordable)
+                                              .index_by(&:id)
+
+      accessible_workspace_root_ids.filter_map { |root_id| roots_by_id[root_id] }
+                                   .uniq
+                                   .sort_by { |root_recording| workspace_label_for(root_recording).downcase }
     end
   end
 
@@ -83,5 +84,20 @@ class ApplicationController < ActionController::Base
     end
 
     nil
+  end
+
+  def accessible_workspace_root_ids
+    @accessible_workspace_root_ids ||= begin
+      accessible_query = RecordingStudioAccessible::DirectAccessQuery.access_recordings_for_actor_in(
+        recordings: workspace_roots_scope,
+        actor: Current.actor
+      )
+
+      accessible_query.distinct.pluck(:parent_recording_id)
+    end
+  end
+
+  def workspace_roots_scope
+    RecordingStudio::Recording.where(recordable_type: "Workspace", parent_recording_id: nil)
   end
 end

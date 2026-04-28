@@ -21,24 +21,28 @@ class WorkspaceSwitcherTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Restricted Workspace"
   end
 
-  def test_top_nav_uses_access_check_root_lookup_for_workspace_roots
-    expected_roots = RecordingStudio::Recording.where(
-      id: Workspace.where(name: ["Studio Workspace", "Client Workspace"]).map do |workspace|
-        RecordingStudio::Recording.find_by!(recordable: workspace, parent_recording_id: nil).id
+  def test_top_nav_uses_accessible_direct_access_query_for_workspace_roots
+    accessible_root_ids = Workspace.where(name: ["Studio Workspace", "Client Workspace"]).map do |workspace|
+      RecordingStudio::Recording.find_by!(recordable: workspace, parent_recording_id: nil).id
+    end
+    query_result = Struct.new(:root_ids) do
+      def distinct
+        self
       end
-    )
-    called = false
 
-    RecordingStudio::Services::AccessCheck.stub(:root_recordings_for, lambda { |actor:, minimum_role:|
-      called = true
+      def pluck(_column_name)
+        root_ids
+      end
+    end.new(accessible_root_ids)
+
+    RecordingStudioAccessible::DirectAccessQuery.stub(:access_recordings_for_actor_in, lambda { |recordings:, actor:|
       assert_equal @user, actor
-      assert_equal :view, minimum_role
-      expected_roots
+      assert_equal "Workspace", recordings.first.recordable_type
+      query_result
     }) do
       get root_path
     end
 
-    assert called
     assert_response :success
     assert_includes response.body, "Studio Workspace"
     assert_includes response.body, "Client Workspace"

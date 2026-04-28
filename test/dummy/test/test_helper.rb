@@ -31,10 +31,12 @@ module DummyMoveableTestHelpers
   end
 
   def grant_root_access(root:, actor:, role: :admin)
-    root.record(RecordingStudio::Access, actor: actor, parent_recording: root) do |access|
-      access.actor = actor
-      access.role = role
-    end
+    RecordingStudioAccessible::Services::GrantRecordingAccess.call(
+      recording: root,
+      actor: actor,
+      role: role,
+      manager_actor: actor
+    ).value!
   end
 end
 

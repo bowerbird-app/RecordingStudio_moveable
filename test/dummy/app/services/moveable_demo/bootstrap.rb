@@ -107,21 +107,12 @@ module MoveableDemo
     end
 
     def ensure_root_access!(root_recording)
-      access = RecordingStudio::Access.find_by(actor: actor)
-
-      if access.present?
-        access.update!(role: :admin) if access.role.to_sym != :admin
-        return RecordingStudio::Recording.unscoped.find_or_create_by!(
-          root_recording_id: root_recording.id,
-          parent_recording_id: root_recording.id,
-          recordable: access
-        )
-      end
-
-      root_recording.record(RecordingStudio::Access, actor: actor, parent_recording: root_recording) do |new_access|
-        new_access.actor = actor
-        new_access.role = :admin
-      end
+      RecordingStudioAccessible::Services::GrantRecordingAccess.call(
+        recording: root_recording,
+        actor: actor,
+        role: :admin,
+        manager_actor: actor
+      ).value!
     end
 
     def ensure_demo_tree!(root_recording, workspace_data)

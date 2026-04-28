@@ -66,8 +66,7 @@ module RecordingStudio
       end
 
       def editable_recording?(recording)
-        ensure_access_check_available!
-        RecordingStudio::Services::AccessCheck.allowed?(actor: actor, recording: recording, role: :edit)
+        RecordingStudio::Moveable::Access.allowed?(actor: actor, recording: recording, role: :edit)
       end
 
       def built_in_access?
@@ -82,20 +81,6 @@ module RecordingStudio
           impersonator: impersonator,
           metadata: metadata
         )
-      end
-
-      def ensure_access_check_available!
-        require "recording_studio_accessible" unless defined?(RecordingStudioAccessible::Compatibility)
-        return if defined?(RecordingStudio::Services::AccessCheck)
-
-        raise LoadError, "RecordingStudio::Services::AccessCheck is unavailable"
-      rescue LoadError => e
-        raise LoadError, <<~MESSAGE.squish
-          RecordingStudio Moveable built-in authorization requires the recording_studio_accessible gem.
-          Add `gem "recording_studio_accessible"` to your Gemfile or set
-          `RecordingStudio::Moveable.configure { |config| config.use_builtin_access = false }`.
-          Original error: #{e.message}
-        MESSAGE
       end
     end
   end

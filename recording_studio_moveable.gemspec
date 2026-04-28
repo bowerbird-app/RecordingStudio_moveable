@@ -27,5 +27,6 @@ Gem::Specification.new do |spec|
   # Host applications must declare: gem "flat_pack", github: "bowerbird-app/flatpack"
   spec.add_dependency "rails", ">= 7.0.0"
   spec.add_dependency "recording_studio", ">= 0.1.0"
+  spec.add_dependency "recording_studio_accessible", ">= 0.1.0"
   spec.add_dependency "recording_studio_icons", ">= 0.1.0"
 end

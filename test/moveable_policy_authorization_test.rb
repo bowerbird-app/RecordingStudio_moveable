@@ -23,7 +23,7 @@ class MoveablePolicyTest < Minitest::Test
       [@source, @destination].include?(recording)
     end
 
-    RecordingStudio::Services::AccessCheck.stub(:allowed?, allowed) do
+    RecordingStudio::Moveable::Access.stub(:allowed?, allowed) do
       policy = RecordingStudio::Moveable::Policy.new(actor: @actor, source: @source)
       hidden_destination = Struct.new(:id).new("hidden")
 
@@ -35,25 +35,8 @@ class MoveablePolicyTest < Minitest::Test
     end
   end
 
-  def test_builtin_access_loads_recording_studio_accessible_before_using_access_check
-    script = <<~RUBY
-      require "test_helper"
-
-      raise "expected RecordingStudioAccessible to be unloaded" if defined?(RecordingStudioAccessible)
-
-      RecordingStudio::Services::AccessCheck.stub(:allowed?, ->(**) { true }) do
-        policy = RecordingStudio::Moveable::Policy.new(
-          actor: Object.new,
-          source: Struct.new(:id).new("source")
-        )
-
-        raise "expected source to be editable" unless policy.source_editable?
-      end
-
-      raise "expected RecordingStudioAccessible to be loaded" unless defined?(RecordingStudioAccessible)
-    RUBY
-
-    assert system(RbConfig.ruby, "-Itest", "-e", script)
+  def test_built_in_access_is_backed_by_recording_studio_accessible
+    assert defined?(RecordingStudioAccessible)
   end
 
   def test_destination_selectable_returns_false_when_destination_is_not_editable
@@ -64,7 +47,7 @@ class MoveablePolicyTest < Minitest::Test
       recording == @source
     end
 
-    RecordingStudio::Services::AccessCheck.stub(:allowed?, allowed) do
+    RecordingStudio::Moveable::Access.stub(:allowed?, allowed) do
       policy = RecordingStudio::Moveable::Policy.new(actor: @actor, source: @source)
 
       assert policy.source_editable?
@@ -73,7 +56,7 @@ class MoveablePolicyTest < Minitest::Test
   end
 
   def test_authorize_move_raises_when_source_is_not_editable
-    RecordingStudio::Services::AccessCheck.stub(:allowed?, ->(**) { false }) do
+    RecordingStudio::Moveable::Access.stub(:allowed?, ->(**) { false }) do
       policy = RecordingStudio::Moveable::Policy.new(actor: @actor, source: @source)
 
       error = assert_raises(RecordingStudio::AccessDenied) do
@@ -89,7 +72,7 @@ class MoveablePolicyTest < Minitest::Test
       recording == @source
     end
 
-    RecordingStudio::Services::AccessCheck.stub(:allowed?, allowed) do
+    RecordingStudio::Moveable::Access.stub(:allowed?, allowed) do
       policy = RecordingStudio::Moveable::Policy.new(actor: @actor, source: @source)
 
       error = assert_raises(RecordingStudio::AccessDenied) do

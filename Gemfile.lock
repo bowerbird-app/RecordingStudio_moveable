@@ -36,6 +36,7 @@ PATH
     recording_studio_moveable (0.1.0)
       rails (>= 7.0.0)
       recording_studio (>= 0.1.0)
+      recording_studio_accessible (>= 0.1.0)
       recording_studio_icons (>= 0.1.0)
 
 GEM

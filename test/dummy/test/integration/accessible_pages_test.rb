@@ -9,7 +9,7 @@ class AccessiblePagesTest < ActionDispatch::IntegrationTest
     @user = create_user(email: "accessible-pages@example.com")
     @root = bootstrap_demo_for(@user)
     sign_in @user
-    @access_recording = RecordingStudio::Services::AccessCheck.access_recordings_for(@root).first
+    @access_recording = RecordingStudioAccessible::DirectAccessQuery.access_recordings_for(@root).first
   end
 
   def test_accessible_engine_pages_render_successfully

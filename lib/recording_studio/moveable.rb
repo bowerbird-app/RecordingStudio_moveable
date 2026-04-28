@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "recording_studio_accessible"
+require "recording_studio/moveable/access"
 require "recording_studio/moveable/configuration"
 require "recording_studio/moveable/policy"
 require "recording_studio/moveable/authorization"
