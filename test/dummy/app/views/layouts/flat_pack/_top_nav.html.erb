@@ -22,7 +22,7 @@
   <% nav.right do %>
     <div class="ml-auto flex items-center gap-3">
       <% if workspace_roots.many? %>
-        <%= form_with url: workspace_selection_path, method: :patch, class: "hidden sm:block" do %>
+        <%= form_with url: main_app.workspace_selection_path, method: :patch, class: "hidden sm:block" do %>
           <%= hidden_field_tag :return_to, request.fullpath %>
           <label class="sr-only" for="workspace-switcher">Workspace</label>
           <%= select_tag :root_recording_id,

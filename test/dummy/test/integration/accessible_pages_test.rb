@@ -17,13 +17,11 @@ class AccessiblePagesTest < ActionDispatch::IntegrationTest
       "/recording_studio_accessible",
       "/recording_studio_accessible/overview",
       "/recording_studio_accessible/methods",
-      "/recording_studio_accessible/boundaries",
       "/recording_studio_accessible/user_invites",
       "/recording_studio_accessible/email_template",
       "/recording_studio_accessible/recordings/#{@root.id}/accesses",
       "/recording_studio_accessible/recordings/#{@root.id}/accesses/new",
-      "/recording_studio_accessible/recordings/#{@root.id}/accesses/#{@access_recording.id}/edit",
-      "/recording_studio_accessible/recordings/#{@root.id}/boundary/new"
+      "/recording_studio_accessible/recordings/#{@root.id}/accesses/#{@access_recording.id}/edit"
     ].each do |path|
       get path
       assert_response :success, "expected #{path} to load successfully"

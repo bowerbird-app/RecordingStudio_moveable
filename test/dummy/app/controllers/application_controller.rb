@@ -93,11 +93,29 @@ class ApplicationController < ActionController::Base
         actor: Current.actor
       )
 
-      accessible_query.distinct.pluck(:parent_recording_id)
+      accessible_query.unscope(:order).distinct.pluck(:parent_recording_id)
     end
   end
 
   def workspace_roots_scope
     RecordingStudio::Recording.where(recordable_type: "Workspace", parent_recording_id: nil)
+  end
+
+  def require_recording_view_access!(recording)
+    raise ActiveRecord::RecordNotFound unless recording_viewable?(recording)
+
+    recording
+  end
+
+  def filter_viewable_recordings(recordings)
+    Array(recordings).select { |recording| recording_viewable?(recording) }
+  end
+
+  def recording_viewable?(recording)
+    RecordingStudio::Moveable::Access.allowed?(
+      actor: Current.actor,
+      recording: recording,
+      role: :view
+    )
   end
 end

@@ -346,6 +346,28 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  def test_page_show_returns_not_found_when_actor_cannot_access_page
+    sign_out @user
+
+    outsider = create_user(email: "outsider-page@example.com")
+    sign_in outsider
+
+    get recording_studio_page_path(@page.recordable)
+
+    assert_response :not_found
+  end
+
+  def test_folder_show_returns_not_found_when_actor_cannot_access_folder
+    sign_out @user
+
+    outsider = create_user(email: "outsider-folder@example.com")
+    sign_in outsider
+
+    get recording_studio_folder_path(@source_folder.recordable)
+
+    assert_response :not_found
+  end
+
   def test_move_screen_uses_gem_authorization_to_hide_inaccessible_destinations
     hidden_folder = @root.record(RecordingStudioFolder, actor: @user, parent_recording: @root) { |f| f.name = "Hidden" }
 

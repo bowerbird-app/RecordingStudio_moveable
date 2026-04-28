@@ -15,7 +15,7 @@
   - logs event metadata with parent ids and root ids
   - supports `actor`, optional `impersonator`, optional `metadata`
 - Authorization modes:
-  - **Built-in mode (default):** uses `recording_studio_accessible` for `RecordingStudio::Services::AccessCheck` and raises `RecordingStudio::AccessDenied` on failures
+  - **Built-in mode (default):** uses `recording_studio_accessible` query and grant APIs to resolve access roles and raises `RecordingStudio::AccessDenied` on failures
   - **Custom hook mode:** disable built-in mode and provide your own `authorization_hook`
 - Gem-provided reusable move UI:
   - full-page mode
@@ -80,6 +80,8 @@ Install `recording_studio_accessible` and configure your root recordables to all
 - move UI only lists destinations the actor can move into
 - failures raise `RecordingStudio::AccessDenied`
 
+Under the hood, move authorization is resolved through `RecordingStudioAccessible::DirectAccessQuery`, and the dummy app grants access with `RecordingStudioAccessible::Services::GrantRecordingAccess`.
+
 Example root recordable setup:
 
 ```ruby
@@ -98,7 +100,7 @@ bin/rails generate recording_studio_accessible:migrations
 bin/rails db:migrate
 ```
 
-Mount `RecordingStudioAccessible::Engine` as well if you want the addon-owned access management pages in your host app. On current `recording_studio` releases that still ship access tables/constants, `recording_studio_accessible` runs in compatibility mode, so your existing access migrations may already satisfy the database setup.
+Mount `RecordingStudioAccessible::Engine` as well if you want the addon-owned access management pages in your host app. On current `recording_studio` releases that still ship access tables/constants, `recording_studio_accessible` runs in compatibility mode, so your existing access migrations may already satisfy the database setup. In that setup, runtime authorization still flows through the Accessible gem's public APIs rather than legacy `recording_studio` access-check helpers.
 
 Move screens read the acting principal from `Current.actor` by default. If your host app uses a different controller-level source, configure it explicitly:
 
@@ -160,6 +162,7 @@ The dummy app explicitly installs both `recording_studio_accessible` and `record
 - `RecordingStudioFolder` and `RecordingStudioPage` (move-enabled)
 - `RecordingStudioArchiveBox` (disallowed destination type demo)
 - routes/controllers/views to demonstrate same-workspace and cross-workspace move flows
+- Recording Studio Accessible integration for workspace discovery, access management pages, and seeded access grants
 
 ### Seed reset instructions
 

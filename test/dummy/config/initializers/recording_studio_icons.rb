@@ -10,7 +10,7 @@ unless RecordingStudioIcons::Renderers::Heroicons.singleton_class.ancestors.any?
   module RecordingStudioDocumentIconAlias
     def icon_definition(icon_reference)
       if icon_reference.name == "document" && (icon_reference.variant || :outline) == :outline
-        return RecordingStudioIcons::Renderers::HEROICON_DEFINITIONS[["document-text", :outline]]
+        return RecordingStudioIcons::Renderers::HEROICON_DEFINITIONS[[ "document-text", :outline ]]
       end
 
       super

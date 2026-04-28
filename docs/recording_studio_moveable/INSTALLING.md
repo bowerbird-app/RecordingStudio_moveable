@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** December 11, 2025
+> *   **Last Updated:** April 28, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -42,6 +42,24 @@ gem "recording_studio_moveable"
 ```bash
 bundle install
 ```
+
+### 2.5 Install Access Integration for Built-In Authorization
+
+If you want RecordingStudioMoveable to enforce move authorization itself, install `recording_studio_accessible` alongside the moveable gem:
+
+```ruby
+gem "recording_studio_accessible"
+```
+
+Then run:
+
+```bash
+bin/rails generate recording_studio_accessible:install
+bin/rails generate recording_studio_accessible:migrations
+bin/rails db:migrate
+```
+
+Configure your root recordables with `RecordingStudioAccessible::AllowsAccessibleChildren` and expose the acting principal through `Current.actor` or `RecordingStudioMoveable.configure`.
 
 ### 3. Run the Install Generator
 
@@ -86,6 +104,8 @@ end
 ```
 
 See [CONFIGURATION.md](CONFIGURATION.md) for all options.
+
+Built-in authorization uses Recording Studio Accessible's public query APIs. It does not depend on legacy `RecordingStudio::Services::AccessCheck` helpers.
 
 ### Tailwind CSS
 
@@ -132,6 +152,8 @@ end
 
 Use `redirect_mode` on move links when you need per-request behavior, for example `redirect_mode: "destination"` to land on the folder that received the moved item.
 
+If you are not using built-in authorization, disable it and provide your own `authorization_hook` in the same initializer.
+
 ### Configure Tailwind (If Using)
 
 Add to your `app/assets/tailwind/application.css`:
@@ -161,6 +183,8 @@ bin/rails tailwindcss:build
    ```
 
 You should see the engine's welcome page.
+
+If built-in authorization is enabled, also verify that an actor with edit access can open the move UI and that an actor without edit access is denied. Those checks should flow through Accessible, even when Accessible is running in compatibility mode on top of `recording_studio` access tables.
 
 ---
 

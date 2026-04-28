@@ -269,7 +269,7 @@ Devise.setup do |config|
   # config.navigational_formats = ['*/*', :html, :turbo_stream]
 
   # Allow GET sign-out for links that cannot submit DELETE (e.g. plain anchors).
-  config.sign_out_via = [:delete, :get]
+  config.sign_out_via = [ :delete, :get ]
 
   # ==> OmniAuth
   # Add a new OmniAuth provider. Check the wiki for more information on setting

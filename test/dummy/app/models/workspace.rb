@@ -1,7 +1,7 @@
 class Workspace < ApplicationRecord
   include RecordingStudioAccessible::AllowsAccessibleChildren
 
-  recording_studio_accessible_children :access, :boundary
+  recording_studio_accessible_children :access
 
   RecordingStudioIcons.register_default_icon self,
     library: :heroicons,

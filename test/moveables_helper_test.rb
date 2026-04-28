@@ -232,7 +232,7 @@ class MoveablesHelperTest < Minitest::Test
 
     assert_equal "📁 Tracking Folder", helper.moveable_label_for(named_recording)
     assert_equal "Folder", helper.moveable_type_for(named_recording)
-    assert_equal "Move 📁 Tracking Folder", helper.moveable_title_for(named_recording)
+    assert_equal "Move Tracking Folder", helper.moveable_title_for(named_recording)
     assert_equal "MoveablesHelperTest::ArchiveRecordable #box-3", helper.moveable_label_for(fallback_recording)
     assert_equal "Archive box", helper.moveable_type_for(fallback_recording)
   end

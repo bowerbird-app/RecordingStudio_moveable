@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** December 11, 2025
+> *   **Last Updated:** April 28, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -10,11 +10,22 @@
 
 This guide explains how to work with database migrations in RecordingStudioMoveable.
 
+RecordingStudioMoveable itself does not own the access-control schema. If you use built-in authorization, install access-related migrations from `recording_studio_accessible`.
+
 ---
 
 ## Installing Migrations in a Host App
 
 RecordingStudioMoveable includes a migrations generator that copies engine migrations to your host application with proper timestamps.
+
+For access setup, run the Accessible generators separately:
+
+```bash
+bin/rails generate recording_studio_accessible:install
+bin/rails generate recording_studio_accessible:migrations
+```
+
+On current `recording_studio` releases, Accessible may reuse existing access tables in compatibility mode. That storage compatibility does not change the runtime integration point for move authorization.
 
 ### Run the Generator
 
