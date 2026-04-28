@@ -55,6 +55,12 @@ jobs:
       env:
         DATABASE_URL: postgres://postgres:postgres@localhost:5432/gem_template_test
 
+    - name: Build dummy app Tailwind CSS
+      run: bundle exec rails tailwindcss:build RAILS_ENV=test
+      working-directory: test/dummy
+      env:
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/gem_template_test
+
     - name: Run RuboCop
       run: bundle exec rubocop
 
