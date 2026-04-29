@@ -21,35 +21,29 @@ class WorkspaceSwitcherTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Restricted Workspace"
   end
 
-  def test_top_nav_uses_accessible_public_authorization_api_for_workspace_roots
+  def test_top_nav_uses_accessible_public_root_recording_ids_api_for_workspace_roots
     accessible_root_ids = Workspace.where(name: [ "Studio Workspace", "Client Workspace" ]).map do |workspace|
       RecordingStudio::Recording.find_by!(recordable: workspace, parent_recording_id: nil).id
     end
     calls = []
 
-    authorized = lambda do |actor:, recording:, role:|
-      calls << { actor: actor, recording: recording, role: role }
-      accessible_root_ids.include?(recording.id)
+    root_recording_ids_for = lambda do |actor:, minimum_role:|
+      calls << { actor: actor, minimum_role: minimum_role }
+      accessible_root_ids
     end
 
     accessible_singleton = RecordingStudioAccessible.singleton_class
-    original_method = accessible_singleton.instance_method(:authorized?)
-
-    accessible_singleton.define_method(:authorized?, authorized)
+    original_method = accessible_singleton.instance_method(:root_recording_ids_for)
+    accessible_singleton.define_method(:root_recording_ids_for, root_recording_ids_for)
 
     begin
       get root_path
     ensure
-      accessible_singleton.define_method(:authorized?, original_method)
+      accessible_singleton.define_method(:root_recording_ids_for, original_method)
     end
 
     assert_response :success
-    assert_equal [ @user ], calls.map { |call| call[:actor] }.uniq
-    assert_equal [ :view ], calls.map { |call| call[:role] }.uniq
-    assert_equal(
-      [ "Client Workspace", "Restricted Workspace", "Studio Workspace" ],
-      calls.map { |call| call[:recording].recordable.name }.sort
-    )
+    assert_equal [ { actor: @user, minimum_role: :view } ], calls
     assert_includes response.body, "Studio Workspace"
     assert_includes response.body, "Client Workspace"
     refute_includes response.body, "Restricted Workspace"

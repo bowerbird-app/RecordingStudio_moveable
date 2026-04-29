@@ -55,4 +55,14 @@ class MoveableAccessTest < Minitest::Test
       )
     end
   end
+
+  def test_allowed_returns_false_when_accessible_public_api_denies
+    RecordingStudioAccessible.stub(:authorized?, ->(**) { false }) do
+      assert_not RecordingStudio::Moveable::Access.allowed?(
+        actor: Object.new,
+        recording: FakeRecording.new(id: 10),
+        role: :edit
+      )
+    end
+  end
 end
