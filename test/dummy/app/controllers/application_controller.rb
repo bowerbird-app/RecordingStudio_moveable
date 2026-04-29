@@ -88,12 +88,13 @@ class ApplicationController < ActionController::Base
 
   def accessible_workspace_root_ids
     @accessible_workspace_root_ids ||= begin
-      accessible_query = RecordingStudioAccessible::DirectAccessQuery.access_recordings_for_actor_in(
-        recordings: workspace_roots_scope,
-        actor: Current.actor
-      )
-
-      accessible_query.unscope(:order).distinct.pluck(:parent_recording_id)
+      workspace_roots_scope.filter_map do |root_recording|
+        root_recording.id if RecordingStudioAccessible.authorized?(
+          actor: Current.actor,
+          recording: root_recording,
+          role: :view
+        )
+      end
     end
   end
 

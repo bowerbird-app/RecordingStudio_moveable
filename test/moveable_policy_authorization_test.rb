@@ -35,8 +35,9 @@ class MoveablePolicyTest < Minitest::Test
     end
   end
 
-  def test_built_in_access_is_backed_by_recording_studio_accessible
+  def test_built_in_access_uses_recording_studio_accessible_public_api
     assert defined?(RecordingStudioAccessible)
+    assert_respond_to RecordingStudioAccessible, :authorized?
   end
 
   def test_destination_selectable_returns_false_when_destination_is_not_editable

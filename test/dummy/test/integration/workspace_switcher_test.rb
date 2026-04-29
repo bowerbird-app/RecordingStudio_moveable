@@ -3,23 +3,6 @@
 require_relative "../test_helper"
 
 class WorkspaceSwitcherTest < ActionDispatch::IntegrationTest
-  FakeAccessibleWorkspaceQuery = Struct.new(:root_ids) do
-    attr_reader :unscoped_values
-
-    def unscope(*values)
-      @unscoped_values = values
-      self
-    end
-
-    def distinct
-      self
-    end
-
-    def pluck(_column_name)
-      root_ids
-    end
-  end
-
   def setup
     super
 
@@ -38,31 +21,35 @@ class WorkspaceSwitcherTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Restricted Workspace"
   end
 
-  def test_top_nav_uses_accessible_direct_access_query_for_workspace_roots
+  def test_top_nav_uses_accessible_public_authorization_api_for_workspace_roots
     accessible_root_ids = Workspace.where(name: [ "Studio Workspace", "Client Workspace" ]).map do |workspace|
       RecordingStudio::Recording.find_by!(recordable: workspace, parent_recording_id: nil).id
     end
-    query_result = FakeAccessibleWorkspaceQuery.new(accessible_root_ids)
-    test_case = self
-    expected_user = @user
+    calls = []
 
-    query_singleton = RecordingStudioAccessible::DirectAccessQuery.singleton_class
-    original_method = query_singleton.instance_method(:access_recordings_for_actor_in)
-
-    query_singleton.define_method(:access_recordings_for_actor_in) do |recordings:, actor:|
-      test_case.assert_equal expected_user, actor
-      test_case.assert_equal "Workspace", recordings.first.recordable_type
-      query_result
+    authorized = lambda do |actor:, recording:, role:|
+      calls << { actor: actor, recording: recording, role: role }
+      accessible_root_ids.include?(recording.id)
     end
+
+    accessible_singleton = RecordingStudioAccessible.singleton_class
+    original_method = accessible_singleton.instance_method(:authorized?)
+
+    accessible_singleton.define_method(:authorized?, authorized)
 
     begin
       get root_path
     ensure
-      query_singleton.define_method(:access_recordings_for_actor_in, original_method)
+      accessible_singleton.define_method(:authorized?, original_method)
     end
 
     assert_response :success
-  assert_equal [ :order ], query_result.unscoped_values
+    assert_equal [ @user ], calls.map { |call| call[:actor] }.uniq
+    assert_equal [ :view ], calls.map { |call| call[:role] }.uniq
+    assert_equal(
+      [ "Client Workspace", "Restricted Workspace", "Studio Workspace" ],
+      calls.map { |call| call[:recording].recordable.name }.sort
+    )
     assert_includes response.body, "Studio Workspace"
     assert_includes response.body, "Client Workspace"
     refute_includes response.body, "Restricted Workspace"
