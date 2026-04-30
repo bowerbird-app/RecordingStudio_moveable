@@ -88,12 +88,13 @@ class ApplicationController < ActionController::Base
 
   def accessible_workspace_root_ids
     @accessible_workspace_root_ids ||= begin
-      accessible_query = RecordingStudioAccessible::DirectAccessQuery.access_recordings_for_actor_in(
-        recordings: workspace_roots_scope,
-        actor: Current.actor
+      workspace_root_ids = workspace_roots_scope.pluck(:id)
+      authorized_root_ids = RecordingStudioAccessible.root_recording_ids_for(
+        actor: Current.actor,
+        minimum_role: :view
       )
 
-      accessible_query.unscope(:order).distinct.pluck(:parent_recording_id)
+      workspace_root_ids & Array(authorized_root_ids)
     end
   end
 

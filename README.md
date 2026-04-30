@@ -15,7 +15,7 @@
   - logs event metadata with parent ids and root ids
   - supports `actor`, optional `impersonator`, optional `metadata`
 - Authorization modes:
-  - **Built-in mode (default):** uses `recording_studio_accessible` query and grant APIs to resolve access roles and raises `RecordingStudio::AccessDenied` on failures
+  - **Built-in mode (default):** uses `recording_studio_accessible` public access API to resolve roles and direct grants, and raises `RecordingStudio::AccessDenied` on failures
   - **Custom hook mode:** disable built-in mode and provide your own `authorization_hook`
 - Gem-provided reusable move UI:
   - full-page mode
@@ -80,7 +80,7 @@ Install `recording_studio_accessible` and configure your root recordables to all
 - move UI only lists destinations the actor can move into
 - failures raise `RecordingStudio::AccessDenied`
 
-Under the hood, move authorization is resolved through `RecordingStudioAccessible::DirectAccessQuery`, and the dummy app grants access with `RecordingStudioAccessible::Services::GrantRecordingAccess`.
+Under the hood, move authorization is resolved through `RecordingStudioAccessible.authorized?`, `RecordingStudioAccessible.role_for`, and related public access helpers. The dummy app still uses the Accessible gem's grant services for seeding and management flows.
 
 Example root recordable setup:
 

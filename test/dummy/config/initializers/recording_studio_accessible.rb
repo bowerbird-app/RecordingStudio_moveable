@@ -6,10 +6,10 @@ dummy_access_authorizer = lambda do |recording:, actor:, **|
   next false if actor.blank? || recording.blank?
 
   root_recording = recording.root_recording || recording
-  root_access_recordings = RecordingStudioAccessible::DirectAccessQuery.access_recordings_for(root_recording)
+  root_access_recordings = RecordingStudioAccessible.access_recordings_for(root_recording)
   next true if root_access_recordings.none?
 
-  RecordingStudioAccessible::DirectAccessQuery.access_recordings_for_actor(recording: root_recording, actor: actor)
+  RecordingStudioAccessible.access_recordings_for_actor(recording: root_recording, actor: actor)
                            .any? { |access_recording| access_recording.recordable.role.to_sym == :admin }
 end
 
