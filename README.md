@@ -32,7 +32,7 @@ Add to your Gemfile:
 ```ruby
 gem "recording_studio_moveable"
 gem "recording_studio_accessible"
-gem "flat_pack", github: "bowerbird-app/flatpack"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.33"
 ```
 
 Then bundle install and mount the moveable engine UI routes:

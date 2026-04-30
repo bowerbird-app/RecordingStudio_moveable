@@ -29,12 +29,15 @@ Add to your `Gemfile`:
 ```ruby
 # From GitHub
 gem "recording_studio_moveable", github: "bowerbird-app/RecordingStudio_moveable"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.33"
 
 # Or from a local path (for development)
 gem "recording_studio_moveable", path: "../recording_studio_moveable"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.33"
 
 # Or from RubyGems (after publishing)
 gem "recording_studio_moveable"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.33"
 ```
 
 ### 2. Install Dependencies
@@ -42,6 +45,8 @@ gem "recording_studio_moveable"
 ```bash
 bundle install
 ```
+
+RecordingStudioMoveable currently expects FlatPack `v0.1.33` or newer so the generated Tailwind scaffold and install metadata stay aligned with the move UI integration.
 
 ### 2.5 Install Access Integration for Built-In Authorization
 
