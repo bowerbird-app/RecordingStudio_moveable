@@ -24,7 +24,11 @@ jobs:
           ruby-version: 3.3.0
           bundler-cache: false
 
-      - name: Install Flatpack checker
+      - name: Install root dependencies
+        run: bundle install
+
+      - name: Install dummy app dependencies
+        working-directory: test/dummy
         run: bundle install
 
       - name: Run Flatpack check
