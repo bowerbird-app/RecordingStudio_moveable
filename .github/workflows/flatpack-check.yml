@@ -28,4 +28,5 @@ jobs:
         run: bundle install
 
       - name: Run Flatpack check
-        run: bundle exec flatpack-checker
+        working-directory: test/dummy
+        run: bin/rake flat_pack:verify_install
