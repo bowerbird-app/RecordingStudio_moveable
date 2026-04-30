@@ -12,6 +12,13 @@ module DummyMoveableTestHelpers
     nil
   end
 
+  def compatible_device_session_model
+    return nil unless defined?(RecordingStudio)
+    return RecordingStudio.const_get(:DeviceSession) if RecordingStudio.const_defined?(:DeviceSession)
+
+    nil
+  end
+
   def restore_dummy_moveable_capabilities!
     [ RecordingStudioFolder, RecordingStudioPage ].each do |recordable_type|
       RecordingStudio.set_capability_options(
@@ -53,7 +60,7 @@ class ActiveSupport::TestCase
 
   setup do
     RecordingStudio::Event.delete_all
-    RecordingStudio::DeviceSession.delete_all
+    compatible_device_session_model&.delete_all
     RecordingStudio::Recording.delete_all
     compatible_access_model&.delete_all
     RecordingStudioFolder.delete_all

@@ -1,0 +1,36 @@
+name: Flatpack Check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+env:
+  BUNDLE_GITHUB__COM: x-access-token:${{ secrets.BOWERBIRD_ORG_CI_TOKEN }}
+
+jobs:
+  flatpack-check:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3
+          bundler-cache: false
+
+      - name: Install root dependencies
+        run: bundle install
+
+      - name: Install dummy app dependencies
+        working-directory: test/dummy
+        run: bundle install
+
+      - name: Run Flatpack check
+        working-directory: test/dummy
+        run: bin/rake flat_pack:verify_install

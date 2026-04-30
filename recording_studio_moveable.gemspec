@@ -23,8 +23,8 @@ Gem::Specification.new do |spec|
     Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
   end
 
-  # FlatPack UI component library >= 0.1.12 is required as a peer dependency.
-  # Host applications must declare: gem "flat_pack", github: "bowerbird-app/flatpack"
+  # FlatPack UI component library >= 0.1.33 is required as a peer dependency.
+  # Host applications should declare: gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.33"
   spec.add_dependency "rails", ">= 7.0.0"
   spec.add_dependency "recording_studio", ">= 0.1.0"
   spec.add_dependency "recording_studio_accessible", ">= 0.1.0"
