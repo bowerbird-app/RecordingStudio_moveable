@@ -18,6 +18,9 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "flat_pack/variables", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "flat_pack/application", "data-turbo-track": "reload" %>
+    <% if recording_studio_moveable_asset_available?("tailwind.css") %>
+      <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <% end %>
     <%= recording_studio_moveable_meta_tags %>
     <%= javascript_importmap_tags %>
   </head>
