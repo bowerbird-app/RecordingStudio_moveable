@@ -15,6 +15,7 @@ This guide explains how to install the RecordingStudioMoveable engine in your Ra
 ## Prerequisites
 
 - Rails 7.0+ application
+- RecordingStudio core 2.0+
 - PostgreSQL (recommended for UUID compatibility)
 - TailwindCSS (optional, for styling engine views)
 
@@ -60,6 +61,27 @@ bin/rails db:migrate
 ```
 
 Configure your root recordables with `RecordingStudioAccessible::AllowsAccessibleChildren` and expose the acting principal through `Current.actor` or `RecordingStudioMoveable.configure`.
+
+### 2.6 Declare RecordingStudio Core Hierarchy
+
+RecordingStudio core owns structural hierarchy in V2. Every configured recordable type should declare `recording_studio_recordable`, and child recordables should list allowed parent types there:
+
+```ruby
+class Workspace < ApplicationRecord
+  recording_studio_recordable label: "Workspace", root: true, allowed_parent_types: []
+end
+
+class RecordingStudioPage < ApplicationRecord
+  recording_studio_recordable \
+    label: "Page",
+    root: false,
+    allowed_parent_types: ["Workspace", "RecordingStudioFolder"]
+
+  include RecordingStudio::Capabilities::Moveable.enabled(allow_cross_root: true)
+end
+```
+
+Moveable only enables move behavior and move-specific options such as `allow_cross_root:`. It does not define destination parent types; the destination picker uses core declarations plus same-root/cross-root rules, self/descendant protection, and authorization filtering.
 
 ### 3. Run the Install Generator
 

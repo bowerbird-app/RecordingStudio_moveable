@@ -55,6 +55,7 @@ Addon-owned move behavior and UI for RecordingStudio.
 |-------|-------------|
 | [Renaming](RENAMING.md) | Notes on the historical rename away from the generic engine template. |
 | [Installation](INSTALLING.md) | Step-by-step guide for installing this engine in a host Rails application. |
+| [Upgrading](UPGRADING.md) | Breaking changes for RecordingStudio core V2 and the `Moveable.enabled(...)` API. |
 | [Configuration](CONFIGURATION.md) | Details on configuring the gem, including move redirect modes and custom redirect resolution. |
 | [Private Gems](PRIVATE_GEMS.md) | How to authenticate and access private gem dependencies in Codespaces, local, and production environments. |
 | [Database Migrations](MIGRATIONS.md) | How to generate and manage database migrations for the engine. |

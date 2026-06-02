@@ -237,8 +237,7 @@ module RecordingStudioMoveable
     end
 
     def current_root_recording
-      root_id = @recording.root_recording_id.presence || @recording.id
-      RecordingStudio::Recording.find_by(id: root_id) || @recording
+      RecordingStudio.root_recording_or_self(@recording)
     end
 
     def explicit_redirect_target

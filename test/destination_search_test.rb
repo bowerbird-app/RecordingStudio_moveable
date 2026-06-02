@@ -196,22 +196,24 @@ class DestinationSearchTest < Minitest::Test
     end
   end
 
-  def test_allowed_parent_types_and_cross_root_flag_use_capability_options
+  def test_core_allowed_parent_types_and_cross_root_flag_use_core_and_capability_options
+    allowed_parent_types = lambda do |recordable_type|
+      assert_equal "RecordingStudioPage", recordable_type
+      [:Workspace, "RecordingStudioFolder"]
+    end
     capability_options = lambda do |capability, for_type:|
       assert_equal :movable, capability
       assert_equal "RecordingStudioPage", for_type
-
-      {
-        allowed_parent_types: [:Workspace, "RecordingStudioFolder"],
-        allow_cross_root: true
-      }
+      { allow_cross_root: true }
     end
 
-    RecordingStudio.stub(:capability_options, capability_options) do
+    RecordingStudio.stub(:allowed_parent_types_for, allowed_parent_types) do
       search = build_search
 
-      assert_equal %w[Workspace RecordingStudioFolder], search.send(:allowed_parent_types)
-      assert search.send(:allow_cross_root?)
+      RecordingStudio.stub(:capability_options, capability_options) do
+        assert_equal %w[Workspace RecordingStudioFolder], search.send(:core_allowed_parent_types)
+        assert search.send(:allow_cross_root?)
+      end
     end
   end
 
@@ -252,15 +254,15 @@ class DestinationSearchTest < Minitest::Test
     scope = FakeScope.new([same_root, other_root, excluded, wrong_type])
     search = build_search
 
-    capability_options = lambda do |*, **|
-      { allowed_parent_types: ["RecordingStudioFolder"], allow_cross_root: false }
-    end
+    capability_options = ->(*, **) { { allow_cross_root: false } }
 
     RecordingStudio.stub(:capability_options, capability_options) do
-      RecordingStudio::Recording.stub(:all, scope) do
-        search.stub(:excluded_destination_ids, %w[source-id child-1]) do
-          assert_equal [same_root], search.send(:structurally_allowed_destinations)
-          assert_equal [other_root, same_root], search.send(:structurally_allowed_destinations, across_roots: true)
+      with_core_hierarchy do
+        RecordingStudio::Recording.stub(:all, scope) do
+          search.stub(:excluded_destination_ids, %w[source-id child-1]) do
+            assert_equal [same_root], search.send(:structurally_allowed_destinations)
+            assert_equal [other_root, same_root], search.send(:structurally_allowed_destinations, across_roots: true)
+          end
         end
       end
     end
@@ -272,25 +274,26 @@ class DestinationSearchTest < Minitest::Test
     wrong_type = recording(id: "page-1", root_recording_id: "root-1", recordable_type: "RecordingStudioPage")
     search = build_search
 
-    capability_options = lambda do |*, **|
-      { allowed_parent_types: ["RecordingStudioFolder"], allow_cross_root: false }
-    end
+    capability_options = ->(*, **) { { allow_cross_root: false } }
+    parent_allowed = ->(child_type:, parent_recording:) { child_type == "RecordingStudioPage" && parent_recording.recordable_type == "RecordingStudioFolder" }
 
     RecordingStudio.stub(:capability_options, capability_options) do
-      search.stub(:excluded_destination_ids, ["source-id"]) do
-        assert search.send(:structurally_allowed_destination?, same_root)
-        assert_not search.send(:structurally_allowed_destination?, cross_root)
-        assert_not search.send(:structurally_allowed_destination?, wrong_type)
+      with_core_hierarchy(parent_allowed: parent_allowed) do
+        search.stub(:excluded_destination_ids, ["source-id"]) do
+          assert search.send(:structurally_allowed_destination?, same_root)
+          assert_not search.send(:structurally_allowed_destination?, cross_root)
+          assert_not search.send(:structurally_allowed_destination?, wrong_type)
+        end
       end
     end
 
-    capability_options = lambda do |*, **|
-      { allowed_parent_types: ["RecordingStudioFolder"], allow_cross_root: true }
-    end
+    capability_options = ->(*, **) { { allow_cross_root: true } }
 
     RecordingStudio.stub(:capability_options, capability_options) do
-      search.stub(:excluded_destination_ids, %w[source-id folder-2]) do
-        assert_not search.send(:structurally_allowed_destination?, cross_root)
+      with_core_hierarchy(parent_allowed: parent_allowed) do
+        search.stub(:excluded_destination_ids, %w[source-id folder-2]) do
+          assert_not search.send(:structurally_allowed_destination?, cross_root)
+        end
       end
     end
   end
@@ -303,18 +306,18 @@ class DestinationSearchTest < Minitest::Test
     policy = FakePolicy.new(filtered_destinations: [workspace_a, workspace_b, workspace_a])
     search = build_search(policy: policy)
 
-    capability_options = lambda do |*, **|
-      { allowed_parent_types: ["RecordingStudioFolder"], allow_cross_root: true }
-    end
+    capability_options = ->(*, **) { { allow_cross_root: true } }
 
     RecordingStudio.stub(:capability_options, capability_options) do
-      search.stub(:structurally_allowed_destinations, [same_root, workspace_a, workspace_b]) do
-        RecordingStudio::Recording.stub(:where, lambda { |id:|
-          FakeScope.new(roots_scope.records.select { |record| Array(id).include?(record.id) })
-        }) do
-          assert_equal %w[root-2 root-3], search.send(:workspace_root_ids)
-          assert_equal [workspace_b, workspace_a], search.send(:cross_root_workspace_destinations)
-          assert_equal [same_root, workspace_a, workspace_b], policy.destinations_seen
+      with_core_hierarchy do
+        search.stub(:structurally_allowed_destinations, [same_root, workspace_a, workspace_b]) do
+          RecordingStudio::Recording.stub(:where, lambda { |id:|
+            FakeScope.new(roots_scope.records.select { |record| Array(id).include?(record.id) })
+          }) do
+            assert_equal %w[root-2 root-3], search.send(:workspace_root_ids)
+            assert_equal [workspace_b, workspace_a], search.send(:cross_root_workspace_destinations)
+            assert_equal [same_root, workspace_a, workspace_b], policy.destinations_seen
+          end
         end
       end
     end
@@ -323,9 +326,7 @@ class DestinationSearchTest < Minitest::Test
   def test_cross_root_workspace_destinations_returns_empty_when_cross_root_disabled
     search = build_search
 
-    capability_options = lambda do |*, **|
-      { allowed_parent_types: ["RecordingStudioFolder"], allow_cross_root: false }
-    end
+    capability_options = ->(*, **) { { allow_cross_root: false } }
 
     RecordingStudio.stub(:capability_options, capability_options) do
       assert_equal [], search.send(:cross_root_workspace_destinations)
@@ -378,15 +379,15 @@ class DestinationSearchTest < Minitest::Test
     policy = FakePolicy.new(filtered_destinations: [sibling_folder])
     search = build_search(source: source, policy: policy)
 
-    capability_options = lambda do |*, **|
-      { allowed_parent_types: %w[Workspace RecordingStudioFolder], allow_cross_root: false }
-    end
+    capability_options = ->(*, **) { { allow_cross_root: false } }
 
     RecordingStudio.stub(:capability_options, capability_options) do
-      RecordingStudio::Recording.stub(:all, scope) do
-        search.stub(:descendant_ids, []) do
-          assert_equal [sibling_folder], search.results(limit: nil)
-          assert_equal [sibling_folder], policy.destinations_seen
+      with_core_hierarchy(allowed_types: %w[Workspace RecordingStudioFolder]) do
+        RecordingStudio::Recording.stub(:all, scope) do
+          search.stub(:descendant_ids, []) do
+            assert_equal [sibling_folder], search.results(limit: nil)
+            assert_equal [sibling_folder], policy.destinations_seen
+          end
         end
       end
     end
@@ -417,14 +418,14 @@ class DestinationSearchTest < Minitest::Test
     policy = FakePolicy.new(filtered_destinations: [sibling_folder, root_destination])
     search = build_search(source: source, policy: policy)
 
-    capability_options = lambda do |*, **|
-      { allowed_parent_types: %w[Workspace RecordingStudioFolder], allow_cross_root: false }
-    end
+    capability_options = ->(*, **) { { allow_cross_root: false } }
 
     RecordingStudio.stub(:capability_options, capability_options) do
-      RecordingStudio::Recording.stub(:all, scope) do
-        search.stub(:descendant_ids, []) do
-          assert_equal [root_destination, sibling_folder], search.results(limit: nil)
+      with_core_hierarchy(allowed_types: %w[Workspace RecordingStudioFolder]) do
+        RecordingStudio::Recording.stub(:all, scope) do
+          search.stub(:descendant_ids, []) do
+            assert_equal [root_destination, sibling_folder], search.results(limit: nil)
+          end
         end
       end
     end
@@ -484,8 +485,10 @@ class DestinationSearchTest < Minitest::Test
     )
 
     assert_includes search.send(:searchable_terms, archive_recording), "archive box"
-    assert_equal "root-1", search.send(:resolved_root_id, recording(id: "child", root_recording_id: "root-1"))
-    assert_equal "direct-root", search.send(:resolved_root_id, recording(id: "direct-root"))
+    RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
+      assert_equal "root-1", search.send(:resolved_root_id, recording(id: "child", root_recording_id: "root-1"))
+      assert_equal "direct-root", search.send(:resolved_root_id, recording(id: "direct-root"))
+    end
   end
 
   def test_searchable_terms_delegate_to_recording_studio_labels
@@ -504,6 +507,26 @@ class DestinationSearchTest < Minitest::Test
   end
 
   private
+
+  def root_id_resolver
+    lambda do |recording|
+      recording.root_recording_id || recording.id
+    end
+  end
+
+  def with_core_hierarchy(allowed_types: ["RecordingStudioFolder"], parent_allowed: nil)
+    parent_allowed ||= lambda do |child_type:, parent_recording:|
+      child_type.present? && allowed_types.include?(parent_recording.recordable_type)
+    end
+
+    RecordingStudio.stub(:allowed_parent_types_for, ->(_type) { allowed_types }) do
+      RecordingStudio.stub(:parent_allowed?, parent_allowed) do
+        RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
+          yield
+        end
+      end
+    end
+  end
 
   def ensure_recording_class!
     recording_class = if defined?(RecordingStudio::Recording)

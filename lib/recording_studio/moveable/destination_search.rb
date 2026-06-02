@@ -52,19 +52,22 @@ module RecordingStudio
       end
 
       def structurally_allowed_destinations(root: nil, across_roots: false)
+        candidate_types = core_allowed_parent_types
+        return [] if candidate_types.empty?
+
         scope = RecordingStudio::Recording.all
         scope = scope.where(root_recording_id: resolved_root_id(root || source)) unless across_roots
 
-        scope.where(recordable_type: allowed_parent_types)
+        scope.where(recordable_type: candidate_types)
              .where.not(id: excluded_destination_ids)
              .includes(:recordable)
              .order(updated_at: :desc)
              .to_a
+             .select { |destination| structurally_allowed_destination?(destination) }
       end
 
-      def allowed_parent_types
-        options = RecordingStudio.capability_options(:movable, for_type: source.recordable_type) || {}
-        Array(options[:allowed_parent_types]).map(&:to_s)
+      def core_allowed_parent_types
+        Array(RecordingStudio.allowed_parent_types_for(source.recordable_type)).map(&:to_s)
       end
 
       def excluded_destination_ids
@@ -83,7 +86,7 @@ module RecordingStudio
 
       def structurally_allowed_destination?(destination)
         allowed_root?(destination) &&
-          allowed_parent_types.include?(destination.recordable_type.to_s) &&
+          RecordingStudio.parent_allowed?(child_type: source.recordable_type, parent_recording: destination) &&
           excluded_destination_ids.exclude?(destination.id)
       end
 
@@ -166,7 +169,7 @@ module RecordingStudio
       end
 
       def resolved_root_id(recording)
-        recording.root_recording_id.presence || recording.id
+        RecordingStudio.root_recording_id_for(recording)
       end
     end
     # rubocop:enable Metrics/ClassLength

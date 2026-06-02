@@ -13,7 +13,12 @@
           code: <<~CODE
             class RecordingStudioPage < ApplicationRecord
               # This page can move to a workspace or a folder.
-              include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder", allow_cross_root: true)
+              recording_studio_recordable \
+                label: "Page",
+                root: false,
+                allowed_parent_types: ["Workspace", "RecordingStudioFolder"]
+
+              include RecordingStudio::Capabilities::Moveable.enabled(allow_cross_root: true)
             end
           CODE
         }
@@ -34,7 +39,7 @@
         <strong>No self or descendants:</strong> A recording cannot be moved under itself or any of its descendants.
       <% end %>
       <%= render FlatPack::List::Item.new do %>
-        Any recordable type not listed in <code>Moveable.to(...)</code> is excluded from the destination picker and rejected by the move operation.
+        Any destination rejected by core <code>allowed_parent_types</code>, Moveable root rules, self/descendant protection, or authorization is excluded from the picker and rejected by the move operation.
       <% end %>
     <% end %>
   </div>

@@ -17,7 +17,6 @@ module DummyMoveableTestHelpers
       RecordingStudio.set_capability_options(
         :movable,
         on: recordable_type.name,
-        allowed_parent_types: [ "Workspace", "RecordingStudioFolder" ],
         allow_cross_root: true
       )
     end
@@ -25,7 +24,7 @@ module DummyMoveableTestHelpers
 
   def create_workspace_root
     workspace = Workspace.create!(name: "Workspace #{SecureRandom.hex(4)}")
-    root = RecordingStudio::Recording.create!(recordable: workspace)
+    root = RecordingStudio.root_recording_for(workspace)
     [ workspace, root ]
   end
 

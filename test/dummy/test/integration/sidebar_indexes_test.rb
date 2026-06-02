@@ -55,7 +55,7 @@ class SidebarIndexesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Destinations"
     assert_includes response.body, "Where something can be moved in your app"
-    assert_includes response.body, "RecordingStudio::Capabilities::Moveable.to"
+    assert_includes response.body, "RecordingStudio::Capabilities::Moveable.enabled"
     assert_includes response.body, "allow_cross_root: true"
     assert_includes response.body, "Same root by default"
     assert_includes response.body, "No self or descendants"
@@ -64,7 +64,7 @@ class SidebarIndexesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Setup"
     assert_includes response.body, "How to mark a recordable model as moveable in your app"
-    assert_includes response.body, "include RecordingStudio::Capabilities::Moveable.to"
+    assert_includes response.body, "include RecordingStudio::Capabilities::Moveable.enabled"
     assert_includes response.body, "class RecordingStudioPage &lt; ApplicationRecord"
     assert_includes response.body, "class RecordingStudioFolder &lt; ApplicationRecord"
 

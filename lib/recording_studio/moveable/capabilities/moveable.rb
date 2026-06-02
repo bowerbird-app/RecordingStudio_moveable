@@ -4,45 +4,50 @@ module RecordingStudio
   module Moveable
     module Capabilities
       module Moveable
-        def self.to(*allowed_parent_types)
-          options = allowed_parent_types.last.is_a?(Hash) ? allowed_parent_types.pop : {}
-          type_names = capability_type_names(allowed_parent_types)
+        VALID_OPTIONS = [:allow_cross_root].freeze
+        DESTINATION_API_REMOVED_MESSAGE = "RecordingStudio::Capabilities::Moveable.to no longer accepts " \
+                                          "destination types. Define structural parent rules with " \
+                                          "recording_studio_recordable allowed_parent_types: [...] and use " \
+                                          "RecordingStudio::Capabilities::Moveable.enabled(...)."
 
-          build_capability_module(type_names, capability_options(options))
+        def self.enabled(*args, **options)
+          raise ArgumentError, DESTINATION_API_REMOVED_MESSAGE if args.any?
+
+          build_capability_module(capability_options(options))
         end
 
-        def self.build_capability_module(type_names, options)
+        def self.to(*, **)
+          raise ArgumentError, DESTINATION_API_REMOVED_MESSAGE
+        end
+
+        def self.build_capability_module(options)
           Module.new do
             extend ActiveSupport::Concern
 
             included do |base|
-              RecordingStudio::Moveable::Capabilities::Moveable.apply_capability(base, type_names, options)
+              RecordingStudio::Moveable::Capabilities::Moveable.apply_capability(base, options)
             end
           end
         end
 
-        def self.apply_capability(base, type_names, options)
+        def self.apply_capability(base, options)
           RecordingStudio.enable_capability(:movable, on: base.name)
           RecordingStudio.set_capability_options(
             :movable,
             on: base.name,
-            allowed_parent_types: type_names,
             allow_cross_root: options[:allow_cross_root]
           )
         end
 
         def self.capability_options(options)
+          unknown_options = options.keys - VALID_OPTIONS
+          if unknown_options.any?
+            raise ArgumentError, "Unknown Moveable option(s): #{unknown_options.join(', ')}"
+          end
+
           {
             allow_cross_root: options[:allow_cross_root] == true
           }
-        end
-
-        def self.capability_type_names(allowed_parent_types)
-          allowed_parent_types.flatten.filter_map do |type|
-            next if type.nil?
-
-            type.is_a?(Class) ? type.name : type.to_s
-          end.uniq
         end
 
         module RecordingMethods
@@ -60,18 +65,14 @@ module RecordingStudio
               new_parent = self.class.find(new_parent.id)
 
               assert_capability!(:movable)
-              assert_recording_belongs_to_root!(new_parent) unless cross_root_move?(new_parent)
               assert_parent_recording_not_self_or_descendant!(new_parent)
-
-              allowed_types = moveable_allowed_parent_types
-              unless allowed_types.include?(new_parent.recordable_type)
-                raise ArgumentError,
-                      "Cannot move to #{new_parent.recordable_type}; allowed: #{allowed_types.join(', ')}"
-              end
 
               if cross_root?(new_parent) && !moveable_allows_cross_root?
                 raise ArgumentError, "Destination must belong to this root recording"
               end
+
+              assert_recording_belongs_to_root!(new_parent) unless cross_root_move?(new_parent)
+              RecordingStudio.assert_parent_allowed!(child_type: recordable_type, parent_recording: new_parent)
 
               RecordingStudio::Moveable::Policy.new(
                 actor: actor,
@@ -102,11 +103,6 @@ module RecordingStudio
 
           private
 
-          def moveable_allowed_parent_types
-            options = RecordingStudio.capability_options(:movable, for_type: recordable_type) || {}
-            Array(options[:allowed_parent_types]).map(&:to_s)
-          end
-
           def moveable_allows_cross_root?
             options = RecordingStudio.capability_options(:movable, for_type: recordable_type) || {}
             options[:allow_cross_root] == true
@@ -121,7 +117,7 @@ module RecordingStudio
           end
 
           def resolved_root_id(recording)
-            recording.root_recording_id.presence || recording.id
+            RecordingStudio.root_recording_id_for(recording)
           end
 
           def descendant_ids
@@ -157,8 +153,12 @@ module RecordingStudio
     module Movable
       singleton_class.send(:remove_method, :to) if singleton_class.method_defined?(:to)
 
-      def self.to(*allowed_parent_types)
-        RecordingStudio::Moveable::Capabilities::Moveable.to(*allowed_parent_types)
+      def self.enabled(*args, **options)
+        RecordingStudio::Moveable::Capabilities::Moveable.enabled(*args, **options)
+      end
+
+      def self.to(*args, **options)
+        RecordingStudio::Moveable::Capabilities::Moveable.to(*args, **options)
       end
     end
   end
