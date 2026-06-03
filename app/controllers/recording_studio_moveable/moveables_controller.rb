@@ -233,7 +233,7 @@ module RecordingStudioMoveable
         ArgumentError,
         ActiveRecord::RecordInvalid,
         ActiveRecord::RecordNotFound,
-        ("RecordingStudio::InvalidParent".safe_constantize)
+        "RecordingStudio::InvalidParent".safe_constantize
       ].compact
     end
 
