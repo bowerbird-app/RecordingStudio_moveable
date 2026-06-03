@@ -3,7 +3,7 @@ class RecordingStudioArchiveBox < ApplicationRecord
     label: "Archive box",
     plural_label: "Archive boxes",
     root: false,
-    allowed_parent_types: ["Workspace"]
+    allowed_parent_types: [ "Workspace" ]
   )
 
   RecordingStudioIcons.register_default_icon self,

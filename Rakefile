@@ -39,7 +39,7 @@ def dummy_test_launcher
       "DB_PORT" => ENV["DB_PORT"],
       "DB_USER" => ENV["DB_USER"],
       "DB_PASSWORD" => ENV["DB_PASSWORD"],
-      "DB_NAME" => ENV["DB_NAME"],
+      "DB_NAME" => ENV["DB_TEST_NAME"] || "app_test",
       "DATABASE_URL" => ENV["DATABASE_URL"]
     }.compact
 

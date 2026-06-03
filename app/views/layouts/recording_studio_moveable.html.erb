@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="rounded" class="light">
   <head>
     <title><%= content_for(:title) || "Move" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -20,14 +20,14 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="min-h-screen bg-white text-slate-950">
+  <body class="min-h-screen bg-(--surface-page-background-color) text-(--surface-content-color)">
     <main class="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
       <% if notice.present? %>
-        <p class="mb-4 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"><%= notice %></p>
+        <%= render FlatPack::Alert::Component.new(description: notice, style: :success, dismissible: true, class: "mb-4") %>
       <% end %>
 
       <% if alert.present? %>
-        <p class="mb-4 rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800"><%= alert %></p>
+        <%= render FlatPack::Alert::Component.new(description: alert, style: :danger, dismissible: true, class: "mb-4") %>
       <% end %>
 
       <%= yield %>

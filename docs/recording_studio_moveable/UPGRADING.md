@@ -1,6 +1,6 @@
-# Upgrading RecordingStudio Moveable to 2.0
+# Upgrading RecordingStudio Moveable to 1.0
 
-RecordingStudio Moveable 2.0 targets RecordingStudio core V2. This is a breaking release because Moveable no longer defines destination parent types.
+RecordingStudio Moveable 1.0 is the breaking release that targets RecordingStudio core V2. Moveable no longer defines destination parent types.
 
 ## What changed
 

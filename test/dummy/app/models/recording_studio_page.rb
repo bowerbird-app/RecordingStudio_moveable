@@ -3,7 +3,7 @@ class RecordingStudioPage < ApplicationRecord
     label: "Page",
     plural_label: "Pages",
     root: false,
-    allowed_parent_types: ["Workspace", "RecordingStudioFolder"]
+    allowed_parent_types: [ "Workspace", "RecordingStudioFolder" ]
   )
 
   RecordingStudioIcons.register_default_icon self,

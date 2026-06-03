@@ -36,6 +36,6 @@ if RecordingStudio.configuration.recordable_types.include?(access_type) &&
   access_class.recording_studio_recordable(
     label: "Access",
     root: false,
-    allowed_parent_types: ["Workspace"]
+    allowed_parent_types: [ "Workspace" ]
   )
 end

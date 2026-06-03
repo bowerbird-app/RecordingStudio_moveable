@@ -37,13 +37,15 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     change_index = response.body.index(">Change<")
     picker_index = response.body.index(%(id="move-destination-picker-#{@page.id}"))
 
-    assert_includes response.body, "Move Move Me to..."
-    assert_includes response.body, "Search or choose a destination below."
+    assert_includes response.body, "Move Move Me"
+    assert_includes response.body, "Choose destination"
+    refute_includes response.body, "Move Move Me to..."
+    refute_includes response.body, "Search or choose a destination below."
     refute_includes response.body, "Choose a destination for Move Me"
-    assert_includes response.body, "aria-label=\"Breadcrumb\""
-    assert_includes response.body, ">Back<"
+    assert_includes response.body, "aria-label=\"Page navigation\""
+    refute_includes response.body, "aria-label=\"Breadcrumb\""
     assert_includes response.body, %(href="/")
-    assert_includes response.body, %(data-flat-pack--icon-name-value="chevron-left")
+    assert_includes response.body, %(data-controller="flat-pack--page-nav")
     assert_includes response.body, "Search destinations"
     assert_includes response.body, @workspace.name
     assert_includes response.body, ">Change<"
@@ -67,8 +69,9 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'data-recording-studio-moveable-modal-root="true"'
     assert_includes response.body, 'data-recording-studio-moveable-modal-body="true"'
     assert_includes response.body, 'data-recording-studio-moveable-modal-element="true"'
-    assert_includes response.body, "Move Move Me to..."
-    assert_includes response.body, "Search or choose a destination below."
+    assert_includes response.body, "Move Move Me"
+    assert_includes response.body, "Choose destination"
+    refute_includes response.body, "Search or choose a destination below."
     assert_includes response.body, %(data-controller="flat-pack--picker")
     assert_includes response.body, "!border-0 !bg-transparent !shadow-none !rounded-none !p-0 sm:!p-0"
     refute_includes response.body, "Main navigation"
@@ -77,7 +80,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_response :success
     refute_includes response.body, "Choose a destination for Move Me"
     refute_includes response.body, "aria-label=\"Breadcrumb\""
-    refute_includes response.body, ">Back<"
+    refute_includes response.body, "aria-label=\"Page navigation\""
     assert_includes response.body, %(data-controller="flat-pack--picker")
     refute_includes response.body, "Main navigation"
   end
@@ -90,6 +93,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, %(href="#{referer}")
     assert_includes response.body, "redirect_to=#{ERB::Util.url_encode(referer)}"
+    assert_includes response.body, "aria-label=\"Page navigation\""
 
     post recording_studio_moveable.move_recording_path(recording_id: @page.id), params: {
       destination_id: @target_folder.id,
@@ -107,6 +111,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "redirect_to=#{ERB::Util.url_encode(referer)}"
+    refute_includes response.body, "aria-label=\"Page navigation\""
 
     post recording_studio_moveable.move_recording_path(recording_id: @page.id), params: {
       destination_id: @target_folder.id,
@@ -271,12 +276,14 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, %(href="#{launch_origin}")
     assert_includes response.body, %(href="#{workspace_href}")
+    assert_includes response.body, "aria-label=\"Page navigation\""
 
     get workspace_path
 
     assert_response :success
-    assert_includes response.body, %(href="#{move_href}")
-    refute_includes response.body, %(href="#{launch_origin}")
+    refute_includes response.body, %(href="#{move_href}")
+    assert_includes response.body, %(href="#{launch_origin}")
+    assert_includes response.body, "aria-label=\"Page navigation\""
 
     get move_path
 

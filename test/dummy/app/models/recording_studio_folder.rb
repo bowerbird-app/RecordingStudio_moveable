@@ -3,7 +3,7 @@ class RecordingStudioFolder < ApplicationRecord
     label: "Folder",
     plural_label: "Folders",
     root: false,
-    allowed_parent_types: ["Workspace", "RecordingStudioFolder"]
+    allowed_parent_types: [ "Workspace", "RecordingStudioFolder" ]
   )
 
   RecordingStudioIcons.register_default_icon self,

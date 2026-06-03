@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.0.0] - 2026-06-02
+## [1.0.0] - 2026-06-02
 
 ### Changed
 - Require RecordingStudio core V2 and use core recordable hierarchy declarations for move parent validation.
@@ -31,6 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v2.0.0...HEAD
-[2.0.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v0.1.0...v2.0.0
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v0.1.0...v1.0.0
 [0.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/releases/tag/v0.1.0
