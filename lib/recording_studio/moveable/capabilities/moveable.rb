@@ -41,9 +41,7 @@ module RecordingStudio
 
         def self.capability_options(options)
           unknown_options = options.keys - VALID_OPTIONS
-          if unknown_options.any?
-            raise ArgumentError, "Unknown Moveable option(s): #{unknown_options.join(', ')}"
-          end
+          raise ArgumentError, "Unknown Moveable option(s): #{unknown_options.join(', ')}" if unknown_options.any?
 
           {
             allow_cross_root: options[:allow_cross_root] == true
@@ -108,6 +106,14 @@ module RecordingStudio
             options[:allow_cross_root] == true
           end
 
+          def assert_parent_recording_not_self_or_descendant!(new_parent)
+            raise ArgumentError, "Cannot move a recording under itself" if new_parent.id == id
+
+            return unless descendant_ids.include?(new_parent.id)
+
+            raise ArgumentError, "Cannot move a recording under its descendant"
+          end
+
           def cross_root_move?(new_parent)
             cross_root?(new_parent)
           end
@@ -153,12 +159,12 @@ module RecordingStudio
     module Movable
       singleton_class.send(:remove_method, :to) if singleton_class.method_defined?(:to)
 
-      def self.enabled(*args, **options)
-        RecordingStudio::Moveable::Capabilities::Moveable.enabled(*args, **options)
+      def self.enabled(*, **)
+        RecordingStudio::Moveable::Capabilities::Moveable.enabled(*, **)
       end
 
-      def self.to(*args, **options)
-        RecordingStudio::Moveable::Capabilities::Moveable.to(*args, **options)
+      def self.to(*, **)
+        RecordingStudio::Moveable::Capabilities::Moveable.to(*, **)
       end
     end
   end

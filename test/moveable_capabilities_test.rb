@@ -291,7 +291,8 @@ class MoveableCapabilitiesTest < Minitest::Test
       RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
         RecordingStudio.stub(:assert_parent_allowed!, parent_allowed) do
           RecordingStudio::Moveable::Policy.stub(:new, policy) do
-            source.move_to!(new_parent: target, actor: :actor, impersonator: :impersonator, metadata: { reason: "reorg" })
+            source.move_to!(new_parent: target, actor: :actor, impersonator: :impersonator,
+                            metadata: { reason: "reorg" })
           end
         end
       end

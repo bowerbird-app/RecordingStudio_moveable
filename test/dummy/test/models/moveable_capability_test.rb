@@ -29,7 +29,7 @@ class MoveableCapabilityTest < ActiveSupport::TestCase
   end
 
   def test_move_to_blocks_disallowed_destination_type
-    error = assert_raises(ArgumentError) do
+    error = assert_raises(RecordingStudio::InvalidParent) do
       @page.move_to!(new_parent: @archive_box, actor: @actor)
     end
 

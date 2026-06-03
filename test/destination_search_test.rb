@@ -7,9 +7,21 @@ class DestinationSearchTest < Minitest::Test
     :id, :parent_recording_id, :root_recording_id, :recordable_type, :recordable,
     keyword_init: true
   )
-  TitleRecordable = Struct.new(:title, keyword_init: true)
-  NameRecordable = Struct.new(:name, keyword_init: true)
-  BlankRecordable = Struct.new(:title, :name, :id, keyword_init: true)
+  TitleRecordable = Struct.new(:title, keyword_init: true) do
+    def self.model_name
+      Struct.new(:human).new("Title recordable")
+    end
+  end
+  NameRecordable = Struct.new(:name, keyword_init: true) do
+    def self.model_name
+      Struct.new(:human).new("Name recordable")
+    end
+  end
+  BlankRecordable = Struct.new(:title, :name, :id, keyword_init: true) do
+    def self.model_name
+      Struct.new(:human).new("Blank recordable")
+    end
+  end
   HookedFolderRecordable = Struct.new(:name, :id, keyword_init: true) do
     def self.recordable_type_label
       "Folder"
@@ -51,6 +63,10 @@ class DestinationSearchTest < Minitest::Test
     def destination_selectable?(destination:)
       @destination_checked = destination
       @destination_allowed
+    end
+
+    def destination_visible?(destination:)
+      destination_selectable?(destination: destination)
     end
   end
 
@@ -163,14 +179,26 @@ class DestinationSearchTest < Minitest::Test
   end
 
   def test_allowed_workspace_root_uses_resolved_root_ids
-    search = build_search
-    nested_recording = recording(id: "child", root_recording_id: "root-2")
+    allowed_policy = FakePolicy.new(filtered_destinations: [], destination_allowed: true)
+    denied_policy = FakePolicy.new(filtered_destinations: [], destination_allowed: false)
+    search = build_search(policy: allowed_policy)
     direct_root = recording(id: "root-3")
 
-    search.stub(:workspace_root_ids, %w[root-2 root-3]) do
-      assert search.allowed_workspace_root?(nested_recording)
-      assert search.allowed_workspace_root?(direct_root)
-      assert_not search.allowed_workspace_root?(recording(id: "root-4"))
+    RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
+      RecordingStudio.stub(:root_recording?, ->(recording) { recording.parent_recording_id.nil? }) do
+        search.stub(:workspace_root_ids, %w[root-2 root-3]) do
+          assert search.allowed_workspace_root?(direct_root)
+          assert_equal direct_root, allowed_policy.destination_checked
+          assert_not search.allowed_workspace_root?(recording(id: "child", root_recording_id: "root-2",
+                                                              parent_recording_id: "root-2"))
+          assert_not search.allowed_workspace_root?(recording(id: "root-4"))
+        end
+
+        denied_search = build_search(policy: denied_policy)
+        denied_search.stub(:workspace_root_ids, %w[root-3]) do
+          assert_not denied_search.allowed_workspace_root?(direct_root)
+        end
+      end
     end
   end
 
@@ -261,7 +289,7 @@ class DestinationSearchTest < Minitest::Test
         RecordingStudio::Recording.stub(:all, scope) do
           search.stub(:excluded_destination_ids, %w[source-id child-1]) do
             assert_equal [same_root], search.send(:structurally_allowed_destinations)
-            assert_equal [other_root, same_root], search.send(:structurally_allowed_destinations, across_roots: true)
+            assert_equal [same_root], search.send(:structurally_allowed_destinations, across_roots: true)
           end
         end
       end
@@ -275,7 +303,9 @@ class DestinationSearchTest < Minitest::Test
     search = build_search
 
     capability_options = ->(*, **) { { allow_cross_root: false } }
-    parent_allowed = ->(child_type:, parent_recording:) { child_type == "RecordingStudioPage" && parent_recording.recordable_type == "RecordingStudioFolder" }
+    parent_allowed = lambda { |child_type:, parent_recording:|
+      child_type == "RecordingStudioPage" && parent_recording.recordable_type == "RecordingStudioFolder"
+    }
 
     RecordingStudio.stub(:capability_options, capability_options) do
       with_core_hierarchy(parent_allowed: parent_allowed) do
@@ -431,6 +461,36 @@ class DestinationSearchTest < Minitest::Test
     end
   end
 
+  def test_results_include_root_recording_with_nil_root_recording_id
+    root_destination = recording(
+      id: "root-1",
+      parent_recording_id: nil,
+      root_recording_id: nil,
+      recordable_type: "Workspace",
+      recordable: NameRecordable.new(name: "Studio Workspace")
+    )
+    nested_folder = recording(
+      id: "folder-2",
+      parent_recording_id: "root-1",
+      root_recording_id: "root-1",
+      recordable_type: "RecordingStudioFolder",
+      recordable: NameRecordable.new(name: "Delivered")
+    )
+    scope = FakeScope.new([root_destination, nested_folder])
+    policy = FakePolicy.new(filtered_destinations: [root_destination, nested_folder])
+    search = build_search(policy: policy)
+
+    RecordingStudio.stub(:capability_options, ->(*, **) { { allow_cross_root: false } }) do
+      with_core_hierarchy(allowed_types: %w[Workspace RecordingStudioFolder]) do
+        RecordingStudio::Recording.stub(:all, scope) do
+          search.stub(:descendant_ids, []) do
+            assert_equal [root_destination, nested_folder], search.results(limit: nil)
+          end
+        end
+      end
+    end
+  end
+
   def test_filter_by_query_matches_title_name_type_and_identifier
     titled = recording(
       id: "folder-1",
@@ -514,16 +574,14 @@ class DestinationSearchTest < Minitest::Test
     end
   end
 
-  def with_core_hierarchy(allowed_types: ["RecordingStudioFolder"], parent_allowed: nil)
+  def with_core_hierarchy(allowed_types: ["RecordingStudioFolder"], parent_allowed: nil, &block)
     parent_allowed ||= lambda do |child_type:, parent_recording:|
       child_type.present? && allowed_types.include?(parent_recording.recordable_type)
     end
 
     RecordingStudio.stub(:allowed_parent_types_for, ->(_type) { allowed_types }) do
       RecordingStudio.stub(:parent_allowed?, parent_allowed) do
-        RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
-          yield
-        end
+        RecordingStudio.stub(:root_recording_id_for, root_id_resolver, &block)
       end
     end
   end

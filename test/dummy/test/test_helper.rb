@@ -52,7 +52,7 @@ class ActiveSupport::TestCase
 
   setup do
     RecordingStudio::Event.delete_all
-    RecordingStudio::DeviceSession.delete_all
+    RecordingStudio::DeviceSession.delete_all if defined?(RecordingStudio::DeviceSession)
     RecordingStudio::Recording.delete_all
     compatible_access_model&.delete_all
     RecordingStudioFolder.delete_all

@@ -8,6 +8,11 @@ require "recording_studio_moveable/root_label"
 require "recording_studio_moveable/services/base_service"
 require "recording_studio_moveable/services/example_service"
 require "recording_studio"
+
+module RecordingStudio
+  AccessDenied = Class.new(StandardError) unless const_defined?(:AccessDenied)
+end
+
 begin
   require "recording_studio/labels"
 rescue LoadError => e

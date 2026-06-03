@@ -31,7 +31,9 @@ module RecordingStudio
       end
 
       def allowed_workspace_root?(root_recording)
-        workspace_root_ids.include?(resolved_root_id(root_recording))
+        RecordingStudio.root_recording?(root_recording) &&
+          workspace_root_ids.include?(resolved_root_id(root_recording)) &&
+          policy.destination_visible?(destination: root_recording)
       end
 
       def allowed_destination?(destination)
@@ -56,14 +58,18 @@ module RecordingStudio
         return [] if candidate_types.empty?
 
         scope = RecordingStudio::Recording.all
-        scope = scope.where(root_recording_id: resolved_root_id(root || source)) unless across_roots
+                                          .where(recordable_type: candidate_types)
+                                          .where.not(id: excluded_destination_ids)
+                                          .includes(:recordable)
+                                          .order(updated_at: :desc)
 
-        scope.where(recordable_type: candidate_types)
-             .where.not(id: excluded_destination_ids)
-             .includes(:recordable)
-             .order(updated_at: :desc)
-             .to_a
-             .select { |destination| structurally_allowed_destination?(destination) }
+        destinations = across_roots ? scope.to_a : same_root_destinations(scope, root || source)
+        destinations.select { |destination| structurally_allowed_destination?(destination) }
+      end
+
+      def same_root_destinations(scope, root)
+        root_id = resolved_root_id(root)
+        (scope.where(root_recording_id: root_id).to_a + scope.where(id: root_id).to_a).uniq(&:id)
       end
 
       def core_allowed_parent_types
