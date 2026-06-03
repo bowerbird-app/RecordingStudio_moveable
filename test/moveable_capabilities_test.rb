@@ -109,9 +109,11 @@ class MoveableCapabilitiesTest < Minitest::Test
   end
 
   class FakePolicy
-    attr_reader :destination
+    attr_reader :destination, :destinations
 
     define_method(:authorize_move!) do |destination:|
+      @destinations ||= []
+      @destinations << destination
       @destination = destination
       true
     end
@@ -303,6 +305,7 @@ class MoveableCapabilitiesTest < Minitest::Test
     assert_equal target, source.descendant_guard_with
     assert_equal({ parent_recording: target }, source.updated_with)
     assert_equal target, policy.destination
+    assert_equal [target, target], policy.destinations
     assert_equal %w[child source target], FakeRecording.lock_proxy.looked_up_ids
     assert_equal "moved", source.logged_event[:action]
     assert_equal :actor, source.logged_event[:actor]
@@ -320,7 +323,11 @@ class MoveableCapabilitiesTest < Minitest::Test
   end
 
   def test_move_to_transfers_descendants_for_cross_root_move
-    source = FakeRecording.new(id: "source", root_recording_id: "root-1", recordable_type: "RecordingStudioFolder")
+    source = FakeRecording.new(
+      id: "source",
+      root_recording_id: "root-1",
+      recordable_type: "RecordingStudioFolder"
+    )
     child = FakeRecording.new(id: "child", parent_recording_id: "source", root_recording_id: "root-1")
     target = FakeRecording.new(id: "target", root_recording_id: "root-2", recordable_type: "RecordingStudioFolder")
 
@@ -339,6 +346,38 @@ class MoveableCapabilitiesTest < Minitest::Test
     assert_equal "root-2", child.root_recording_id
     assert_equal({ parent_recording: target, root_recording_id: "root-2" }, source.updated_with)
     assert_equal "root-2", source.root_recording_id
+  end
+
+  def test_move_to_authorizes_each_descendant_before_transferring_subtree
+    source = FakeRecording.new(
+      id: "source",
+      root_recording_id: "root-1",
+      recordable_type: "RecordingStudioFolder"
+    )
+    child = FakeRecording.new(id: "child", parent_recording_id: "source", root_recording_id: "root-1")
+    grandchild = FakeRecording.new(id: "grandchild", parent_recording_id: "child", root_recording_id: "root-1")
+    target = FakeRecording.new(id: "target", root_recording_id: "root-2", recordable_type: "RecordingStudioFolder")
+    sources_checked = []
+
+    policy = FakePolicy.new
+
+    capability_options = ->(*, **) { { allow_cross_root: true } }
+
+    RecordingStudio.stub(:capability_options, capability_options) do
+      RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
+        RecordingStudio.stub(:assert_parent_allowed!, true) do
+          RecordingStudio::Moveable::Policy.stub(:new, lambda { |source:, **|
+            sources_checked << source
+            policy
+          }) do
+            source.moveable_to!(new_parent: target, actor: :actor)
+          end
+        end
+      end
+    end
+
+    assert_equal [source, child, grandchild], sources_checked
+    assert_equal [target, target, target], policy.destinations
   end
 
   def test_move_to_rejects_disallowed_parent_type

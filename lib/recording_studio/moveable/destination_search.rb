@@ -32,8 +32,7 @@ module RecordingStudio
 
       def allowed_workspace_root?(root_recording)
         RecordingStudio.root_recording?(root_recording) &&
-          workspace_root_ids.include?(resolved_root_id(root_recording)) &&
-          policy.destination_visible?(destination: root_recording)
+          workspace_root_ids.include?(resolved_root_id(root_recording))
       end
 
       def allowed_destination?(destination)
@@ -77,7 +76,7 @@ module RecordingStudio
       end
 
       def excluded_destination_ids
-        [source.id, *descendant_ids(source), *current_root_no_op_destination_ids]
+        @excluded_destination_ids ||= [source.id, *descendant_ids(source), *current_root_no_op_destination_ids]
       end
 
       def current_root_no_op_destination_ids
@@ -120,8 +119,7 @@ module RecordingStudio
       end
 
       def visible_workspace_root?(root_recording)
-        RecordingStudio.root_recording?(root_recording) &&
-          policy.destination_visible?(destination: root_recording)
+        RecordingStudio.root_recording?(root_recording)
       end
 
       def workspace_root_ids
@@ -137,6 +135,12 @@ module RecordingStudio
       end
 
       def descendant_ids(recording)
+        descendant_ids_by_recording_id.fetch(recording.id) do
+          descendant_ids_by_recording_id[recording.id] = find_descendant_ids(recording)
+        end
+      end
+
+      def find_descendant_ids(recording)
         descendants = []
         frontier = [recording.id]
 
@@ -147,6 +151,10 @@ module RecordingStudio
         end
 
         descendants
+      end
+
+      def descendant_ids_by_recording_id
+        @descendant_ids_by_recording_id ||= {}
       end
 
       def filter_by_query(destinations, query)

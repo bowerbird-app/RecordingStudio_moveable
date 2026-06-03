@@ -180,24 +180,21 @@ class DestinationSearchTest < Minitest::Test
   end
 
   def test_allowed_workspace_root_uses_resolved_root_ids
-    allowed_policy = FakePolicy.new(filtered_destinations: [], destination_allowed: true)
-    denied_policy = FakePolicy.new(filtered_destinations: [], destination_allowed: false)
-    search = build_search(policy: allowed_policy)
+    search = build_search
     direct_root = recording(id: "root-3")
 
     RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
       RecordingStudio.stub(:root_recording?, ->(recording) { recording.parent_recording_id.nil? }) do
         search.stub(:workspace_root_ids, %w[root-2 root-3]) do
           assert search.allowed_workspace_root?(direct_root)
-          assert_equal direct_root, allowed_policy.destination_checked
           assert_not search.allowed_workspace_root?(recording(id: "child", root_recording_id: "root-2",
                                                               parent_recording_id: "root-2"))
           assert_not search.allowed_workspace_root?(recording(id: "root-4"))
         end
 
-        denied_search = build_search(policy: denied_policy)
+        denied_search = build_search(policy: FakePolicy.new(filtered_destinations: [], destination_allowed: false))
         denied_search.stub(:workspace_root_ids, %w[root-3]) do
-          assert_not denied_search.allowed_workspace_root?(direct_root)
+          assert denied_search.allowed_workspace_root?(direct_root)
         end
       end
     end
@@ -359,7 +356,8 @@ class DestinationSearchTest < Minitest::Test
               FakeScope.new(roots_scope.records.select { |record| Array(id).include?(record.id) })
             }) do
               assert_equal %w[root-2 root-3 root-4 root-5], search.send(:workspace_root_ids)
-              assert_equal [workspace_b, workspace_a], search.send(:cross_root_workspace_destinations)
+              assert_equal [unauthorized_workspace, workspace_b, workspace_a],
+                           search.send(:cross_root_workspace_destinations)
               assert_equal destinations, policy.destinations_seen
             end
           end

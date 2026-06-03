@@ -141,7 +141,11 @@ The same authorization layer is also used by the move UI. In custom hook mode:
 
 - the source recording must pass the hook before the move screen is rendered
 - each listed destination must pass the hook
+- the source and each descendant must pass the hook before a subtree move is persisted
 - inaccessible source recordings return not found instead of rendering the move screen
+
+Metadata submitted through the public move UI is namespaced under `client_metadata`.
+Treat those values as untrusted request input in custom authorization hooks.
 
 ## UI usage examples
 

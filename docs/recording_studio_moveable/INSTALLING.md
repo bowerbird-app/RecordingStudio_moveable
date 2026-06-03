@@ -175,6 +175,8 @@ end
 Use `redirect_mode` on move links when you need per-request behavior, for example `redirect_mode: "destination"` to land on the folder that received the moved item.
 
 If you are not using built-in authorization, disable it and provide your own `authorization_hook` in the same initializer.
+The hook must allow the source and each descendant before a subtree move is persisted.
+Metadata submitted through the public move UI is namespaced under `client_metadata`; treat those values as untrusted request input.
 
 ### Configure Tailwind (If Using)
 

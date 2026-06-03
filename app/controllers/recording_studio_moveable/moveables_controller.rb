@@ -37,7 +37,7 @@ module RecordingStudioMoveable
       destination = find_destination!(params[:destination_id])
       move_recording!(destination)
       redirect_to move_redirect_target(destination: destination), notice: move_success_notice
-    rescue RecordingStudio::AccessDenied, ArgumentError, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
+    rescue *move_failure_exceptions => e
       redirect_to failed_move_path, alert: e.message
     end
 
@@ -151,7 +151,7 @@ module RecordingStudioMoveable
                         raw_metadata.to_h
                       end
 
-      metadata_hash.stringify_keys
+      { "client_metadata" => metadata_hash.deep_stringify_keys }
     end
 
     def source_visible?
@@ -224,7 +224,17 @@ module RecordingStudioMoveable
     end
 
     def source_allowed_for_cross_root_destinations?
-      filtered_workspace_roots.any?
+      destination_search.workspace_results(query: nil, limit: 1).any?
+    end
+
+    def move_failure_exceptions
+      [
+        RecordingStudio::AccessDenied,
+        ArgumentError,
+        ActiveRecord::RecordInvalid,
+        ActiveRecord::RecordNotFound,
+        ("RecordingStudio::InvalidParent".safe_constantize)
+      ].compact
     end
 
     def selected_target_root
