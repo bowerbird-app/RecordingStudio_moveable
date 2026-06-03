@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="rounded" class="light">
   <head>
     <title><%= content_for(:title) || "Dummy" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -25,6 +25,7 @@
     <% if recording_studio_moveable_asset_available?("tailwind.css") %>
       <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <% end %>
+    <%= stylesheet_link_tag "flat_pack/rich_text", "data-turbo-track": "reload" %>
     <%= recording_studio_moveable_meta_tags %>
     <%= javascript_importmap_tags %>
   </head>

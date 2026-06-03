@@ -1,4 +1,11 @@
 class RecordingStudioArchiveBox < ApplicationRecord
+  recording_studio_recordable(
+    label: "Archive box",
+    plural_label: "Archive boxes",
+    root: false,
+    allowed_parent_types: [ "Workspace" ]
+  )
+
   RecordingStudioIcons.register_default_icon self,
     library: :heroicons,
     name: "document-duplicate",

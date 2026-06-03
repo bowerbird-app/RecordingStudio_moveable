@@ -25,8 +25,8 @@ Gem::Specification.new do |spec|
 
   # FlatPack UI component library >= 0.1.12 is required as a peer dependency.
   # Host applications must declare: gem "flat_pack", github: "bowerbird-app/flatpack"
-  spec.add_dependency "rails", ">= 7.0.0"
-  spec.add_dependency "recording_studio", ">= 0.1.0"
+  spec.add_dependency "rails", ">= 8.1.0", "< 9.0"
+  spec.add_dependency "recording_studio", ">= 2.0.0", "< 3.0"
   spec.add_dependency "recording_studio_accessible", ">= 0.1.0"
   spec.add_dependency "recording_studio_icons", ">= 0.1.0"
 end

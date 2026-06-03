@@ -38,6 +38,8 @@ Rails.application.configure do
 
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "example.com" }
+  config.hosts << "example.com"
+  config.hosts << "www.example.com"
 
   # The current ViewComponent release still emits a Rails 8.1 deprecation during boot.
   # Keep test output clean until that dependency is updated.

@@ -5,13 +5,13 @@
 ## What this addon provides
 
 - Addon-owned capability module with addon-facing naming:
-  - `RecordingStudio::Capabilities::Moveable.to(*types)` (preferred)
-  - `RecordingStudio::Capabilities::Movable.to(*types)` (compat alias)
+  - `RecordingStudio::Capabilities::Moveable.enabled(...)` (preferred)
+  - `RecordingStudio::Capabilities::Movable.enabled(...)` (compat alias)
 - `move_to!` behavior equivalent to legacy `movable` behavior:
   - remains in the same root by default
   - can transfer across roots when `allow_cross_root: true`
   - cannot move under itself or descendants
-  - destination type must be in `allowed_parent_types`
+  - destination parent rules come from RecordingStudio core recordable declarations
   - logs event metadata with parent ids and root ids
   - supports `actor`, optional `impersonator`, optional `metadata`
 - Authorization modes:
@@ -21,7 +21,7 @@
   - full-page mode
   - modal mode
   - destination picker powered by `FlatPack::Picker::Component`
-  - only shows destinations that pass gem-owned move visibility checks
+  - only shows destinations that pass core parent rules, Moveable same-root/cross-root rules, self/descendant protection, and authorization
   - returns not found for inaccessible source recordings
   - move action redirects to root page with success flash
 
@@ -50,19 +50,31 @@ import "recording_studio_moveable"
 
 ## Capability usage
 
-Include move capability on recordable models and define allowed parent types:
+Define structural parent rules with RecordingStudio core, then include the Moveable capability on recordable models:
 
 ```ruby
 class RecordingStudioFolder < ApplicationRecord
-  include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder")
+  recording_studio_recordable \
+    label: "Folder",
+    root: false,
+    allowed_parent_types: ["Workspace", "RecordingStudioFolder"]
+
+  include RecordingStudio::Capabilities::Moveable.enabled
 end
 
 class RecordingStudioPage < ApplicationRecord
-  include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder", allow_cross_root: true)
+  recording_studio_recordable \
+    label: "Page",
+    root: false,
+    allowed_parent_types: ["Workspace", "RecordingStudioFolder"]
+
+  include RecordingStudio::Capabilities::Moveable.enabled(allow_cross_root: true)
 end
 ```
 
-Set `allow_cross_root: true` only for recordables that should be transferable between workspace roots.
+Moveable no longer owns destination type definitions. Set `allow_cross_root: true` only for recordables that should be transferable between workspace roots; same-root moves remain the default.
+
+`Moveable.to(...)` and `Movable.to(...)` are no longer supported. If present, they raise an `ArgumentError` that directs callers to core `recording_studio_recordable allowed_parent_types:` declarations and `Moveable.enabled(...)`.
 
 ### Migration note from legacy built-in gate
 
@@ -86,6 +98,8 @@ Example root recordable setup:
 
 ```ruby
 class Workspace < ApplicationRecord
+  recording_studio_recordable label: "Workspace", root: true, allowed_parent_types: []
+
   include RecordingStudioAccessible::AllowsAccessibleChildren
 
   recording_studio_accessible_children :access, :boundary
@@ -127,7 +141,11 @@ The same authorization layer is also used by the move UI. In custom hook mode:
 
 - the source recording must pass the hook before the move screen is rendered
 - each listed destination must pass the hook
+- the source and each descendant must pass the hook before a subtree move is persisted
 - inaccessible source recordings return not found instead of rendering the move screen
+
+Metadata submitted through the public move UI is namespaced under `client_metadata`.
+Treat those values as untrusted request input in custom authorization hooks.
 
 ## UI usage examples
 
@@ -152,7 +170,9 @@ The addon enforces access checks inside the gem-owned move controller.
 - The move screen only renders when the current actor can access the source recording under the addon authorization policy.
 - Inaccessible sources return not found so the UI does not disclose record titles or available actions.
 - Destination lists are filtered through the same gem authorization layer that protects `move_to!`.
+- Destination lists also use `RecordingStudio.allowed_parent_types_for` and `RecordingStudio.parent_allowed?`, so the picker never offers destinations core hierarchy validation would reject.
 - The write path still re-checks authorization inside `move_to!`; UI filtering is not the only enforcement layer.
+- The write path calls `RecordingStudio.assert_parent_allowed!` before updating hierarchy.
 
 ## Dummy app demo
 
@@ -160,7 +180,7 @@ The dummy app explicitly installs both `recording_studio_accessible` and `record
 
 - `Workspace` root recordable
 - `RecordingStudioFolder` and `RecordingStudioPage` (move-enabled)
-- `RecordingStudioArchiveBox` (disallowed destination type demo)
+- `RecordingStudioArchiveBox` (child-only destination filtering demo)
 - routes/controllers/views to demonstrate same-workspace and cross-workspace move flows
 - Recording Studio Accessible integration for workspace discovery, access management pages, and seeded access grants
 

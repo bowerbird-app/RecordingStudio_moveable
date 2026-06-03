@@ -18,12 +18,24 @@ RecordingStudio.configure do |config|
   # Idempotency behavior for log_event!
   config.idempotency_mode = :return_existing # or :raise
 
-  # Include child recordings by default when trashing/restoring
-  config.include_children = false
-
   # Recordable duplication strategy for revisions
   config.recordable_dup_strategy = :dup
 
   # Move behavior in this app comes from recording_studio_moveable addon capability
   # includes on the relevant recordable models.
+end
+
+RecordingStudioAccessible::Compatibility.load_missing_constants!(Rails.application)
+RecordingStudioAccessible::Compatibility.ensure_recordable_types_registered!
+
+access_type = RecordingStudioAccessible::Compatibility::RECORDABLE_TYPES.first
+access_class = access_type.safe_constantize
+if RecordingStudio.configuration.recordable_types.include?(access_type) &&
+   access_class &&
+   !RecordingStudio.recordable_declaration_defined?(access_type)
+  access_class.recording_studio_recordable(
+    label: "Access",
+    root: false,
+    allowed_parent_types: [ "Workspace" ]
+  )
 end

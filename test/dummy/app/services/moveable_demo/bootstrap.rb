@@ -100,10 +100,7 @@ module MoveableDemo
     attr_reader :actor
 
     def ensure_root_recording!(workspace)
-      RecordingStudio::Recording.unscoped.find_or_create_by!(
-        recordable: workspace,
-        parent_recording_id: nil
-      )
+      RecordingStudio.root_recording_for(workspace)
     end
 
     def ensure_root_access!(root_recording)
@@ -146,9 +143,11 @@ module MoveableDemo
       )
       return existing if existing
 
+      RecordingStudio.assert_parent_allowed!(child_type: recordable.class.name, parent_recording: parent)
+
       RecordingStudio::Recording.unscoped.create!(
-        root_recording_id: root.id,
-        parent_recording_id: parent.id,
+        root_recording: root,
+        parent_recording: parent,
         recordable: recordable
       )
     end

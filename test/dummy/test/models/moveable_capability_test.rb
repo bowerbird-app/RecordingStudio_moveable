@@ -29,11 +29,11 @@ class MoveableCapabilityTest < ActiveSupport::TestCase
   end
 
   def test_move_to_blocks_disallowed_destination_type
-    error = assert_raises(ArgumentError) do
+    error = assert_raises(RecordingStudio::InvalidParent) do
       @page.move_to!(new_parent: @archive_box, actor: @actor)
     end
 
-    assert_match(/Cannot move to RecordingStudioArchiveBox/, error.message)
+    assert_match(/RecordingStudioPage cannot be recorded under RecordingStudioArchiveBox/, error.message)
   end
 
   def test_move_to_blocks_cross_root_moves
@@ -125,13 +125,9 @@ class MoveableCapabilityTest < ActiveSupport::TestCase
   end
 
   def set_cross_root_for(recordable_type, value)
-    options = RecordingStudio.capability_options(:movable, for_type: recordable_type.name) || {}
-    allowed_parent_types = Array(options[:allowed_parent_types] || options["allowed_parent_types"])
-
     RecordingStudio.set_capability_options(
       :movable,
       on: recordable_type.name,
-      allowed_parent_types: allowed_parent_types,
       allow_cross_root: value
     )
   end

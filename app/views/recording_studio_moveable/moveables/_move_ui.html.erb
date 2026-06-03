@@ -1,23 +1,24 @@
 <div class="space-y-4">
   <% if @display == :full_page %>
-    <%= render FlatPack::Breadcrumb::Component.new(
-      items: [{ text: "Back", href: @back_path || move_back_path, icon: "chevron-left" }],
+    <%= render FlatPack::PageNav::Component.new(
+      anchor_url: move_back_path,
+      anchor_label: "Return to previous page",
       class: "mb-3"
     ) %>
   <% end %>
 
   <%= render FlatPack::PageTitle::Component.new(
     title: title,
-    subtitle: "Search or choose a destination below.",
+    subtitle: "Choose destination",
     class: "pb-0 mb-0"
   ) %>
 </div>
 
 <div class="mt-4 max-w-3xl">
   <% if @workspace_selection_path.present? %>
-    <div class="mb-4 flex flex-wrap items-center gap-2 text-sm text-slate-700">
+    <div class="mb-4 flex flex-wrap items-center gap-2 text-sm text-(--surface-muted-content-color)">
       <strong><%= moveable_label_for(@target_root || @current_root) %></strong>
-      <%= link_to "Change", @workspace_selection_path, class: "font-medium text-primary hover:underline" %>
+      <%= link_to "Change", @workspace_selection_path, class: "font-medium text-[var(--color-primary)] hover:underline" %>
     </div>
   <% end %>
 

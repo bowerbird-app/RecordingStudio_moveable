@@ -1,10 +1,17 @@
 class RecordingStudioFolder < ApplicationRecord
+  recording_studio_recordable(
+    label: "Folder",
+    plural_label: "Folders",
+    root: false,
+    allowed_parent_types: [ "Workspace", "RecordingStudioFolder" ]
+  )
+
   RecordingStudioIcons.register_default_icon self,
     library: :heroicons,
     name: "folder",
     variant: :outline
 
-  include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder", allow_cross_root: true)
+  include RecordingStudio::Capabilities::Moveable.enabled(allow_cross_root: true)
 
   validates :name, presence: true
 

@@ -8,7 +8,7 @@
   ) do |modal| %>
     <% modal.body do %>
       <div data-recording-studio-moveable-modal-body="true">
-        <%= render "move_ui", title: "#{moveable_title_for(@recording)} to..." %>
+        <%= render "move_ui", title: moveable_title_for(@recording) %>
       </div>
     <% end %>
   <% end %>

@@ -31,7 +31,8 @@ module RecordingStudio
       end
 
       def allowed_workspace_root?(root_recording)
-        workspace_root_ids.include?(resolved_root_id(root_recording))
+        RecordingStudio.root_recording?(root_recording) &&
+          workspace_root_ids.include?(resolved_root_id(root_recording))
       end
 
       def allowed_destination?(destination)
@@ -52,23 +53,30 @@ module RecordingStudio
       end
 
       def structurally_allowed_destinations(root: nil, across_roots: false)
-        scope = RecordingStudio::Recording.all
-        scope = scope.where(root_recording_id: resolved_root_id(root || source)) unless across_roots
+        candidate_types = core_allowed_parent_types
+        return [] if candidate_types.empty?
 
-        scope.where(recordable_type: allowed_parent_types)
-             .where.not(id: excluded_destination_ids)
-             .includes(:recordable)
-             .order(updated_at: :desc)
-             .to_a
+        scope = RecordingStudio::Recording.all
+                                          .where(recordable_type: candidate_types)
+                                          .where.not(id: excluded_destination_ids)
+                                          .includes(:recordable)
+                                          .order(updated_at: :desc)
+
+        destinations = across_roots ? scope.to_a : same_root_destinations(scope, root || source)
+        destinations.select { |destination| structurally_allowed_destination?(destination) }
       end
 
-      def allowed_parent_types
-        options = RecordingStudio.capability_options(:movable, for_type: source.recordable_type) || {}
-        Array(options[:allowed_parent_types]).map(&:to_s)
+      def same_root_destinations(scope, root)
+        root_id = resolved_root_id(root)
+        (scope.where(root_recording_id: root_id).to_a + scope.where(id: root_id).to_a).uniq(&:id)
+      end
+
+      def core_allowed_parent_types
+        Array(RecordingStudio.allowed_parent_types_for(source.recordable_type)).map(&:to_s)
       end
 
       def excluded_destination_ids
-        [source.id, *descendant_ids(source), *current_root_no_op_destination_ids]
+        @excluded_destination_ids ||= [source.id, *descendant_ids(source), *current_root_no_op_destination_ids]
       end
 
       def current_root_no_op_destination_ids
@@ -83,7 +91,7 @@ module RecordingStudio
 
       def structurally_allowed_destination?(destination)
         allowed_root?(destination) &&
-          allowed_parent_types.include?(destination.recordable_type.to_s) &&
+          RecordingStudio.parent_allowed?(child_type: source.recordable_type, parent_recording: destination) &&
           excluded_destination_ids.exclude?(destination.id)
       end
 
@@ -107,6 +115,11 @@ module RecordingStudio
                                   .includes(:recordable)
                                   .order(updated_at: :desc)
                                   .to_a
+                                  .select { |root| visible_workspace_root?(root) }
+      end
+
+      def visible_workspace_root?(root_recording)
+        RecordingStudio.root_recording?(root_recording)
       end
 
       def workspace_root_ids
@@ -122,6 +135,12 @@ module RecordingStudio
       end
 
       def descendant_ids(recording)
+        descendant_ids_by_recording_id.fetch(recording.id) do
+          descendant_ids_by_recording_id[recording.id] = find_descendant_ids(recording)
+        end
+      end
+
+      def find_descendant_ids(recording)
         descendants = []
         frontier = [recording.id]
 
@@ -132,6 +151,10 @@ module RecordingStudio
         end
 
         descendants
+      end
+
+      def descendant_ids_by_recording_id
+        @descendant_ids_by_recording_id ||= {}
       end
 
       def filter_by_query(destinations, query)
@@ -166,7 +189,7 @@ module RecordingStudio
       end
 
       def resolved_root_id(recording)
-        recording.root_recording_id.presence || recording.id
+        RecordingStudio.root_recording_id_for(recording)
       end
     end
     # rubocop:enable Metrics/ClassLength
