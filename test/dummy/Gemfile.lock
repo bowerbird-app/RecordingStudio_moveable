@@ -34,7 +34,7 @@ PATH
   remote: ../..
   specs:
     recording_studio_moveable (2.0.0)
-      rails (>= 7.0.0)
+      rails (>= 8.1.0, < 9.0)
       recording_studio (>= 2.0.0, < 3.0)
       recording_studio_accessible (>= 0.1.0)
       recording_studio_icons (>= 0.1.0)

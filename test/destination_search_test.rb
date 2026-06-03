@@ -50,9 +50,10 @@ class DestinationSearchTest < Minitest::Test
   class FakePolicy
     attr_reader :destinations_seen, :destination_checked
 
-    def initialize(filtered_destinations:, destination_allowed: true)
+    def initialize(filtered_destinations:, destination_allowed: true, hidden_destinations: [])
       @filtered_destinations = filtered_destinations
       @destination_allowed = destination_allowed
+      @hidden_destination_ids = Array(hidden_destinations).map(&:id)
     end
 
     def filter_visible_destinations(destinations:)
@@ -62,7 +63,7 @@ class DestinationSearchTest < Minitest::Test
 
     def destination_selectable?(destination:)
       @destination_checked = destination
-      @destination_allowed
+      @destination_allowed && !@hidden_destination_ids.include?(destination.id)
     end
 
     def destination_visible?(destination:)
@@ -330,23 +331,37 @@ class DestinationSearchTest < Minitest::Test
 
   def test_cross_root_workspace_destinations_and_workspace_root_ids_use_visible_destinations
     same_root = recording(id: "folder-1", root_recording_id: "root-1", recordable_type: "RecordingStudioFolder")
-    workspace_a = recording(id: "root-2", root_recording_id: "root-2", recordable_type: "RecordingStudioFolder")
-    workspace_b = recording(id: "root-3", root_recording_id: "root-3", recordable_type: "RecordingStudioFolder")
-    roots_scope = FakeScope.new([workspace_a, workspace_b, same_root])
-    policy = FakePolicy.new(filtered_destinations: [workspace_a, workspace_b, workspace_a])
+    workspace_a = recording(id: "root-2", parent_recording_id: nil, recordable_type: "Workspace")
+    workspace_b = recording(id: "root-3", parent_recording_id: nil, recordable_type: "Workspace")
+    unauthorized_workspace = recording(id: "root-4", parent_recording_id: nil, recordable_type: "Workspace")
+    nested_not_root = recording(id: "root-5", parent_recording_id: "root-4", recordable_type: "Workspace")
+    nested_visible_destination = recording(
+      id: "folder-4",
+      parent_recording_id: "root-4",
+      root_recording_id: "root-4",
+      recordable_type: "RecordingStudioFolder"
+    )
+    roots_scope = FakeScope.new([workspace_a, workspace_b, unauthorized_workspace, nested_not_root, same_root])
+    policy = FakePolicy.new(
+      filtered_destinations: [workspace_a, workspace_b, nested_visible_destination, nested_not_root, workspace_a],
+      hidden_destinations: [unauthorized_workspace]
+    )
     search = build_search(policy: policy)
 
     capability_options = ->(*, **) { { allow_cross_root: true } }
 
     RecordingStudio.stub(:capability_options, capability_options) do
       with_core_hierarchy do
-        search.stub(:structurally_allowed_destinations, [same_root, workspace_a, workspace_b]) do
-          RecordingStudio::Recording.stub(:where, lambda { |id:|
-            FakeScope.new(roots_scope.records.select { |record| Array(id).include?(record.id) })
-          }) do
-            assert_equal %w[root-2 root-3], search.send(:workspace_root_ids)
-            assert_equal [workspace_b, workspace_a], search.send(:cross_root_workspace_destinations)
-            assert_equal [same_root, workspace_a, workspace_b], policy.destinations_seen
+        destinations = [same_root, workspace_a, workspace_b, nested_visible_destination, nested_not_root]
+        search.stub(:structurally_allowed_destinations, destinations) do
+          RecordingStudio.stub(:root_recording?, ->(recording) { recording.parent_recording_id.nil? }) do
+            RecordingStudio::Recording.stub(:where, lambda { |id:|
+              FakeScope.new(roots_scope.records.select { |record| Array(id).include?(record.id) })
+            }) do
+              assert_equal %w[root-2 root-3 root-4 root-5], search.send(:workspace_root_ids)
+              assert_equal [workspace_b, workspace_a], search.send(:cross_root_workspace_destinations)
+              assert_equal destinations, policy.destinations_seen
+            end
           end
         end
       end

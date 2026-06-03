@@ -116,6 +116,12 @@ module RecordingStudio
                                   .includes(:recordable)
                                   .order(updated_at: :desc)
                                   .to_a
+                                  .select { |root| visible_workspace_root?(root) }
+      end
+
+      def visible_workspace_root?(root_recording)
+        RecordingStudio.root_recording?(root_recording) &&
+          policy.destination_visible?(destination: root_recording)
       end
 
       def workspace_root_ids

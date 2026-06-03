@@ -14,7 +14,7 @@ This guide explains how to install the RecordingStudioMoveable engine in your Ra
 
 ## Prerequisites
 
-- Rails 7.0+ application
+- Rails 8.1+ application
 - RecordingStudio core 2.0+
 - PostgreSQL (recommended for UUID compatibility)
 - TailwindCSS (optional, for styling engine views)
