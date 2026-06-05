@@ -1,6 +1,6 @@
-# Upgrading RecordingStudio Moveable to 1.0
+# Upgrading RecordingStudio Moveable for RecordingStudio 3
 
-RecordingStudio Moveable 1.0 is the breaking release that targets RecordingStudio core V2. Moveable no longer defines destination parent types.
+The next RecordingStudio Moveable compatibility release targets RecordingStudio core V3. Moveable no longer defines destination parent types.
 
 ## What changed
 
@@ -46,6 +46,8 @@ Apps must define declarations for every configured recordable type:
 ```ruby
 class Workspace < ApplicationRecord
   recording_studio_recordable label: "Workspace", root: true, allowed_parent_types: []
+
+  RecordingStudio.enable_capability(:accessible, on: self)
 end
 ```
 

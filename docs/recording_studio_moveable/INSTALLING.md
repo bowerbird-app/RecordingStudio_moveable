@@ -15,7 +15,7 @@ This guide explains how to install the RecordingStudioMoveable engine in your Ra
 ## Prerequisites
 
 - Rails 8.1+ application
-- RecordingStudio core 2.0+
+- RecordingStudio core 3.0+
 - PostgreSQL (recommended for UUID compatibility)
 - TailwindCSS (optional, for styling engine views)
 
@@ -28,6 +28,8 @@ This guide explains how to install the RecordingStudioMoveable engine in your Ra
 Add to your `Gemfile`:
 
 ```ruby
+gem "recording_studio", "~> 3.0"
+gem "recording_studio_accessible", "~> 0.3"
 # From GitHub
 gem "recording_studio_moveable", github: "bowerbird-app/RecordingStudio_moveable"
 
@@ -46,13 +48,13 @@ bundle install
 
 ### 2.5 Install Access Integration for Built-In Authorization
 
-If you want RecordingStudioMoveable to enforce move authorization itself, install `recording_studio_accessible` alongside the moveable gem:
+RecordingStudioMoveable depends on `recording_studio_accessible` for built-in authorization. Keep it in your Gemfile explicitly if your application manages access grants directly:
 
 ```ruby
-gem "recording_studio_accessible"
+gem "recording_studio_accessible", "~> 0.3"
 ```
 
-Then run:
+Then run the Accessible setup if your application does not already have the required access tables:
 
 ```bash
 bin/rails generate recording_studio_accessible:install
@@ -60,15 +62,17 @@ bin/rails generate recording_studio_accessible:migrations
 bin/rails db:migrate
 ```
 
-Configure your root recordables with `RecordingStudioAccessible::AllowsAccessibleChildren` and expose the acting principal through `Current.actor` or `RecordingStudioMoveable.configure`.
+Enable the Accessible capability on root recordables that should accept direct grants and expose the acting principal through `Current.actor` or `RecordingStudioMoveable.configure`.
 
 ### 2.6 Declare RecordingStudio Core Hierarchy
 
-RecordingStudio core owns structural hierarchy in V2. Every configured recordable type should declare `recording_studio_recordable`, and child recordables should list allowed parent types there:
+RecordingStudio core owns structural hierarchy in V3. Every configured recordable type should declare `recording_studio_recordable`, and child recordables should list allowed parent types there:
 
 ```ruby
 class Workspace < ApplicationRecord
   recording_studio_recordable label: "Workspace", root: true, allowed_parent_types: []
+
+  RecordingStudio.enable_capability(:accessible, on: self)
 end
 
 class RecordingStudioPage < ApplicationRecord

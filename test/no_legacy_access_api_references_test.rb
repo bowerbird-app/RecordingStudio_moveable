@@ -8,7 +8,13 @@ class NoLegacyAccessApiReferencesTest < Minitest::Test
     /RecordingStudio::Services::AccessCheck/ => "Use RecordingStudioAccessible query APIs instead of RecordingStudio::Services::AccessCheck.",
     /RecordingStudio::Access\b/ =>
       "Do not reference RecordingStudio::Access in runtime integration code. " \
-      "Route access through Accessible APIs or a compatibility helper."
+      "Route access through Accessible APIs or a compatibility helper.",
+    /RecordingStudioAccessible::AllowsAccessibleChildren/ =>
+      "Use RecordingStudio.enable_capability(:accessible, on: self) instead.",
+    /recording_studio_accessible_children/ =>
+      "Use RecordingStudio.enable_capability(:accessible, on: self) instead.",
+    /RecordingStudioAccessible::Services::GrantRecordingAccess/ =>
+      "Use RecordingStudioAccessible.grant_access for direct grants."
   }.freeze
 
   ALLOWED_FILES = [

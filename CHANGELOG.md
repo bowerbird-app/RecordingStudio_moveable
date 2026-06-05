@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking
+- Require RecordingStudio `~> 3.0` and RecordingStudioAccessible `~> 0.3`, dropping compatibility with RecordingStudio 2.x.
+
+### Changed
+- Replace legacy Accessible child setup with RecordingStudio 3 capability enablement.
+- Use `RecordingStudioAccessible.grant_access` in dummy setup and tests.
+
 ## [1.0.0] - 2026-06-02
 
 ### Changed
