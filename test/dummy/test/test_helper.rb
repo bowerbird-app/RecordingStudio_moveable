@@ -42,7 +42,7 @@ module DummyMoveableTestHelpers
       actor: actor,
       role: role,
       manager_actor: actor
-    )
+    ).value!
   end
 end
 

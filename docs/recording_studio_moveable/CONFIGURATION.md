@@ -143,7 +143,7 @@ In that mode:
 - move source visibility requires `:edit`
 - move destination visibility requires `:edit`
 - access roles are resolved through `RecordingStudioAccessible::DirectAccessQuery`
-- hosts should seed or manage grants through Accessible APIs such as `RecordingStudioAccessible::Services::GrantRecordingAccess`
+- hosts should seed or manage grants through Accessible APIs such as `RecordingStudioAccessible.grant_access`
 
 If your app is still on a `recording_studio` release that ships access tables or constants, Accessible can run in compatibility mode. That compatibility layer does not change the public integration point for move authorization: RecordingStudioMoveable still queries access through Accessible.
 

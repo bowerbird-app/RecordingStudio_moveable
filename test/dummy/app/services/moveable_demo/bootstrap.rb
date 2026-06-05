@@ -109,7 +109,7 @@ module MoveableDemo
         actor: actor,
         role: :admin,
         manager_actor: actor
-      )
+      ).value!
     end
 
     def ensure_demo_tree!(root_recording, workspace_data)

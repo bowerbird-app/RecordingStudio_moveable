@@ -6,6 +6,9 @@ require "test_helper"
 class NoLegacyAccessApiReferencesTest < Minitest::Test
   FORBIDDEN_PATTERNS = {
     /RecordingStudio::Services::AccessCheck/ => "Use RecordingStudioAccessible query APIs instead of RecordingStudio::Services::AccessCheck.",
+    /RecordingStudioAccessible::AllowsAccessibleChildren/ => "Use RecordingStudio.enable_capability(:accessible, on: self).",
+    /recording_studio_accessible_children/ => "Use RecordingStudio.enable_capability(:accessible, on: self).",
+    /RecordingStudioAccessible::Services::GrantRecordingAccess/ => "Use RecordingStudioAccessible.grant_access.",
     /RecordingStudio::Access\b/ =>
       "Do not reference RecordingStudio::Access in runtime integration code. " \
       "Route access through Accessible APIs or a compatibility helper."

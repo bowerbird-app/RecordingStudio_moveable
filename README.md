@@ -30,8 +30,9 @@
 Add to your Gemfile:
 
 ```ruby
+gem "recording_studio", "~> 3.0"
+gem "recording_studio_accessible", "~> 0.3"
 gem "recording_studio_moveable"
-gem "recording_studio_accessible"
 gem "flat_pack", github: "bowerbird-app/flatpack"
 ```
 
@@ -84,7 +85,7 @@ This addon registers `:movable` without a legacy feature gate so it can continue
 
 ### Default (built-in) mode
 
-Install `recording_studio_accessible` and configure your root recordables to allow access children. In this mode:
+Install `recording_studio_accessible` and enable the `:accessible` capability on root recordables. In this mode:
 
 - source requires `:edit`
 - destination requires `:edit`
@@ -92,7 +93,7 @@ Install `recording_studio_accessible` and configure your root recordables to all
 - move UI only lists destinations the actor can move into
 - failures raise `RecordingStudio::AccessDenied`
 
-Under the hood, move authorization is resolved through `RecordingStudioAccessible.authorized?`, `RecordingStudioAccessible.role_for`, and related public access helpers. The dummy app still uses the Accessible gem's grant services for seeding and management flows.
+Under the hood, move authorization is resolved through `RecordingStudioAccessible.authorized?`, `RecordingStudioAccessible.role_for`, and related public access helpers. The dummy app uses `RecordingStudioAccessible.grant_access` for seeding and management flows.
 
 Example root recordable setup:
 
@@ -100,9 +101,7 @@ Example root recordable setup:
 class Workspace < ApplicationRecord
   recording_studio_recordable label: "Workspace", root: true, allowed_parent_types: []
 
-  include RecordingStudioAccessible::AllowsAccessibleChildren
-
-  recording_studio_accessible_children :access, :boundary
+  RecordingStudio.enable_capability(:accessible, on: self)
 end
 ```
 
