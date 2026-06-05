@@ -48,13 +48,13 @@ bundle install
 
 ### 2.5 Install Access Integration for Built-In Authorization
 
-If you want RecordingStudioMoveable to enforce move authorization itself, install `recording_studio_accessible` alongside the moveable gem:
+RecordingStudioMoveable depends on `recording_studio_accessible` for built-in authorization. Keep it in your Gemfile explicitly if your application manages access grants directly:
 
 ```ruby
 gem "recording_studio_accessible", "~> 0.3"
 ```
 
-Then run:
+Then run the Accessible setup if your application does not already have the required access tables:
 
 ```bash
 bin/rails generate recording_studio_accessible:install

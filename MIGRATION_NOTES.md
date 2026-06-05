@@ -1,49 +1,41 @@
-# Migration Notes - Private Gems to Public Gems
+# Migration Notes - RecordingStudio 3 Compatibility
 
 ## Changes Made
 
-1. ✅ Removed repository access entries from `.devcontainer/devcontainer.json`
-2. ✅ Updated documentation in `CODESPACES.md` and `PRIVATE_GEMS.md`
-3. ✅ Updated copilot instructions to reference local docs
-4. ✅ Replaced `makeup_artist` with `flat_pack` in `test/dummy/Gemfile`
+1. ✅ Updated `recording_studio` to `~> 3.0` and RecordingStudio tag `recording_studio/v3.0.0`.
+2. ✅ Updated `recording_studio_accessible` to `~> 0.3` and tag `0.3.1`.
+3. ✅ Kept `recording_studio_root_switchable` out of the runtime dependency set.
+4. ✅ Replaced legacy Accessible child setup with `RecordingStudio.enable_capability(:accessible, on: self)` on root recordables.
+5. ✅ Updated dummy app access grants to use `RecordingStudioAccessible.grant_access`.
+6. ✅ Preserved RecordingStudio core hierarchy declarations through `recording_studio_recordable allowed_parent_types:`.
+7. ✅ Updated README and generated documentation for RecordingStudio 3 / Accessible 0.3 setup.
 
-## Next Steps (Requires Ruby 3.3.0+)
+## Host Application Migration Steps
 
-The following steps need to be completed in an environment with Ruby 3.3.0 or higher:
+Applications upgrading to this compatibility release should:
 
-1. **Update Gemfile.lock**: Run `bundle install` in the test/dummy directory to update the lockfile
+1. **Update dependencies**:
    ```bash
-   cd test/dummy
    bundle install
    ```
 
-2. **Run FlatPack installer**: After bundle install, run the FlatPack installation generator
+2. **Install or verify Accessible setup**:
    ```bash
-   cd test/dummy
-   rails generate flat_pack:install
+   bin/rails generate recording_studio_accessible:install
+   bin/rails generate recording_studio_accessible:migrations
+   bin/rails db:migrate
    ```
 
-3. **Update views**: Replace any `makeup_artist` component references with `flat_pack` components
-   - Search for: `MakeupArtist::`, `makeup_artist/`
-   - Replace with equivalent FlatPack components
+3. **Enable Accessible on root recordables** with `RecordingStudio.enable_capability(:accessible, on: self)`.
 
-4. **Test the application**: Start the dummy app and verify all UI components work
-   ```bash
-   cd test/dummy
-   bin/dev
-   ```
+4. **Declare hierarchy rules in RecordingStudio core** using `recording_studio_recordable allowed_parent_types:`.
 
-5. **Run tests**: Execute the test suite
+5. **Run tests**:
    ```bash
    bundle exec rake test
+   bundle exec rake app:test
    ```
 
-## Component Migration Guide
+## Breaking Change and Release Classification
 
-FlatPack is the successor to MakeupArtist with similar components:
-
-- Both use ViewComponent architecture
-- Both integrate with Tailwind CSS
-- Component names and APIs may differ slightly
-
-See: https://github.com/bowerbird-app/flatpack for component documentation
+This update drops compatibility with RecordingStudio 2.x. The expected release classification is **major**, and merge metadata should preserve a Conventional Commits breaking-change signal.

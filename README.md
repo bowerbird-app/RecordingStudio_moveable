@@ -93,7 +93,7 @@ Install `recording_studio_accessible` `~> 0.3` and enable the Accessible capabil
 - move UI only lists destinations the actor can move into
 - failures raise `RecordingStudio::AccessDenied`
 
-Under the hood, move authorization is resolved through `RecordingStudioAccessible.authorized?`, `RecordingStudioAccessible.role_for`, and related public access helpers. The dummy app still uses the Accessible gem's grant services for seeding and management flows.
+Under the hood, move authorization is resolved through `RecordingStudioAccessible.authorized?`, `RecordingStudioAccessible.role_for`, and related public access helpers. The dummy app uses `RecordingStudioAccessible.grant_access` for seeding and management flows.
 
 Example root recordable setup:
 
@@ -131,12 +131,15 @@ end
 RecordingStudio::Moveable.configure do |config|
   config.use_builtin_access = false
   config.authorization_hook = lambda do |actor:, source:, destination:, impersonator:, metadata:|
-    actor.present? && source.root_recording_id == destination.root_recording_id
+    next false if actor.blank?
+
+    AppMovePolicy.new(actor, impersonator: impersonator).allowed?(source: source, destination: destination, metadata: metadata)
   end
 end
 ```
 
 If your hook returns false, move is denied with `RecordingStudio::AccessDenied`.
+Your hook must enforce your application's source and destination permissions. Structural checks such as same-root comparisons are useful isolation rules, but they are not a substitute for authorization.
 
 The same authorization layer is also used by the move UI. In custom hook mode:
 
