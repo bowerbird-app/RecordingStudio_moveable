@@ -1,9 +1,7 @@
 class Workspace < ApplicationRecord
-  include RecordingStudioAccessible::AllowsAccessibleChildren
-
   recording_studio_recordable label: "Workspace", plural_label: "Workspaces", root: true, allowed_parent_types: []
 
-  recording_studio_accessible_children :access
+  RecordingStudio.enable_capability(:accessible, on: self)
 
   RecordingStudioIcons.register_default_icon self,
     library: :heroicons,

@@ -104,12 +104,12 @@ module MoveableDemo
     end
 
     def ensure_root_access!(root_recording)
-      RecordingStudioAccessible::Services::GrantRecordingAccess.call(
+      RecordingStudioAccessible.grant_access(
         recording: root_recording,
         actor: actor,
         role: :admin,
         manager_actor: actor
-      ).value!
+      )
     end
 
     def ensure_demo_tree!(root_recording, workspace_data)
