@@ -7,14 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking
+- Require RecordingStudio `~> 3.0` and RecordingStudioAccessible `~> 0.3`, dropping compatibility with RecordingStudio 2.x.
+
 ### Changed
-- Target RecordingStudio `~> 3.0` and RecordingStudioAccessible `~> 0.3`.
 - Replace legacy Accessible child setup with RecordingStudio 3 capability enablement.
+- Use `RecordingStudioAccessible.grant_access` in dummy setup and tests.
 
 ## [1.0.0] - 2026-06-02
 
 ### Changed
-- Require RecordingStudio core V3 and use core recordable hierarchy declarations for move parent validation.
+- Require RecordingStudio core V2 and use core recordable hierarchy declarations for move parent validation.
 - Replace `Moveable.to(...)` destination configuration with `Moveable.enabled(...)`.
 - Use core root-recording helpers in dummy setup and move logic.
 

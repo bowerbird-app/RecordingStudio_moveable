@@ -99,7 +99,7 @@ Example root recordable setup:
 
 ```ruby
 class Workspace < ApplicationRecord
-  recording_studio_recordable label: "Workspace", root: true
+  recording_studio_recordable label: "Workspace", root: true, allowed_parent_types: []
 
   RecordingStudio.enable_capability(:accessible, on: self)
 end
@@ -124,6 +124,8 @@ end
 ```
 
 ### Custom authorization hook mode
+
+`recording_studio_accessible` remains a runtime dependency of this gem. Custom hook mode disables Moveable's built-in Accessible authorization checks for move decisions.
 
 ```ruby
 RecordingStudio::Moveable.configure do |config|

@@ -70,7 +70,7 @@ RecordingStudio core owns structural hierarchy in V3. Every configured recordabl
 
 ```ruby
 class Workspace < ApplicationRecord
-  recording_studio_recordable label: "Workspace", root: true
+  recording_studio_recordable label: "Workspace", root: true, allowed_parent_types: []
 
   RecordingStudio.enable_capability(:accessible, on: self)
 end
