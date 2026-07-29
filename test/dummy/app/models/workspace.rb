@@ -2,6 +2,7 @@ class Workspace < ApplicationRecord
   recording_studio_recordable label: "Workspace", plural_label: "Workspaces", root: true, allowed_parent_types: []
 
   RecordingStudio.enable_capability(:accessible, on: self)
+  RecordingStudio.enable_capability(:api_access_point, on: self)
 
   RecordingStudioIcons.register_default_icon self,
     library: :heroicons,

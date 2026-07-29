@@ -1,0 +1,64 @@
+<div class="space-y-8">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "API action",
+    subtitle: "The optional RecordingStudioApi integration exposes move for Moveable-enabled recordables."
+  ) %>
+
+  <section class="space-y-4">
+    <p class="text-sm text-[var(--surface-muted-content-color)]">
+      The API is an optional host-app dependency. Moveable registers its action only when
+      <code>RecordingStudioApi</code> is installed, and the API automatically exposes it for recordable types with
+      the <code>:movable</code> capability.
+    </p>
+
+    <%= render FlatPack::CodeBlock::Component.new(
+      title: "Version profile",
+      language: "ruby",
+      code: <<~'CODE'
+        # config/initializers/recording_studio_api.rb
+        RecordingStudioApi.configure do |config|
+          config.version "v1" do |api|
+            api.use :moveable, "~> 1.0"
+          end
+        end
+      CODE
+    ) %>
+  </section>
+
+  <section class="space-y-4">
+    <%= render FlatPack::SectionTitle::Component.new(
+      title: "Move endpoint",
+      anchor_link: true,
+      anchor_id: "move-endpoint",
+      class: "my-0"
+    ) %>
+
+    <%= render FlatPack::CodeBlock::Component.new(
+      language: "http",
+      code: <<~'CODE'
+        POST /recording_studio_api/api/v1/recording_studio_pages/:id/actions/move
+        Content-Type: application/json
+        Authorization: ******
+
+        { "parent_id": "<destination-recording-id>" }
+      CODE
+    ) %>
+
+    <p class="text-sm text-[var(--surface-muted-content-color)]">
+      <code>parent_id</code> is preferred; <code>destination_id</code> and <code>new_parent_id</code> remain
+      accepted for compatible clients. The handler checks the API access grant for edit access to both recordings
+      before it invokes Moveable's existing move behavior. Structural validation failures return 422; policy
+      denials return 403.
+    </p>
+  </section>
+
+  <p class="text-sm">
+    <%= link_to(
+      "RecordingStudioApi capability-backed action contract",
+      "https://github.com/bowerbird-app/RecordingStudio_api#capability-backed-actions",
+      target: "_blank",
+      rel: "noopener noreferrer",
+      class: "underline"
+    ) %>
+  </p>
+</div>

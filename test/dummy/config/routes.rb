@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  mount RecordingStudioApi::Engine, at: "/recording_studio_api"
   devise_for :users
 
   # RecordingStudio engine is data/API-focused and has no browser root route.
@@ -29,6 +30,7 @@ Rails.application.routes.draw do
   get "docs/setup", to: "moveable_docs#setup", as: :setup_docs
   get "docs/methods", to: "moveable_docs#methods", as: :methods_docs
   get "docs/redirects", to: "moveable_docs#redirects", as: :redirects_docs
+  get "docs/api", to: "moveable_docs#api", as: :api_docs
 
   resources :events, only: :index
   resources :recording_studio_folders, only: :show

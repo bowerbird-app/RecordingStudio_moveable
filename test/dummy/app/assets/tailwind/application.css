@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* Include RecordingStudioApi engine views for Tailwind CSS */
+@source "../../vendor/bundle/**/recording_studio_api/app/views/**/*.erb";
+@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/recording_studio_api-*/app/views/**/*.erb";
+
+/* Include FlatPack component sources for Tailwind CSS */
+@source "../../vendor/bundle/**/flatpack/app/components/**/*.{rb,erb}";
+
 /* Extend Tailwind theme with the FlatPack tokens used by the dummy app. */
 @theme {
 	--color-fp-primary: oklch(0.52 0.26 250);

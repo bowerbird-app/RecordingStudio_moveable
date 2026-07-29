@@ -58,6 +58,13 @@
         active: current_page?(main_app.redirects_docs_path)
       ) %>
 
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "API action",
+        href: main_app.api_docs_path,
+        icon: "code-bracket",
+        active: current_page?(main_app.api_docs_path)
+      ) %>
+
     </nav>
   <% end %>
 

@@ -10,4 +10,7 @@ class MoveableDocsController < ApplicationController
 
   def redirects
   end
+
+  def api
+  end
 end

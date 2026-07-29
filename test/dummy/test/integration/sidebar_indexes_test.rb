@@ -25,6 +25,7 @@ class SidebarIndexesTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Setup"
     assert_includes response.body, "Methods"
     assert_includes response.body, "Redirects"
+    assert_includes response.body, "API action"
 
     get events_path
     assert_response :success
@@ -84,6 +85,14 @@ class SidebarIndexesTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "default_redirect_mode = :moved_record"
     assert_includes response.body, "previous_page"
     assert_includes response.body, "destination"
+
+    get api_docs_path
+    assert_response :success
+    assert_includes response.body, "API action"
+    assert_includes response.body, "RecordingStudioApi integration"
+    assert_includes response.body, "api.use :moveable"
+    assert_includes response.body, "/actions/move"
+    assert_includes response.body, "RecordingStudioApi capability-backed action contract"
 
     get "/docs/moveable"
     assert_response :not_found

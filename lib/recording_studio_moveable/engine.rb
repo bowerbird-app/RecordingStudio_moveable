@@ -40,6 +40,11 @@ module RecordingStudioMoveable
       RecordingStudioMoveable::Hooks.run(:after_initialize, self)
     end
 
+    initializer "recording_studio_moveable.register_recording_studio_api_action",
+                before: "recording_studio_api.after_initialize" do
+      RecordingStudio::Moveable::Api.register_capability_action!
+    end
+
     initializer "recording_studio_moveable.apply_model_extensions" do
       ActiveSupport.on_load(:active_record) do
         RecordingStudioMoveable::Hooks.run(:active_record_loaded, self)
