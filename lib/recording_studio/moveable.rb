@@ -7,6 +7,7 @@ require "recording_studio/moveable/policy"
 require "recording_studio/moveable/authorization"
 require "recording_studio/moveable/destination_search"
 require "recording_studio/moveable/capabilities/moveable"
+require "recording_studio/moveable/api"
 
 module RecordingStudio
   module Moveable

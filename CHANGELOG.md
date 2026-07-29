@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - No unreleased changes yet.
 
+## [2.1.0] - 2026-07-29
+
+### Added
+- Optional `RecordingStudio::Moveable::API` integration that registers a move action for RecordingStudio API clients.
+- API action documentation and dummy application coverage, including Scalar API reference navigation.
+
 ## [2.0.0] - 2026-06-05
 
 ### Breaking
@@ -43,7 +49,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.0.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.1.0...HEAD
+[2.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v1.0.0...2.0.0
 [1.0.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v0.1.0...v1.0.0
 [0.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/releases/tag/v0.1.0

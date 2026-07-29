@@ -20,6 +20,16 @@ class NoLegacyAccessApiReferencesTest < Minitest::Test
   ALLOWED_FILES = [
     File.expand_path("../test/dummy/db/migrate/20260217072823_add_indexes_for_access_container_lookup.rb", __dir__),
     File.expand_path("../test/dummy/db/migrate/20260217072824_replace_container_with_root_recording.rb", __dir__),
+    # RecordingStudioApi generator migrations use this persisted recordable type while
+    # transforming historical API data. They do not invoke the legacy access API.
+    File.expand_path(
+      "../test/dummy/db/migrate/20260729035308_backfill_recording_studio_api_oauth_authorization_code_recordings.rb",
+      __dir__
+    ),
+    File.expand_path(
+      "../test/dummy/db/migrate/20260729035315_isolate_recording_studio_api_client_access_recordings.rb",
+      __dir__
+    ),
     File.expand_path("../test/dummy/db/schema.rb", __dir__),
     File.expand_path(__FILE__)
   ].freeze

@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** April 28, 2026
+> *   **Last Updated:** July 29, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -86,6 +86,20 @@ end
 ```
 
 Moveable only enables move behavior and move-specific options such as `allow_cross_root:`. It does not define destination parent types; the destination picker uses core declarations plus same-root/cross-root rules, self/descendant protection, and authorization filtering.
+
+### 2.7 Optional RecordingStudio API Action
+
+Moveable does not require `recording_studio_api` at runtime. To expose moves over the programmable API, install
+RecordingStudioApi in the host application, then run its generators from the host application directory:
+
+```bash
+bin/rails generate recording_studio_api:install
+bin/rails generate recording_studio_api:migrations
+bin/rails db:migrate
+```
+
+Configure API version profiles with `api.use :moveable, "~> 1.0"` when the host uses profiles. See
+[API.md](API.md) for the dependency declarations, endpoint, parameter contract, and authorization behavior.
 
 ### 3. Run the Install Generator
 
