@@ -31,6 +31,8 @@ Rails.application.routes.draw do
   get "docs/methods", to: "moveable_docs#methods", as: :methods_docs
   get "docs/redirects", to: "moveable_docs#redirects", as: :redirects_docs
   get "docs/api", to: "moveable_docs#api", as: :api_docs
+  get "recording_studio_api/docs/scalar", to: "moveable_docs#scalar", as: :scalar_docs
+  get "recording_studio_api/openapi/v1.json", to: "moveable_docs#openapi", as: :recording_studio_api_openapi
 
   resources :events, only: :index
   resources :recording_studio_folders, only: :show

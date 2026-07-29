@@ -77,6 +77,8 @@ class MoveableApiTest < Minitest::Test
       assert_equal :edit, registration.fetch(:required_role)
       assert_equal RecordingStudio::Moveable::Api::MoveRecording, registration.fetch(:handler)
       assert_equal api.serializer, registration.fetch(:serializer)
+      refute registration.fetch(:openapi).key?(:tags)
+      assert_equal "Move", registration.fetch(:openapi).fetch(:summary)
       assert_equal(
         {
           reject_unknown: true,

@@ -57,9 +57,8 @@ module RecordingStudio
 
         def move_openapi
           {
-            summary: "Move recording",
+            summary: "Move",
             description: "Moves the recording below an accessible destination recording.",
-            tags: ["Moveable"],
             responses: {
               "200" => { description: "Recording moved successfully." },
               "403" => { description: "API access is not authorized to move this recording." },

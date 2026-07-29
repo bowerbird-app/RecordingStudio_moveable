@@ -92,7 +92,31 @@ class SidebarIndexesTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "RecordingStudioApi integration"
     assert_includes response.body, "api.use :moveable"
     assert_includes response.body, "/actions/move"
+    assert_includes response.body, "API scalar docs"
+    assert_includes response.body, "/recording_studio_api/docs/scalar"
+    assert_includes response.body, 'data-turbo="false"'
     assert_includes response.body, "RecordingStudioApi capability-backed action contract"
+
+    get scalar_docs_path
+    assert_response :success
+    assert_includes response.body, "@scalar/api-reference"
+    assert_includes response.body, 'id="api-reference"'
+    assert_includes response.body, "data-url="
+    assert_includes response.body, recording_studio_api_openapi_path(format: :json)
+
+    get recording_studio_api_openapi_path(format: :json)
+    assert_response :success
+    openapi_paths = JSON.parse(response.body).fetch("paths")
+    folder_move = openapi_paths.fetch(
+      "/recording_studio_api/api/v1/recording_studio_folders/{id}/actions/move"
+    ).fetch("post")
+    page_move = openapi_paths.fetch(
+      "/recording_studio_api/api/v1/recording_studio_pages/{id}/actions/move"
+    ).fetch("post")
+    assert_equal ["Recording Studio Folder"], folder_move.fetch("tags")
+    assert_equal ["Recording Studio Page"], page_move.fetch("tags")
+    refute_includes openapi_paths.values.flat_map(&:values).flat_map { |operation| operation.fetch("tags", []) },
+                    "Moveable"
 
     get "/docs/moveable"
     assert_response :not_found

@@ -11,6 +11,14 @@
       the <code>:movable</code> capability.
     </p>
 
+    <%= render FlatPack::Button::Component.new(
+      text: "API scalar docs",
+      style: :secondary,
+      size: :sm,
+      url: "/recording_studio_api/docs/scalar",
+      data: { turbo: false }
+    ) %>
+
     <%= render FlatPack::CodeBlock::Component.new(
       title: "Version profile",
       language: "ruby",
