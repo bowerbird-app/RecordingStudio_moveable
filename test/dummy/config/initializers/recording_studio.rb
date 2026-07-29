@@ -6,7 +6,8 @@ RecordingStudio.configure do |config|
     "Workspace",
     "RecordingStudioFolder",
     "RecordingStudioPage",
-    "RecordingStudioArchiveBox"
+    "RecordingStudioArchiveBox",
+    "RecordingStudioApi::AdminApi"
   ]
 
   # Actor resolver for events when no actor is explicitly supplied

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 RecordingStudioApi.configure do |config|
+  config.admin_root_recordable_type_names = ["Workspace"]
+
   # Optional title shown in generated OpenAPI/Scalar docs.
   # Defaults to your Rails application module name (for example: Dummy).
   # config.openapi_title = "My App API"

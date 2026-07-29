@@ -33,6 +33,16 @@ class MoveableApiActionsTest < ActionDispatch::IntegrationTest
     clear_api_records!
   end
 
+  def test_move_endpoint_moves_recording_and_returns_serialized_result
+    post move_action_path(@page), params: { parent_id: @target_folder.id }, headers: @headers
+
+    assert_response :success
+    payload = JSON.parse(response.body).fetch("data")
+    assert_equal @page.id, payload.fetch("id")
+    assert_equal @target_folder.id, payload.fetch("parent_id")
+    assert_equal @target_folder.id, @page.reload.parent_recording_id
+  end
+
   def test_move_endpoint_returns_422_for_self_and_preserves_parent
     original_parent_id = @source_folder.parent_recording_id
 
