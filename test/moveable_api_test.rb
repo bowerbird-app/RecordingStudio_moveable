@@ -92,6 +92,48 @@ class MoveableApiTest < Minitest::Test
     end
   end
 
+  def test_registration_registers_public_and_named_api_surfaces_independently
+    with_fake_recording_studio_api(api_names: %w[public operations partners]) do |api|
+      RecordingStudio::Moveable::Api.register_capability_action!
+      registered_apis = api.registrations.map { |registration| registration.fetch(:api) }
+
+      assert_equal %w[public operations partners], registered_apis
+    end
+  end
+
+  def test_registration_does_not_replace_existing_actions_on_any_api_surface
+    existing_actions = {
+      "public" => Object.new,
+      "operations" => Object.new
+    }
+
+    with_fake_recording_studio_api(api_names: %w[public operations partners], existing_actions:) do |api|
+      RecordingStudio::Moveable::Api.register_capability_action!
+      registered_apis = api.registrations.map { |registration| registration.fetch(:api) }
+
+      assert_equal ["partners"], registered_apis
+    end
+  end
+
+  def test_api_0_2_input_contract_filters_internal_string_and_symbol_keys
+    with_fake_recording_studio_api(api_names: %w[public]) do |api|
+      RecordingStudio::Moveable::Api.register_capability_action!
+      contract = api.registrations.fetch(0).fetch(:input_contract)
+
+      assert_operator contract.class, :<, api.action_input_contract
+
+      result = contract.call("parent_id" => "destination", "api_key" => "public", api_version: "v1")
+
+      assert result.success?, result.errors.join(", ")
+      assert_equal({ parent_id: "destination" }, result.value)
+
+      unknown_result = contract.call(parent_id: "destination", api_key: "public", "api_version" => "v1", extra: true)
+
+      refute unknown_result.success?
+      assert_equal ["Unknown parameters: extra"], unknown_result.errors
+    end
+  end
+
   def test_handler_authorizes_both_recordings_and_moves_to_parent_id
     destination = Recording.new(recordable_type: "RecordingStudioFolder")
     source = Recording.new
@@ -287,7 +329,7 @@ class MoveableApiTest < Minitest::Test
     ]
   end
 
-  def with_fake_recording_studio_api(existing_action: nil)
+  def with_fake_recording_studio_api(existing_action: nil, existing_actions: {}, api_names: nil)
     api = Module.new
     serializers = Module.new
     serializer = Class.new
@@ -307,14 +349,22 @@ class MoveableApiTest < Minitest::Test
     api.const_set(:AuthorizationError, Class.new(StandardError))
     api.const_set(:NotFoundError, Class.new(StandardError))
     api.instance_variable_set(:@existing_action, existing_action)
+    api.instance_variable_set(:@existing_actions, existing_actions.transform_keys(&:to_s))
     api.instance_variable_set(:@registrations, [])
     api.instance_variable_set(:@serializer, serializer)
-    api.define_singleton_method(:capability_action) { |name| @existing_action if name == :move }
-    api.define_singleton_method(:register_capability_action) do |name, **options|
-      @registrations << options.merge(name:)
+
+    if api_names
+      define_api_0_2_behavior(api, api_names)
+    else
+      api.define_singleton_method(:capability_action) { |name| @existing_action if name == :move }
+      api.define_singleton_method(:register_capability_action) do |name, **options|
+        @registrations << options.merge(name:)
+      end
     end
+
     api.define_singleton_method(:registrations) { @registrations }
     api.define_singleton_method(:serializer) { @serializer }
+    api.define_singleton_method(:action_input_contract) { const_get(:ActionInputContract) }
     api.define_singleton_method(:unsupported_action_error) { const_get(:UnsupportedActionError) }
     api.define_singleton_method(:invalid_action_input_error) { const_get(:InvalidActionInputError) }
     api.define_singleton_method(:authorization_error) { const_get(:AuthorizationError) }
@@ -324,5 +374,47 @@ class MoveableApiTest < Minitest::Test
     yield api
   ensure
     Object.send(:remove_const, :RecordingStudioApi) if Object.const_defined?(:RecordingStudioApi, false)
+  end
+
+  def define_api_0_2_behavior(api, api_names)
+    configuration = fake_api_configuration(api_names)
+
+    api.const_set(:ActionInputContract, fake_action_input_contract_class)
+    api.define_singleton_method(:configuration) { configuration }
+    api.define_singleton_method(:capability_action) do |name, api: :public|
+      @existing_actions[api.to_s] if name == :move
+    end
+    api.define_singleton_method(:register_capability_action) do |name, api: :public, **options|
+      @registrations << options.merge(name:, api: api.to_s)
+    end
+  end
+
+  def fake_action_input_contract_class
+    contract_result = Struct.new(:success?, :value, :errors, keyword_init: true)
+    Class.new do
+      define_method(:initialize) do |definition|
+        @definition = definition
+        @fields = definition.fetch(:fields).keys.map(&:to_sym)
+      end
+
+      define_method(:call) do |raw_params|
+        params = raw_params.to_h.transform_keys(&:to_sym)
+        unknown_keys = params.keys - @fields
+        errors = unknown_keys.empty? ? [] : ["Unknown parameters: #{unknown_keys.sort.join(', ')}"]
+        value = errors.empty? ? params.slice(*@fields) : nil
+        contract_result.new(success?: errors.empty?, value:, errors:)
+      end
+
+      define_method(:as_json) { |*| @definition }
+    end
+  end
+
+  def fake_api_configuration(api_names)
+    definitions = api_names.map { |name| Struct.new(:name).new(name.to_s) }
+    Struct.new(:definitions) do
+      def each_api(&)
+        definitions.each(&)
+      end
+    end.new(definitions)
   end
 end

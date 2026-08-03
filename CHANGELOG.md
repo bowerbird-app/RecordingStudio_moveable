@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Upgrade the dummy application and optional integration documentation to RecordingStudio API 0.2.0.
 - Use RecordingStudio API's gem-owned, authenticated Scalar documentation surface in the dummy application.
+- Register Moveable's action independently on public and named API 0.2.0 surfaces and filter named-route keys.
 
 ## [2.1.0] - 2026-07-29
 

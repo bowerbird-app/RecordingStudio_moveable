@@ -10,11 +10,12 @@
 
 `recording_studio_moveable` works without `recording_studio_api`. When the host application installs
 `RecordingStudioApi`, Moveable registers a member `move` action for the `:movable` capability during engine
-initialization. The action is registered before RecordingStudioApi's fallback action, so the handler remains
-owned by this addon.
+initialization. With RecordingStudio API 0.2.0, it registers the action independently in the public API and every
+configured named API without replacing actions already registered by the host or another addon.
 
-The action contract is version `1.0.0`, uses `POST`, requires `:edit`, and is automatically exposed only for
-recordable types that enable `:movable`.
+The action contract is version `1.0.0`, uses `POST`, and requires `:edit`. A surface exposes it only when the
+recordable type enables `:movable` **and** that API surface's recordable-type registration explicitly allowlists
+`:move`.
 
 ## Install the Optional API Engine
 
@@ -86,6 +87,31 @@ RecordingStudioApi.register_recordable_type_api(
 RecordingStudio API 0.2.0 uses a default-deny allowlist for custom capability actions. Register `:move` only for
 the recordable types that should publish Moveable's action. The underlying `:movable` capability and the API
 authorization checks are still required.
+
+Named APIs have independent action and recordable-type registries. Configure the named surface and allowlist
+`:move` on that surface explicitly:
+
+```ruby
+RecordingStudioApi.configure do |config|
+  config.api :operations do |api|
+    api.api_versions = %w[v1]
+    api.default_api_version = "v1"
+
+    api.version "v1" do |version|
+      version.use :moveable, "~> 1.0"
+    end
+  end
+end
+
+RecordingStudioApi.register_recordable_type_api(
+  "RecordingStudioPage",
+  api: :operations,
+  capability_actions: %i[move]
+)
+```
+
+This named allowlist does not expose `:move` on `public`, and the public allowlist does not expose it on
+`:operations`.
 
 ## Endpoint and Input
 
