@@ -79,17 +79,7 @@ class MoveableApiTest < Minitest::Test
       assert_equal api.serializer, registration.fetch(:serializer)
       refute registration.fetch(:openapi).key?(:tags)
       assert_equal "Move", registration.fetch(:openapi).fetch(:summary)
-      assert_equal(
-        {
-          reject_unknown: true,
-          fields: {
-            parent_id: { type: :string, allow_blank: false },
-            destination_id: { type: :string, allow_blank: false },
-            new_parent_id: { type: :string, allow_blank: false }
-          }
-        },
-        registration.fetch(:input_contract)
-      )
+      assert_equal expected_input_contract, registration.fetch(:input_contract)
     end
   end
 
@@ -263,6 +253,17 @@ class MoveableApiTest < Minitest::Test
   end
 
   private
+
+  def expected_input_contract
+    {
+      reject_unknown: true,
+      fields: {
+        parent_id: { type: :string, allow_blank: false },
+        destination_id: { type: :string, allow_blank: false },
+        new_parent_id: { type: :string, allow_blank: false }
+      }
+    }
+  end
 
   def action_context(source:, access_grant:, params:, client: ApiPrincipal.new("client-1"),
                      credential: ApiPrincipal.new("credential-1"))

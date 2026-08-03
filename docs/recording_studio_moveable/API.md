@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** July 29, 2026
+> *   **Last Updated:** August 3, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -22,7 +22,7 @@ Add the API and its browser-administration dependency to the **host application'
 intentionally not dependencies of this gem.
 
 ```ruby
-gem "recording_studio_api", github: "bowerbird-app/RecordingStudio_api", tag: "0.1.0"
+gem "recording_studio_api", github: "bowerbird-app/RecordingStudio_api", tag: "0.2.0"
 gem "recording_studio_admin", github: "bowerbird-app/RecordingStudio_admin", tag: "1.1.0"
 ```
 
@@ -36,6 +36,26 @@ bin/rails db:migrate
 
 The install generator mounts `RecordingStudioApi::Engine`, creates its initializer, and configures Tailwind when
 applicable. The migrations generator copies the API engine migrations into the host application.
+
+RecordingStudio API 0.2.0 provides gem-owned Scalar documentation. Install a named reference instead of copying
+or maintaining Scalar controllers and views in the host application:
+
+```bash
+bin/rails generate recording_studio_api:scalar_docs moveable_api \
+  --mount-path=/recording_studio_api/docs/scalar \
+  --api-mount-path=/recording_studio_api \
+  --api-surface=public \
+  --access=authenticated \
+  --layout=application
+```
+
+This adds managed routes and configuration while keeping the OpenAPI endpoint and Scalar assets in the API gem.
+Enable both `:accessible` and `:api_access_point` on each root recordable type that may receive API access:
+
+```ruby
+RecordingStudio.enable_capability(:accessible, on: Workspace)
+RecordingStudio.enable_capability(:api_access_point, on: Workspace)
+```
 
 ## Configure an API Version Profile
 
@@ -52,7 +72,20 @@ RecordingStudioApi.configure do |config|
     api.use :moveable, "~> 1.0"
   end
 end
+
+RecordingStudioApi.register_recordable_type_api(
+  "RecordingStudioFolder",
+  capability_actions: %i[move]
+)
+RecordingStudioApi.register_recordable_type_api(
+  "RecordingStudioPage",
+  capability_actions: %i[move]
+)
 ```
+
+RecordingStudio API 0.2.0 uses a default-deny allowlist for custom capability actions. Register `:move` only for
+the recordable types that should publish Moveable's action. The underlying `:movable` capability and the API
+authorization checks are still required.
 
 ## Endpoint and Input
 

@@ -27,10 +27,10 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_api.git
-  revision: 06b5ac3aa33ee5befbde682be8bd8b062581292a
-  tag: 0.1.0
+  revision: 790aeed065e3ed95a033477c72a9eeb604f18652
+  tag: 0.2.0
   specs:
-    recording_studio_api (0.1.0)
+    recording_studio_api (0.2.0)
       rails (~> 8.1.0)
       recording_studio (~> 3.0)
       recording_studio_accessible (~> 0.3)
@@ -57,7 +57,7 @@ GIT
 PATH
   remote: ../..
   specs:
-    recording_studio_moveable (2.0.0)
+    recording_studio_moveable (2.1.0)
       rails (>= 8.1.0, < 9.0)
       recording_studio (~> 3.0)
       recording_studio_accessible (~> 0.3)
@@ -618,9 +618,9 @@ CHECKSUMS
   recording_studio (3.0.0)
   recording_studio_accessible (0.3.1)
   recording_studio_admin (1.1.0)
-  recording_studio_api (0.1.0)
+  recording_studio_api (0.2.0)
   recording_studio_icons (0.1.0)
-  recording_studio_moveable (2.0.0)
+  recording_studio_moveable (2.1.0)
   redis (5.4.1) sha256=b5e675b57ad22b15c9bcc765d5ac26f60b675408af916d31527af9bd5a81faae
   redis-client (0.30.1) sha256=5151bc5c7bbfe48623732cdae3b900d8a22dc691cc7cdfacfb351ac55116522d
   regexp_parser (2.11.3) sha256=ca13f381a173b7a93450e53459075c9b76a10433caadcb2f1180f2c741fc55a4

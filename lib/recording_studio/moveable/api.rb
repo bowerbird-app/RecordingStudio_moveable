@@ -6,6 +6,7 @@ module RecordingStudio
   module Moveable
     module Api
       ACTION_VERSION = "1.0.0"
+      INTERNAL_ROUTE_PARAMETER_KEYS = %i[api_key api_version].freeze
 
       class << self
         def register_capability_action!
@@ -45,7 +46,7 @@ module RecordingStudio
         end
 
         def move_input_contract
-          {
+          definition = {
             reject_unknown: true,
             fields: {
               parent_id: { type: :string, allow_blank: false },
@@ -53,6 +54,24 @@ module RecordingStudio
               new_parent_id: { type: :string, allow_blank: false }
             }
           }
+
+          return definition unless defined?(RecordingStudioApi::ActionInputContract)
+
+          route_parameter_filtering_contract.new(definition)
+        end
+
+        def route_parameter_filtering_contract
+          # API 0.2 forwards these named-route keys to action contracts. Filter
+          # them here because declared contract fields become OpenAPI body fields.
+          Class.new(RecordingStudioApi::ActionInputContract) do
+            define_method(:call) do |raw_params|
+              params = raw_params.respond_to?(:to_h) ? raw_params.to_h : raw_params
+              if params.respond_to?(:except)
+                params = params.except(*RecordingStudio::Moveable::Api::INTERNAL_ROUTE_PARAMETER_KEYS)
+              end
+              super(params)
+            end
+          end
         end
 
         def move_openapi

@@ -97,14 +97,14 @@ class SidebarIndexesTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'data-turbo="false"'
     assert_includes response.body, "RecordingStudioApi capability-backed action contract"
 
-    get scalar_docs_path
+    get moveable_api_scalar_docs_version_path(version: "v1")
     assert_response :success
-    assert_includes response.body, "@scalar/api-reference"
-    assert_includes response.body, 'id="api-reference"'
-    assert_includes response.body, "data-url="
-    assert_includes response.body, recording_studio_api_openapi_path(format: :json)
+    assert_includes response.body, "Interactive API explorer"
+    assert_includes response.body, 'id="scalar-api-reference"'
+    assert_includes response.body, "recording_studio_api/scalar-1.64.0"
+    assert_includes response.body, moveable_api_scalar_docs_openapi_path(version: "v1")
 
-    get recording_studio_api_openapi_path(format: :json)
+    get moveable_api_scalar_docs_openapi_path(version: "v1")
     assert_response :success
     openapi_paths = JSON.parse(response.body).fetch("paths")
     folder_move = openapi_paths.fetch(
@@ -115,6 +115,10 @@ class SidebarIndexesTest < ActionDispatch::IntegrationTest
     ).fetch("post")
     assert_equal ["Recording Studio Folder"], folder_move.fetch("tags")
     assert_equal ["Recording Studio Page"], page_move.fetch("tags")
+    request_properties = page_move.dig("requestBody", "content", "application/json", "schema", "properties")
+    assert_equal %w[destination_id new_parent_id parent_id], request_properties.keys.sort
+    refute_includes request_properties, "api_key"
+    refute_includes request_properties, "api_version"
     refute_includes openapi_paths.values.flat_map(&:values).flat_map { |operation| operation.fetch("tags", []) },
                     "Moveable"
 

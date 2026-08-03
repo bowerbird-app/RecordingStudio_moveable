@@ -43,6 +43,20 @@ class MoveableApiActionsTest < ActionDispatch::IntegrationTest
     assert_equal @target_folder.id, @page.reload.parent_recording_id
   end
 
+  def test_move_endpoint_rejects_unknown_input_and_preserves_parent
+    original_parent_id = @page.parent_recording_id
+
+    post move_action_path(@page),
+         params: { parent_id: @target_folder.id, unapproved: "value" },
+         headers: @headers
+
+    assert_response :unprocessable_entity
+    payload = JSON.parse(response.body)
+    assert_equal "Invalid input for action move", payload.fetch("error")
+    assert_includes payload.fetch("details"), "Unknown parameters: unapproved"
+    assert_equal original_parent_id, @page.reload.parent_recording_id
+  end
+
   def test_move_endpoint_returns_422_for_self_and_preserves_parent
     original_parent_id = @source_folder.parent_recording_id
 

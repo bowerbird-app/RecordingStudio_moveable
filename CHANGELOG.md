@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- No unreleased changes yet.
+### Changed
+- Upgrade the dummy application and optional integration documentation to RecordingStudio API 0.2.0.
+- Use RecordingStudio API's gem-owned, authenticated Scalar documentation surface in the dummy application.
 
 ## [2.1.0] - 2026-07-29
 

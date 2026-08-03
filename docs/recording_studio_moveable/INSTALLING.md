@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** July 29, 2026
+> *   **Last Updated:** August 3, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -95,10 +95,21 @@ RecordingStudioApi in the host application, then run its generators from the hos
 ```bash
 bin/rails generate recording_studio_api:install
 bin/rails generate recording_studio_api:migrations
+bin/rails generate recording_studio_api:scalar_docs moveable_api \
+  --mount-path=/recording_studio_api/docs/scalar \
+  --api-mount-path=/recording_studio_api \
+  --api-surface=public \
+  --access=authenticated \
+  --layout=application
 bin/rails db:migrate
 ```
 
-Configure API version profiles with `api.use :moveable, "~> 1.0"` when the host uses profiles. See
+RecordingStudio API 0.2.0 also requires each root type that may receive API access to enable
+`RecordingStudio.enable_capability(:api_access_point, on: self)` alongside `:accessible`.
+
+Configure API version profiles with `api.use :moveable, "~> 1.0"` when the host uses profiles, and explicitly
+allow the action on each published type with
+`RecordingStudioApi.register_recordable_type_api("RecordingStudioPage", capability_actions: %i[move])`. See
 [API.md](API.md) for the dependency declarations, endpoint, parameter contract, and authorization behavior.
 
 ### 3. Run the Install Generator
