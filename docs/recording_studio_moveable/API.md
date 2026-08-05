@@ -17,6 +17,26 @@ The action contract is version `1.0.0`, uses `POST`, and requires `:edit`. A sur
 recordable type enables `:movable` **and** that API surface's recordable-type registration explicitly allowlists
 `:move`.
 
+## Enable Moveable on Source Types
+
+Each recordable type that should be movable through the API must declare its structural parent types and include
+the Moveable capability. The API action is available only for these source types:
+
+```ruby
+class RecordingStudioPage < ApplicationRecord
+  recording_studio_recordable(
+    label: "Page",
+    root: false,
+    allowed_parent_types: ["Workspace", "RecordingStudioFolder"]
+  )
+
+  include RecordingStudio::Capabilities::Moveable.enabled
+end
+```
+
+Pass `allow_cross_root: true` to `enabled` only when the recordable may move between roots. A request must still
+target an accessible, editable destination whose type is listed in `allowed_parent_types`.
+
 ## Install the Optional API Engine
 
 Add the API and its browser-administration dependency to the **host application's** `Gemfile`. They are
@@ -47,7 +67,7 @@ bin/rails generate recording_studio_api:scalar_docs moveable_api \
   --api-mount-path=/recording_studio_api \
   --api-surface=public \
   --access=authenticated \
-  --layout=application
+  --layout=recording_studio/default_layout
 ```
 
 This adds managed routes and configuration while keeping the OpenAPI endpoint and Scalar assets in the API gem.

@@ -100,7 +100,7 @@ bin/rails generate recording_studio_api:scalar_docs moveable_api \
   --api-mount-path=/recording_studio_api \
   --api-surface=public \
   --access=authenticated \
-  --layout=application
+  --layout=recording_studio/default_layout
 bin/rails db:migrate
 ```
 

@@ -31,6 +31,13 @@
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
+        label: "Recordables",
+        href: main_app.recordables_path,
+        icon: "squares-2x2",
+        active: current_page?(main_app.recordables_path)
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
         label: "Destinations",
         href: main_app.access_docs_path,
         icon: "lock-closed",

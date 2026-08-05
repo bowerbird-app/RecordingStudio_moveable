@@ -1,0 +1,15 @@
+<div class="space-y-8">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Recordables",
+    subtitle: "Recordable types registered by the demo application."
+  ) %>
+
+  <%= render FlatPack::Table::Component.new(data: @recordables) do |table| %>
+    <% table.column(title: "Type", html: ->(recordable) {
+         content_tag(:div, recordable.recordable_type_label, class: "font-medium text-(--surface-content-color)")
+       }) %>
+    <% table.column(title: "Model", html: ->(recordable) {
+         content_tag(:div, recordable.name, class: "text-(--surface-muted-content-color)")
+       }) %>
+  <% end %>
+</div>

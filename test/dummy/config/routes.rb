@@ -25,6 +25,7 @@ Rails.application.routes.draw do
   patch "workspace_selection", to: "workspace_selections#update", as: :workspace_selection
 
   get "data", to: "data#index", as: :data
+  get "recordables", to: "recordables#index", as: :recordables
 
   get "docs/access", to: "moveable_docs#access", as: :access_docs
   get "docs/setup", to: "moveable_docs#setup", as: :setup_docs

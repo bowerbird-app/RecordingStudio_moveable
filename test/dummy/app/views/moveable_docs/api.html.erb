@@ -1,34 +1,90 @@
 <div class="space-y-8">
   <%= render FlatPack::PageTitle::Component.new(
     title: "API action",
-    subtitle: "The optional RecordingStudioApi integration exposes move for Moveable-enabled recordables."
+    subtitle: "Expose the Moveable action only for recordables and API surfaces that are ready to authorize it."
+  ) %>
+
+  <%= render FlatPack::Button::Component.new(
+    text: "API docs",
+    style: :primary,
+    size: :sm,
+    url: moveable_api_scalar_docs_path,
+    data: { turbo: false }
   ) %>
 
   <section class="space-y-4">
-    <p class="text-sm text-[var(--surface-muted-content-color)]">
-      The API is an optional host-app dependency. Moveable registers its action only when
-      <code>RecordingStudioApi</code> is installed, and the API automatically exposes it for recordable types with
-      the <code>:movable</code> capability.
-    </p>
-
-    <%= render FlatPack::Button::Component.new(
-      text: "API scalar docs",
-      style: :secondary,
-      size: :sm,
-      url: moveable_api_scalar_docs_path,
-      data: { turbo: false }
+    <%= render FlatPack::SectionTitle::Component.new(
+      title: "Enable the action",
+      anchor_link: true,
+      anchor_id: "enable-action",
+      class: "my-0"
     ) %>
 
     <%= render FlatPack::CodeBlock::Component.new(
-      title: "Version profile",
+      title: "Recordable and public API setup",
       language: "ruby",
       code: <<~'CODE'
+        # app/models/recording_studio_page.rb
+        class RecordingStudioPage < ApplicationRecord
+          recording_studio_recordable(
+            label: "Page",
+            root: false,
+            allowed_parent_types: ["Workspace", "RecordingStudioFolder"]
+          )
+
+          include RecordingStudio::Capabilities::Moveable.enabled
+        end
+
         # config/initializers/recording_studio_api.rb
         RecordingStudioApi.configure do |config|
           config.version "v1" do |api|
             api.use :moveable, "~> 1.0"
           end
         end
+
+        RecordingStudioApi.register_recordable_type_api(
+          "RecordingStudioPage",
+          capability_actions: %i[move]
+        )
+      CODE
+    ) %>
+
+    <%= render FlatPack::Alert::Component.new(
+      title: "Checklist",
+      description: "The source recordable enables Moveable, its allowed parent types include the destination type, the active API version uses moveable 1.x, and the surface allowlists move. A missing step keeps the action unavailable.",
+      style: :info
+    ) %>
+  </section>
+
+  <section class="space-y-4">
+    <%= render FlatPack::SectionTitle::Component.new(
+      title: "Choose the API surface",
+      anchor_link: true,
+      anchor_id: "api-surface",
+      class: "my-0"
+    ) %>
+
+    <p class="text-sm text-(--surface-muted-content-color)">
+      Public and named APIs have separate action and recordable-type registries. Configuring one does not expose move on the other.
+    </p>
+
+    <%= render FlatPack::CodeBlock::Component.new(
+      title: "Named API allowlist",
+      language: "ruby",
+      code: <<~'CODE'
+        RecordingStudioApi.configure do |config|
+          config.api :operations do |api|
+            api.version "v1" do |version|
+              version.use :moveable, "~> 1.0"
+            end
+          end
+        end
+
+        RecordingStudioApi.register_recordable_type_api(
+          "RecordingStudioPage",
+          api: :operations,
+          capability_actions: %i[move]
+        )
       CODE
     ) %>
   </section>
@@ -52,21 +108,29 @@
       CODE
     ) %>
 
-    <p class="text-sm text-[var(--surface-muted-content-color)]">
-      <code>parent_id</code> is preferred; <code>destination_id</code> and <code>new_parent_id</code> remain
-      accepted for compatible clients. The handler checks the API access grant for edit access to both recordings
-      before it invokes Moveable's existing move behavior. Structural validation failures return 422; policy
-      denials return 403.
-    </p>
+    <%= render FlatPack::Alert::Component.new(
+      title: "Request requirements",
+      description: "parent_id is preferred; destination_id and new_parent_id remain accepted for compatible clients. The API access grant must include both recordings with edit access. The destination must be an allowed parent and within the source root unless Moveable enables cross-root moves.",
+      style: :info
+    ) %>
+
+    <%= render FlatPack::Alert::Component.new(
+      title: "Results",
+      description: "A successful move returns the reloaded recording. A destination outside the API grant is not found, policy denials return 403, and invalid structural moves return 422. Move metadata records the action, API client, and credential.",
+      style: :info
+    ) %>
+
   </section>
 
-  <p class="text-sm">
-    <%= link_to(
+  <%= render FlatPack::Alert::Component.new(
+    title: "Further reference",
+    description: link_to(
       "RecordingStudioApi capability-backed action contract",
       "https://github.com/bowerbird-app/RecordingStudio_api#capability-backed-actions",
       target: "_blank",
       rel: "noopener noreferrer",
       class: "underline"
-    ) %>
-  </p>
+    ),
+    style: :info
+  ) %>
 </div>
