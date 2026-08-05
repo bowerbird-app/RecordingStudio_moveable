@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_29_035318) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_03_072305) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -48,10 +48,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_035318) do
 
   create_table "recording_studio_api_api_clients", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "access_recording_id", null: false
+    t.string "api_key", default: "public", null: false
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.datetime "updated_at", null: false
     t.index ["access_recording_id"], name: "index_recording_studio_api_api_clients_on_access_recording_id", unique: true
+    t.index ["api_key"], name: "index_recording_studio_api_api_clients_on_api_key"
   end
 
   create_table "recording_studio_api_api_credentials", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -73,6 +75,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_035318) do
   end
 
   create_table "recording_studio_api_api_daily_latency_histogram_buckets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "api_key", default: "public", null: false
     t.datetime "created_at", null: false
     t.date "metric_date", null: false
     t.bigint "request_count", default: 0, null: false
@@ -81,12 +84,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_035318) do
     t.integer "status_class", null: false
     t.datetime "updated_at", null: false
     t.integer "upper_bound_ms", null: false
-    t.index ["metric_date", "route_name", "request_method", "status_class", "upper_bound_ms"], name: "index_rs_api_daily_latency_histogram_on_dimensions", unique: true
+    t.index ["api_key", "metric_date", "route_name", "request_method", "status_class", "upper_bound_ms"], name: "index_rs_api_daily_latency_histogram_on_dimensions", unique: true
     t.index ["metric_date"], name: "idx_on_metric_date_8723beba88"
   end
 
   create_table "recording_studio_api_api_daily_metrics", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "action_name"
+    t.string "api_key", default: "public", null: false
     t.bigint "client_error_count", default: 0, null: false
     t.string "controller_name"
     t.datetime "created_at", null: false
@@ -101,7 +105,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_035318) do
     t.bigint "server_error_count", default: 0, null: false
     t.integer "status_class", null: false
     t.datetime "updated_at", null: false
-    t.index ["metric_date", "route_name", "request_method", "status_class"], name: "index_rs_api_daily_metrics_on_dimensions", unique: true
+    t.index ["api_key", "metric_date", "route_name", "request_method", "status_class"], name: "index_rs_api_daily_metrics_on_dimensions", unique: true
     t.index ["metric_date"], name: "index_recording_studio_api_api_daily_metrics_on_metric_date"
   end
 
@@ -110,6 +114,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_035318) do
     t.string "action_name"
     t.uuid "api_client_id"
     t.uuid "api_credential_id"
+    t.string "api_key", default: "public", null: false
     t.string "controller_name"
     t.datetime "created_at", null: false
     t.integer "duration_ms", null: false
@@ -129,10 +134,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_035318) do
     t.string "user_agent"
     t.index ["api_client_id", "occurred_at"], name: "index_rs_api_request_logs_on_client_and_time"
     t.index ["api_credential_id", "occurred_at"], name: "index_rs_api_request_logs_on_credential_and_time"
+    t.index ["api_key", "occurred_at"], name: "index_rs_api_request_logs_on_api_and_time"
     t.index ["occurred_at"], name: "index_recording_studio_api_api_request_logs_on_occurred_at"
     t.index ["request_id"], name: "index_recording_studio_api_api_request_logs_on_request_id"
     t.index ["request_path"], name: "index_recording_studio_api_api_request_logs_on_request_path"
     t.index ["status_code"], name: "index_recording_studio_api_api_request_logs_on_status_code"
+  end
+
+  create_table "recording_studio_api_api_settings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.boolean "api_access_enabled", default: true, null: false
+    t.datetime "created_at", null: false
+    t.string "key", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_recording_studio_api_api_settings_on_key", unique: true
   end
 
   create_table "recording_studio_archive_boxes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

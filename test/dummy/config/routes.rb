@@ -25,16 +25,23 @@ Rails.application.routes.draw do
   patch "workspace_selection", to: "workspace_selections#update", as: :workspace_selection
 
   get "data", to: "data#index", as: :data
+  get "recordables", to: "recordables#index", as: :recordables
 
   get "docs/access", to: "moveable_docs#access", as: :access_docs
   get "docs/setup", to: "moveable_docs#setup", as: :setup_docs
   get "docs/methods", to: "moveable_docs#methods", as: :methods_docs
   get "docs/redirects", to: "moveable_docs#redirects", as: :redirects_docs
   get "docs/api", to: "moveable_docs#api", as: :api_docs
-  get "recording_studio_api/docs/scalar", to: "moveable_docs#scalar", as: :scalar_docs
-  get "recording_studio_api/openapi/v1.json", to: "moveable_docs#openapi", as: :recording_studio_api_openapi
 
   resources :events, only: :index
   resources :recording_studio_folders, only: :show
   resources :recording_studio_pages, only: :show
+
+  # BEGIN RecordingStudioApi Scalar docs: moveable_api
+  recording_studio_api_scalar_docs_for :public,
+    at: "/recording_studio_api/docs/scalar",
+    as: :moveable_api_scalar_docs,
+    engine_mount_path: "/recording_studio_api"
+  # END RecordingStudioApi Scalar docs: moveable_api
+
 end

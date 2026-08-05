@@ -4,13 +4,13 @@ source "https://rubygems.org"
 gem "recording_studio_moveable", path: "../.."
 
 # RecordingStudio engine
-gem "recording_studio", "~> 3.0", github: "bowerbird-app/RecordingStudio", tag: "recording_studio/v3.0.0"
+gem "recording_studio", "~> 3.0", github: "bowerbird-app/RecordingStudio", tag: "v3.0.3"
 gem "recording_studio_accessible", "~> 0.3", github: "bowerbird-app/RecordingStudio_accessible", tag: "0.3.1"
 # RecordingStudioApi's generated browser administration integration requires this engine.
 gem "recording_studio_admin", github: "bowerbird-app/RecordingStudio_admin", tag: "1.1.0"
 # The API engine is intentionally scoped to the dummy app. Moveable remains usable
 # without it and registers its API action only when this optional integration is loaded.
-gem "recording_studio_api", github: "bowerbird-app/RecordingStudio_api", tag: "0.1.0"
+gem "recording_studio_api", github: "bowerbird-app/RecordingStudio_api", tag: "0.2.0"
 
 # Devise authentication
 gem "devise"

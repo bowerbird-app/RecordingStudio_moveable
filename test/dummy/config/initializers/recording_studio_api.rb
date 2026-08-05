@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 RecordingStudioApi.configure do |config|
-  config.admin_root_recordable_type_names = ["Workspace"]
+  # API administration roots are intentionally separate from public API resources in 0.2.
+  # This focused dummy has no dedicated API administration root.
+  config.admin_root_recordable_type_names = []
 
   # Optional title shown in generated OpenAPI/Scalar docs.
   # Defaults to your Rails application module name (for example: Dummy).
@@ -54,3 +56,14 @@ RecordingStudioApi.configure do |config|
   # config.api_request_log_retention_days = 30
   # config.api_daily_metric_retention_days = nil
 end
+
+# RecordingStudio API 0.2 defaults custom capability actions to denied. Opt in
+# only the recordable types that should expose Moveable's API action.
+RecordingStudioApi.register_recordable_type_api(
+  "RecordingStudioFolder",
+  capability_actions: %i[move]
+)
+RecordingStudioApi.register_recordable_type_api(
+  "RecordingStudioPage",
+  capability_actions: %i[move]
+)

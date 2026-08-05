@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- No unreleased changes yet.
+## [2.1.1] - 2026-08-05
+
+### Changed
+- Upgrade the dummy application and optional integration documentation to RecordingStudio API 0.2.0.
+- Use RecordingStudio API's gem-owned, authenticated Scalar documentation surface in the dummy application.
+- Register Moveable's action independently on public and named API 0.2.0 surfaces and filter named-route keys.
 
 ## [2.1.0] - 2026-07-29
 
@@ -49,7 +54,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.1.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.1.1...HEAD
+[2.1.1]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v1.0.0...2.0.0
 [1.0.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v0.1.0...v1.0.0

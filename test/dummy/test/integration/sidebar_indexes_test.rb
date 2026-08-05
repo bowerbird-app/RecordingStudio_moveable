@@ -20,6 +20,7 @@ class SidebarIndexesTest < ActionDispatch::IntegrationTest
     assert_not_includes response.body, "Pages Recordables"
     assert_includes response.body, "Events"
     assert_includes response.body, "Data"
+    assert_includes response.body, "Recordables"
     assert_not_includes response.body, "Moveable Docs"
     assert_includes response.body, "Destinations"
     assert_includes response.body, "Setup"
@@ -51,6 +52,14 @@ class SidebarIndexesTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "sidebar@example.com"
     assert_includes response.body, "No users"
     assert_includes response.body, "Archive Box A"
+
+    get recordables_path
+    assert_response :success
+    assert_includes response.body, "Recordables"
+    assert_includes response.body, "Workspace"
+    assert_includes response.body, "Folder"
+    assert_includes response.body, "Page"
+    assert_includes response.body, "Archive box"
 
     get access_docs_path
     assert_response :success
@@ -89,22 +98,30 @@ class SidebarIndexesTest < ActionDispatch::IntegrationTest
     get api_docs_path
     assert_response :success
     assert_includes response.body, "API action"
-    assert_includes response.body, "RecordingStudioApi integration"
+    assert_includes response.body, "Enable the action"
+    assert_includes response.body, "include RecordingStudio::Capabilities::Moveable.enabled"
     assert_includes response.body, "api.use :moveable"
+    assert_includes response.body, "capability_actions: %i[move]"
+    assert_includes response.body, "Choose the API surface"
+    assert_includes response.body, "Public and named APIs have separate action"
+    assert_includes response.body, "Request requirements"
+    assert_includes response.body, "A successful move returns the reloaded recording"
     assert_includes response.body, "/actions/move"
-    assert_includes response.body, "API scalar docs"
+    assert_includes response.body, "API docs"
     assert_includes response.body, "/recording_studio_api/docs/scalar"
     assert_includes response.body, 'data-turbo="false"'
+    assert_match(/API action.*API docs.*Enable the action/m, response.body)
+    assert_match(/button-primary-background-color.*API docs/m, response.body)
     assert_includes response.body, "RecordingStudioApi capability-backed action contract"
 
-    get scalar_docs_path
+    get moveable_api_scalar_docs_version_path(version: "v1")
     assert_response :success
-    assert_includes response.body, "@scalar/api-reference"
-    assert_includes response.body, 'id="api-reference"'
-    assert_includes response.body, "data-url="
-    assert_includes response.body, recording_studio_api_openapi_path(format: :json)
+    assert_includes response.body, "Interactive API explorer"
+    assert_includes response.body, 'id="scalar-api-reference"'
+    assert_includes response.body, "recording_studio_api/scalar-1.64.0"
+    assert_includes response.body, moveable_api_scalar_docs_openapi_path(version: "v1")
 
-    get recording_studio_api_openapi_path(format: :json)
+    get moveable_api_scalar_docs_openapi_path(version: "v1")
     assert_response :success
     openapi_paths = JSON.parse(response.body).fetch("paths")
     folder_move = openapi_paths.fetch(
@@ -115,6 +132,10 @@ class SidebarIndexesTest < ActionDispatch::IntegrationTest
     ).fetch("post")
     assert_equal ["Recording Studio Folder"], folder_move.fetch("tags")
     assert_equal ["Recording Studio Page"], page_move.fetch("tags")
+    request_properties = page_move.dig("requestBody", "content", "application/json", "schema", "properties")
+    assert_equal %w[destination_id new_parent_id parent_id], request_properties.keys.sort
+    refute_includes request_properties, "api_key"
+    refute_includes request_properties, "api_version"
     refute_includes openapi_paths.values.flat_map(&:values).flat_map { |operation| operation.fetch("tags", []) },
                     "Moveable"
 

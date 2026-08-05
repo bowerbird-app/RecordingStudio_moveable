@@ -26,12 +26,18 @@ class MoveableApiActionTest < ActiveSupport::TestCase
     assert_equal RecordingStudio::Moveable::Api::MoveRecording, action.handler
     assert_equal RecordingStudioApi::Serializers::ResourceRecordingSerializer, action.serializer
 
-    accepted = action.input_contract.call(destination_id: "destination-id")
+    accepted = action.input_contract.call(
+      destination_id: "destination-id",
+      api_key: "public",
+      api_version: "v1"
+    )
     rejected = action.input_contract.call(destination_id: "destination-id", unapproved: "value")
 
     assert_predicate accepted, :success?
     refute_predicate rejected, :success?
     assert_includes rejected.errors, "Unknown parameters: unapproved"
+    refute_includes action.input_contract.as_json.fetch(:fields), :api_key
+    refute_includes action.input_contract.as_json.fetch(:fields), :api_version
   end
 
   test "exposes move only for Moveable-enabled recordable types" do
