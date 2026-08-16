@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* FlatPack::Grid builds responsive column classes dynamically; keep them safelisted. */
+@source inline("grid grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4 grid-cols-6 grid-cols-12 sm:grid-cols-2 md:grid-cols-2 md:grid-cols-3 md:grid-cols-4 md:grid-cols-6 lg:grid-cols-2 lg:grid-cols-3 lg:grid-cols-4 lg:grid-cols-6 lg:grid-cols-12 xl:grid-cols-4 gap-2 gap-4 gap-6 items-start items-center items-stretch w-5 h-5");
+
 /* Include RecordingStudioApi engine views for Tailwind CSS */
 @source "../../vendor/bundle/**/recording_studio_api/app/views/**/*.erb";
 @source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/recording_studio_api-*/app/views/**/*.erb";

@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** August 3, 2026
+> *   **Last Updated:** August 16, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -104,7 +104,7 @@ bin/rails generate recording_studio_api:scalar_docs moveable_api \
 bin/rails db:migrate
 ```
 
-RecordingStudio API 0.2.0 also requires each root type that may receive API access to enable
+RecordingStudio API 0.4.0 also requires each root type that may receive API access to enable
 `RecordingStudio.enable_capability(:api_access_point, on: self)` alongside `:accessible`.
 
 Configure API version profiles with `api.use :moveable, "~> 1.0"` when the host uses profiles, and explicitly

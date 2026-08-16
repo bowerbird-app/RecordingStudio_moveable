@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RecordingStudioApi.configure do |config|
-  # API administration roots are intentionally separate from public API resources in 0.2.
+  # API administration roots are intentionally separate from public API resources.
   # This focused dummy has no dedicated API administration root.
   config.admin_root_recordable_type_names = []
 
@@ -30,6 +30,8 @@ RecordingStudioApi.configure do |config|
   end
 
   # Recommended Redis-backed rate limiting for production API installs.
+  # RecordingStudio API 0.4.0 enables authenticated API rate limiting by default and
+  # fail-closes the `api` bucket. Keep those off in this dummy except production.
   config.rate_limit_redis_url = ENV.fetch("RECORDING_STUDIO_API_RATE_LIMIT_REDIS_URL", nil)
   config.rate_limit_redis_namespace = "recording_studio_api"
   config.rate_limit_oauth_enabled = Rails.env.production?
@@ -46,6 +48,10 @@ RecordingStudioApi.configure do |config|
   config.rate_limit_fail_closed = Rails.env.production?
   config.rate_limit_fail_closed_buckets = %w[oauth api_pre_auth]
 
+  # Dummy tests provision public API clients via access-point grants without an AdminApi ACL.
+  # Host apps should keep the gem default (true) unless they intentionally want open public management.
+  config.api_management_authorization_required = false
+
   # Optional: log API requests to the API request log database
   # config.api_request_logging_enabled = true
   # Use "filtered_params" only when request parameter retention is required.
@@ -57,13 +63,20 @@ RecordingStudioApi.configure do |config|
   # config.api_daily_metric_retention_days = nil
 end
 
-# RecordingStudio API 0.2 defaults custom capability actions to denied. Opt in
-# only the recordable types that should expose Moveable's API action.
+# RecordingStudio API 0.4.0 defaults custom capability actions to denied. Opt in
+# only the recordable types that should expose Moveable's API action, and declare
+# the serializer keys the flat recording contract is allowed to emit.
 RecordingStudioApi.register_recordable_type_api(
   "RecordingStudioFolder",
+  serializer: ->(folder, **) { { name: folder.name } },
+  output_keys: %i[name],
+  writable_attributes: %i[name],
   capability_actions: %i[move]
 )
 RecordingStudioApi.register_recordable_type_api(
   "RecordingStudioPage",
+  serializer: ->(page, **) { { title: page.title } },
+  output_keys: %i[title],
+  writable_attributes: %i[title],
   capability_actions: %i[move]
 )

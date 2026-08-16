@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** August 3, 2026
+> *   **Last Updated:** August 16, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -10,7 +10,7 @@
 
 `recording_studio_moveable` works without `recording_studio_api`. When the host application installs
 `RecordingStudioApi`, Moveable registers a member `move` action for the `:movable` capability during engine
-initialization. With RecordingStudio API 0.2.0, it registers the action independently in the public API and every
+initialization. With RecordingStudio API 0.4.0, it registers the action independently in the public API and every
 configured named API without replacing actions already registered by the host or another addon.
 
 The action contract is version `1.0.0`, uses `POST`, and requires `:edit`. A surface exposes it only when the
@@ -43,8 +43,8 @@ Add the API and its browser-administration dependency to the **host application'
 intentionally not dependencies of this gem.
 
 ```ruby
-gem "recording_studio_api", github: "bowerbird-app/RecordingStudio_api", tag: "0.2.0"
-gem "recording_studio_admin", github: "bowerbird-app/RecordingStudio_admin", tag: "1.1.0"
+gem "recording_studio_api", github: "bowerbird-app/RecordingStudio_api", tag: "0.4.0"
+gem "recording_studio_admin", github: "bowerbird-app/RecordingStudio_admin", tag: "1.2.0"
 ```
 
 Then run the API generators from the host application directory:
@@ -58,7 +58,7 @@ bin/rails db:migrate
 The install generator mounts `RecordingStudioApi::Engine`, creates its initializer, and configures Tailwind when
 applicable. The migrations generator copies the API engine migrations into the host application.
 
-RecordingStudio API 0.2.0 provides gem-owned Scalar documentation. Install a named reference instead of copying
+RecordingStudio API 0.4.0 provides gem-owned Scalar documentation. Install a named reference instead of copying
 or maintaining Scalar controllers and views in the host application:
 
 ```bash
@@ -96,17 +96,23 @@ end
 
 RecordingStudioApi.register_recordable_type_api(
   "RecordingStudioFolder",
+  serializer: ->(folder, **) { { name: folder.name } },
+  output_keys: %i[name],
+  writable_attributes: %i[name],
   capability_actions: %i[move]
 )
 RecordingStudioApi.register_recordable_type_api(
   "RecordingStudioPage",
+  serializer: ->(page, **) { { title: page.title } },
+  output_keys: %i[title],
+  writable_attributes: %i[title],
   capability_actions: %i[move]
 )
 ```
 
-RecordingStudio API 0.2.0 uses a default-deny allowlist for custom capability actions. Register `:move` only for
-the recordable types that should publish Moveable's action. The underlying `:movable` capability and the API
-authorization checks are still required.
+RecordingStudio API 0.4.0 uses a default-deny allowlist for custom capability actions and a flat recording
+response contract. Register `:move` only for the recordable types that should publish Moveable's action.
+The underlying `:movable` capability and the API authorization checks are still required.
 
 Named APIs have independent action and recordable-type registries. Configure the named surface and allowlist
 `:move` on that surface explicitly:
@@ -126,6 +132,8 @@ end
 RecordingStudioApi.register_recordable_type_api(
   "RecordingStudioPage",
   api: :operations,
+  serializer: ->(page, **) { { title: page.title } },
+  output_keys: %i[title],
   capability_actions: %i[move]
 )
 ```
@@ -148,8 +156,9 @@ Authorization: ******
 `parent_id` is preferred. `destination_id` and `new_parent_id` are supported aliases for existing clients.
 All other input keys are rejected. The handler limits destination lookup to the API access grant's accessible
 recordings and authorizes `:edit` access to both the source and destination before calling `move_to!`. It records
-the API action, API client ID, and credential ID as move metadata and returns the reloaded recording for API
-serialization.
+the API action, API client ID, and credential ID as move metadata and returns the reloaded recording using
+API 0.4.0's flat recording contract (`id`, `type`, `parent_id`, `root_id`, timestamps, plus registered
+serializer keys). Errors use a nested `{ "error": { "code", "message" } }` object.
 
 Structural move failures, including self/descendant destinations, invalid parent types, and prohibited
 cross-root moves, return `422 Unprocessable Entity`. Move policy denials return `403 Forbidden`.
