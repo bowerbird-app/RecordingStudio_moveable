@@ -37,9 +37,10 @@ class MoveableApiActionsTest < ActionDispatch::IntegrationTest
     post move_action_path(@page), params: { parent_id: @target_folder.id }, headers: @headers
 
     assert_response :success
-    payload = JSON.parse(response.body).fetch("data")
+    payload = JSON.parse(response.body)
     assert_equal @page.id, payload.fetch("id")
     assert_equal @target_folder.id, payload.fetch("parent_id")
+    assert_equal "Move page", payload.fetch("title")
     assert_equal @target_folder.id, @page.reload.parent_recording_id
   end
 
@@ -51,9 +52,10 @@ class MoveableApiActionsTest < ActionDispatch::IntegrationTest
          headers: @headers
 
     assert_response :unprocessable_entity
-    payload = JSON.parse(response.body)
-    assert_equal "Invalid input for action move", payload.fetch("error")
-    assert_includes payload.fetch("details"), "Unknown parameters: unapproved"
+    error = JSON.parse(response.body).fetch("error")
+    assert_equal "invalid_input", error.fetch("code")
+    assert_equal "Invalid input for action move", error.fetch("message")
+    assert_includes error.fetch("details"), "Unknown parameters: unapproved"
     assert_equal original_parent_id, @page.reload.parent_recording_id
   end
 
@@ -63,9 +65,10 @@ class MoveableApiActionsTest < ActionDispatch::IntegrationTest
     post move_action_path(@source_folder), params: { parent_id: @source_folder.id }, headers: @headers
 
     assert_response :unprocessable_entity
-    payload = JSON.parse(response.body)
-    assert_equal "Cannot move a recording under itself", payload.fetch("error")
-    assert_equal ["Cannot move a recording under itself"], payload.fetch("details")
+    error = JSON.parse(response.body).fetch("error")
+    assert_equal "invalid_input", error.fetch("code")
+    assert_equal "Cannot move a recording under itself", error.fetch("message")
+    assert_equal ["Cannot move a recording under itself"], error.fetch("details")
     assert_equal original_parent_id, @source_folder.reload.parent_recording_id
   end
 
@@ -75,7 +78,8 @@ class MoveableApiActionsTest < ActionDispatch::IntegrationTest
     post move_action_path(@source_folder), params: { parent_id: @child_folder.id }, headers: @headers
 
     assert_response :unprocessable_entity
-    assert_equal "Cannot move a recording under its descendant", JSON.parse(response.body).fetch("error")
+    assert_equal "Cannot move a recording under its descendant",
+                 JSON.parse(response.body).dig("error", "message")
     assert_equal original_parent_id, @source_folder.reload.parent_recording_id
   end
 
@@ -85,7 +89,7 @@ class MoveableApiActionsTest < ActionDispatch::IntegrationTest
     post move_action_path(@page), params: { parent_id: @archive_box.id }, headers: @headers
 
     assert_response :unprocessable_entity
-    assert_match(/cannot be recorded under/, JSON.parse(response.body).fetch("error"))
+    assert_match(/cannot be recorded under/, JSON.parse(response.body).dig("error", "message"))
     assert_equal original_parent_id, @page.reload.parent_recording_id
   end
 
@@ -99,7 +103,9 @@ class MoveableApiActionsTest < ActionDispatch::IntegrationTest
     post move_action_path(@source_folder), params: { parent_id: @target_folder.id }, headers: @headers
 
     assert_response :forbidden
-    assert_equal "Move authorization hook denied this move", JSON.parse(response.body).fetch("error")
+    error = JSON.parse(response.body).fetch("error")
+    assert_equal "forbidden", error.fetch("code")
+    assert_equal "Move authorization hook denied this move", error.fetch("message")
     assert_equal original_parent_id, @source_folder.reload.parent_recording_id
   end
 

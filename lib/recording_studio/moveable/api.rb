@@ -85,7 +85,7 @@ module RecordingStudio
         end
 
         def route_parameter_filtering_contract
-          # API 0.2 forwards these named-route keys to action contracts. Filter
+          # API 0.2+ forwards these named-route keys to action contracts. Filter
           # them here because declared contract fields become OpenAPI body fields.
           Class.new(RecordingStudioApi::ActionInputContract) do
             define_method(:call) do |raw_params|

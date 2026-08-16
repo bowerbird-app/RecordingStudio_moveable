@@ -44,6 +44,9 @@
 
         RecordingStudioApi.register_recordable_type_api(
           "RecordingStudioPage",
+          serializer: ->(page, **) { { title: page.title } },
+          output_keys: %i[title],
+          writable_attributes: %i[title],
           capability_actions: %i[move]
         )
       CODE
@@ -83,6 +86,8 @@
         RecordingStudioApi.register_recordable_type_api(
           "RecordingStudioPage",
           api: :operations,
+          serializer: ->(page, **) { { title: page.title } },
+          output_keys: %i[title],
           capability_actions: %i[move]
         )
       CODE
@@ -116,7 +121,7 @@
 
     <%= render FlatPack::Alert::Component.new(
       title: "Results",
-      description: "A successful move returns the reloaded recording. A destination outside the API grant is not found, policy denials return 403, and invalid structural moves return 422. Move metadata records the action, API client, and credential.",
+      description: "A successful move returns the reloaded recording in API 0.4.0's flat contract. A destination outside the API grant is not found, policy denials return 403, and invalid structural moves return 422. Errors use a nested error object. Move metadata records the action, API client, and credential.",
       style: :info
     ) %>
 

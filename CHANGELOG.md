@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.2] - 2026-08-16
+
+### Changed
+- Pin development and dummy bundles to RecordingStudio Accessible 0.3.2, RecordingStudio Admin 1.2.0, FlatPack 0.1.129, and RecordingStudio API 0.4.0.
+- Upgrade the dummy application and optional integration documentation to RecordingStudio API 0.4.0's flat recording contract and nested error payload.
+- Align the gem development FlatPack pin with the dummy app instead of tracking untagged `main`.
+- Refresh public development and dummy gem lockfiles, including Puma 8.
+
 ## [2.1.1] - 2026-08-05
 
 ### Changed
@@ -54,7 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.1.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.1.2...HEAD
+[2.1.2]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.1.1...2.1.2
 [2.1.1]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v1.0.0...2.0.0

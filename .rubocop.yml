@@ -14,6 +14,14 @@ Style/StringLiterals:
   Enabled: true
   EnforcedStyle: double_quotes
 
+# RuboCop 1.89+ flags addon files that intentionally share a namespace across
+# a public RecordingStudio module and the engine module in one file.
+Style/OneClassPerFile:
+  Enabled: false
+
+Style/EmptyClassDefinition:
+  Enabled: false
+
 Layout/LineLength:
   Max: 120
 
