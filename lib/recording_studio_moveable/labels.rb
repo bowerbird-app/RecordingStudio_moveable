@@ -108,6 +108,8 @@ module RecordingStudioMoveable
   end
 end
 
+# Prefer RecordingStudio core Labels when present (RecordingStudio 4+).
+# Keep this addon helper as a fallback for hosts that have not loaded core Labels yet.
 module RecordingStudio
   Labels = RecordingStudioMoveable::Labels unless const_defined?(:Labels, false)
 end

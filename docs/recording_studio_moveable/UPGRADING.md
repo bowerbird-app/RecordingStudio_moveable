@@ -1,6 +1,49 @@
+# Upgrading RecordingStudio Moveable
+
+## Upgrading to Moveable 3.0 / RecordingStudio 4
+
+Moveable 3.0 requires RecordingStudio `~> 4.0` and Accessible `~> 0.6`. Move behavior itself is unchanged: destination parent types still come from core declarations, and Moveable still owns same-root / cross-root rules, authorization, UI, and move event logging.
+
+### Dependency bump
+
+```ruby
+gem "recording_studio", "~> 4.0"
+gem "recording_studio_accessible", "~> 0.6"
+gem "recording_studio_moveable", "~> 3.0"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.132"
+```
+
+Stay on Moveable `2.1.x` if the host must remain on RecordingStudio 3.
+
+### RecordingStudio 4 host steps
+
+1. Run `bin/rails generate recording_studio:migrations` and `bin/rails db:migrate` so the harden / unique-root indexes are installed.
+2. Replace any reliance on Recording's old implicit newest-first order with `.recent` or an explicit `order:`.
+3. Keep Event history append-only; use SQL `delete_all` for intentional purges.
+4. Configure Accessible actor allowlisting before creating new grants:
+
+```ruby
+RecordingStudioAccessible.configure do |config|
+  config.access_actor_types = ["User"]
+end
+```
+
+### Optional API
+
+Moveable still registers an optional `move` action when `recording_studio_api` is present. Re-enable that engine in host apps only after API declares RecordingStudio `~> 4.0`. Until then, keep Moveable UI and Accessible authorization as the supported path.
+
+### FlatPack notes
+
+Hosts on FlatPack `0.1.132+` should use:
+
+- `FlatPack::Sidebar::Item::Component` with `text:` (not `label:`)
+- `FlatPack::PageNav::Component` with `secondary_anchor_href:` / `anchor_href:` (not `anchor_url:`)
+
+---
+
 # Upgrading RecordingStudio Moveable for RecordingStudio 3
 
-The next RecordingStudio Moveable compatibility release targets RecordingStudio core V3. Moveable no longer defines destination parent types.
+The RecordingStudio Moveable 2.x line targets RecordingStudio core V3. Moveable no longer defines destination parent types.
 
 ## What changed
 

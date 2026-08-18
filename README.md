@@ -30,10 +30,10 @@
 Add to your Gemfile:
 
 ```ruby
-gem "recording_studio", "~> 3.0"
-gem "recording_studio_accessible", "~> 0.3"
+gem "recording_studio", "~> 4.0"
+gem "recording_studio_accessible", "~> 0.6"
 gem "recording_studio_moveable"
-gem "flat_pack", github: "bowerbird-app/flatpack"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.132"
 ```
 
 Then bundle install and mount the moveable engine UI routes:
@@ -85,7 +85,7 @@ This addon registers `:movable` without a legacy feature gate so it can continue
 
 ### Default (built-in) mode
 
-Install `recording_studio_accessible` `~> 0.3` and enable the Accessible capability on root recordables that should accept direct access grants. In this mode:
+Install `recording_studio_accessible` `~> 0.6` and enable the Accessible capability on root recordables that should accept direct access grants. Configure `config.access_actor_types` before creating new grants. In this mode:
 
 - source requires `:edit`
 - destination requires `:edit`
@@ -180,7 +180,7 @@ The addon enforces access checks inside the gem-owned move controller.
 
 ## Dummy app demo
 
-The dummy app explicitly installs `recording_studio` `~> 3.0`, `recording_studio_accessible` `~> 0.3`, and `recording_studio_moveable`. It includes:
+The dummy app explicitly installs `recording_studio` `~> 4.0`, `recording_studio_accessible` `~> 0.6`, and `recording_studio_moveable`. It includes:
 
 - `Workspace` root recordable
 - `RecordingStudioFolder` and `RecordingStudioPage` (move-enabled)

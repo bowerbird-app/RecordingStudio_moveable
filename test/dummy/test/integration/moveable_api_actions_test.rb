@@ -5,6 +5,8 @@ require_relative "../test_helper"
 class MoveableApiActionsTest < ActionDispatch::IntegrationTest
   def setup
     super
+    skip "recording_studio_api is deferred until it supports RecordingStudio 4" unless defined?(RecordingStudioApi)
+
     clear_api_records!
 
     @user = create_user(email: "move-api@example.com")

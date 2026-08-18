@@ -98,6 +98,7 @@ class SidebarIndexesTest < ActionDispatch::IntegrationTest
     get api_docs_path
     assert_response :success
     assert_includes response.body, "API action"
+    assert_includes response.body, "Demo note"
     assert_includes response.body, "Enable the action"
     assert_includes response.body, "include RecordingStudio::Capabilities::Moveable.enabled"
     assert_includes response.body, "api.use :moveable"
@@ -107,37 +108,8 @@ class SidebarIndexesTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Request requirements"
     assert_includes response.body, "A successful move returns the reloaded recording"
     assert_includes response.body, "/actions/move"
-    assert_includes response.body, "API docs"
-    assert_includes response.body, "/recording_studio_api/docs/scalar"
-    assert_includes response.body, 'data-turbo="false"'
-    assert_match(/API action.*API docs.*Enable the action/m, response.body)
-    assert_match(/button-primary-background-color.*API docs/m, response.body)
     assert_includes response.body, "RecordingStudioApi capability-backed action contract"
-
-    get moveable_api_scalar_docs_version_path(version: "v1")
-    assert_response :success
-    assert_includes response.body, "Interactive API explorer"
-    assert_includes response.body, 'id="scalar-api-reference"'
-    assert_includes response.body, "recording_studio_api/scalar-1.64.0"
-    assert_includes response.body, moveable_api_scalar_docs_openapi_path(version: "v1")
-
-    get moveable_api_scalar_docs_openapi_path(version: "v1")
-    assert_response :success
-    openapi_paths = JSON.parse(response.body).fetch("paths")
-    folder_move = openapi_paths.fetch(
-      "/recording_studio_api/api/v1/recording_studio_folders/{id}/actions/move"
-    ).fetch("post")
-    page_move = openapi_paths.fetch(
-      "/recording_studio_api/api/v1/recording_studio_pages/{id}/actions/move"
-    ).fetch("post")
-    assert_equal ["Recording Studio Folder"], folder_move.fetch("tags")
-    assert_equal ["Recording Studio Page"], page_move.fetch("tags")
-    request_properties = page_move.dig("requestBody", "content", "application/json", "schema", "properties")
-    assert_equal %w[destination_id new_parent_id parent_id], request_properties.keys.sort
-    refute_includes request_properties, "api_key"
-    refute_includes request_properties, "api_version"
-    refute_includes openapi_paths.values.flat_map(&:values).flat_map { |operation| operation.fetch("tags", []) },
-                    "Moveable"
+    assert_not_includes response.body, "/recording_studio_api/docs/scalar"
 
     get "/docs/moveable"
     assert_response :not_found

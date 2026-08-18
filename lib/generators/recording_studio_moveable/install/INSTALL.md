@@ -6,12 +6,14 @@ The engine has been mounted at /recording_studio_moveable in your application.
 
 The default authorization mode expects `recording_studio_accessible` to be installed.
 If you want built-in move authorization instead of a custom authorization hook:
-1. Add `gem "recording_studio", "~> 3.0"` and `gem "recording_studio_accessible", "~> 0.3"` to your Gemfile
+1. Add `gem "recording_studio", "~> 4.0"` and `gem "recording_studio_accessible", "~> 0.6"` to your Gemfile
 2. Run `bin/rails generate recording_studio_accessible:install`
 3. Run `bin/rails generate recording_studio_accessible:migrations`
-4. Run `bin/rails db:migrate`
-5. Enable `RecordingStudio.enable_capability(:accessible, on: self)` on root recordables that should accept direct access grants
-6. Expose your acting principal through `Current.actor` or configure
+4. Run `bin/rails generate recording_studio:migrations`
+5. Run `bin/rails db:migrate`
+6. Enable `RecordingStudio.enable_capability(:accessible, on: self)` on root recordables that should accept direct access grants
+7. Configure `RecordingStudioAccessible.configure { |config| config.access_actor_types = ["User"] }` (or your actor allowlist)
+8. Expose your acting principal through `Current.actor` or configure
    `RecordingStudioMoveable.configure { |config| config.current_actor_resolver = ->(controller:) { controller.current_user } }`
 
 In built-in mode, RecordingStudioMoveable resolves roles through Recording Studio Accessible's public query APIs, even when Accessible is running in compatibility mode on top of existing `recording_studio` access tables.

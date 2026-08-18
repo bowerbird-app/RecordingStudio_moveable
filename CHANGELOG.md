@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-08-18
+
+### Breaking
+- Require RecordingStudio `~> 4.0` and RecordingStudioAccessible `~> 0.6`, dropping compatibility with RecordingStudio 3.x / Accessible 0.3–0.5.
+- Host apps must install RecordingStudio 4's harden / unique-root indexes and configure Accessible `access_actor_types` before granting access.
+
+### Changed
+- Pin development and dummy bundles to RecordingStudio `v4.0.0`, Accessible `0.6.0`, Admin `1.2.0`, and FlatPack `v0.1.132`.
+- Prefer RecordingStudio core Labels when present; keep the Moveable Labels helper as a fallback.
+- Update move PageNav usage for FlatPack's `secondary_anchor_href` API.
+- Defer the optional RecordingStudio API dummy integration until that gem declares RecordingStudio `~> 4.0`. The Moveable API adapter remains and still registers when the API engine is loaded.
+
+### Upgrade Notes
+- See [docs/recording_studio_moveable/UPGRADING.md](docs/recording_studio_moveable/UPGRADING.md) for the RecordingStudio 4 path.
+- Stay on Moveable `2.1.x` while remaining on RecordingStudio 3.
+
 ## [2.1.1] - 2026-08-05
 
 ### Changed
@@ -54,7 +70,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.1.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.0.0...HEAD
+[3.0.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.1.1...3.0.0
 [2.1.1]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v1.0.0...2.0.0

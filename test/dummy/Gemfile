@@ -4,13 +4,16 @@ source "https://rubygems.org"
 gem "recording_studio_moveable", path: "../.."
 
 # RecordingStudio engine
-gem "recording_studio", "~> 3.0", github: "bowerbird-app/RecordingStudio", tag: "v3.0.3"
-gem "recording_studio_accessible", "~> 0.3", github: "bowerbird-app/RecordingStudio_accessible", tag: "0.3.1"
-# RecordingStudioApi's generated browser administration integration requires this engine.
-gem "recording_studio_admin", github: "bowerbird-app/RecordingStudio_admin", tag: "1.1.0"
-# The API engine is intentionally scoped to the dummy app. Moveable remains usable
-# without it and registers its API action only when this optional integration is loaded.
-gem "recording_studio_api", github: "bowerbird-app/RecordingStudio_api", tag: "0.2.0"
+gem "recording_studio", "~> 4.0", github: "bowerbird-app/RecordingStudio", tag: "v4.0.0"
+# Accessible 0.6.0 (RecordingStudio 4 support) — pin the release branch until the tag ships.
+gem "recording_studio_accessible", "~> 0.6",
+    github: "bowerbird-app/RecordingStudio_accessible",
+    branch: "cursor/support-recording-studio-4-8e1e"
+# RecordingStudio Admin stays on Accessible ~> 0.3 which accepts 0.6.x (< 1.0).
+gem "recording_studio_admin", github: "bowerbird-app/RecordingStudio_admin", tag: "1.2.0"
+# RecordingStudio API still requires recording_studio ~> 3.0, so it is deferred until
+# that gem declares RecordingStudio 4 support. Moveable's optional API adapter remains
+# in the gem and registers only when the API engine is loaded.
 
 # Devise authentication
 gem "devise"
@@ -36,8 +39,7 @@ gem "jbuilder"
 gem "tailwindcss-rails"
 
 # FlatPack UI component library [https://github.com/bowerbird-app/flatpack]
-# RecordingStudioApi's generated administration surface requires this compatible release.
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.124"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.132"
 gem "recording_studio_icons", github: "bowerbird-app/RecordingStudio_icons"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
@@ -57,7 +59,7 @@ gem "bootsnap", require: false
 # Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
 gem "kamal", require: false
 
-# Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
+# Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster]
 gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
@@ -67,14 +69,15 @@ group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
   gem "minitest", "~> 5.26"
+  gem "minitest-mock"
 
   # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
   gem "bundler-audit", require: false
 
-  # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
+  # Static analysis for security vulnerabilities [https://brakemanscanner.org]
   gem "brakeman", require: false
 
-  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
+  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase]
   gem "rubocop-rails-omakase", require: false
 end
 

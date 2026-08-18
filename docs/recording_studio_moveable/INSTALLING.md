@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** August 3, 2026
+> *   **Last Updated:** August 18, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -15,7 +15,8 @@ This guide explains how to install the RecordingStudioMoveable engine in your Ra
 ## Prerequisites
 
 - Rails 8.1+ application
-- RecordingStudio core 3.0+
+- RecordingStudio core 4.0+
+- RecordingStudio Accessible 0.6+
 - PostgreSQL (recommended for UUID compatibility)
 - TailwindCSS (optional, for styling engine views)
 
@@ -28,8 +29,8 @@ This guide explains how to install the RecordingStudioMoveable engine in your Ra
 Add to your `Gemfile`:
 
 ```ruby
-gem "recording_studio", "~> 3.0"
-gem "recording_studio_accessible", "~> 0.3"
+gem "recording_studio", "~> 4.0"
+gem "recording_studio_accessible", "~> 0.6"
 # From GitHub
 gem "recording_studio_moveable", github: "bowerbird-app/RecordingStudio_moveable"
 
@@ -51,7 +52,7 @@ bundle install
 RecordingStudioMoveable depends on `recording_studio_accessible` for built-in authorization. Keep it in your Gemfile explicitly if your application manages access grants directly:
 
 ```ruby
-gem "recording_studio_accessible", "~> 0.3"
+gem "recording_studio_accessible", "~> 0.6"
 ```
 
 Then run the Accessible setup if your application does not already have the required access tables:
@@ -62,11 +63,24 @@ bin/rails generate recording_studio_accessible:migrations
 bin/rails db:migrate
 ```
 
-Enable the Accessible capability on root recordables that should accept direct grants and expose the acting principal through `Current.actor` or `RecordingStudioMoveable.configure`.
+Enable the Accessible capability on root recordables that should accept direct grants, configure `access_actor_types`, and expose the acting principal through `Current.actor` or `RecordingStudioMoveable.configure`.
+
+```ruby
+RecordingStudioAccessible.configure do |config|
+  config.access_actor_types = ["User"]
+end
+```
+
+Also run RecordingStudio 4 migrations so the harden / unique-root indexes are present:
+
+```bash
+bin/rails generate recording_studio:migrations
+bin/rails db:migrate
+```
 
 ### 2.6 Declare RecordingStudio Core Hierarchy
 
-RecordingStudio core owns structural hierarchy in V3. Every configured recordable type should declare `recording_studio_recordable`, and child recordables should list allowed parent types there:
+RecordingStudio core owns structural hierarchy. Every configured recordable type should declare `recording_studio_recordable`, and child recordables should list allowed parent types there:
 
 ```ruby
 class Workspace < ApplicationRecord
@@ -89,28 +103,17 @@ Moveable only enables move behavior and move-specific options such as `allow_cro
 
 ### 2.7 Optional RecordingStudio API Action
 
-Moveable does not require `recording_studio_api` at runtime. To expose moves over the programmable API, install
-RecordingStudioApi in the host application, then run its generators from the host application directory:
+Moveable does not require `recording_studio_api` at runtime. To expose moves over the programmable API, install a RecordingStudio-4-compatible `recording_studio_api` release in the host application, then run its generators from the host application directory. Until that gem declares RecordingStudio `~> 4.0`, keep Moveable UI and Accessible authorization as the supported path.
+
+When the API engine is available:
 
 ```bash
 bin/rails generate recording_studio_api:install
 bin/rails generate recording_studio_api:migrations
-bin/rails generate recording_studio_api:scalar_docs moveable_api \
-  --mount-path=/recording_studio_api/docs/scalar \
-  --api-mount-path=/recording_studio_api \
-  --api-surface=public \
-  --access=authenticated \
-  --layout=recording_studio/default_layout
 bin/rails db:migrate
 ```
 
-RecordingStudio API 0.2.0 also requires each root type that may receive API access to enable
-`RecordingStudio.enable_capability(:api_access_point, on: self)` alongside `:accessible`.
-
-Configure API version profiles with `api.use :moveable, "~> 1.0"` when the host uses profiles, and explicitly
-allow the action on each published type with
-`RecordingStudioApi.register_recordable_type_api("RecordingStudioPage", capability_actions: %i[move])`. See
-[API.md](API.md) for the dependency declarations, endpoint, parameter contract, and authorization behavior.
+Enable both `:accessible` and `:api_access_point` on each root recordable type that may receive API access, configure API version profiles with `api.use :moveable, "~> 1.0"`, and allowlist `:move` on each published type. See [API.md](API.md).
 
 ### 3. Run the Install Generator
 
