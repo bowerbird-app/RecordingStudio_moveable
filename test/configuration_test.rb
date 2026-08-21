@@ -64,7 +64,7 @@ class ConfigurationTest < Minitest::Test
     assert_equal 80, @configuration.move_modal_prefetch_delay_ms
     assert_equal 10_000, @configuration.move_modal_prefetch_ttl_ms
     assert_equal true, @configuration.move_modal_reuse_shell
-    assert_equal "recording_studio_moveable", @configuration.full_page_layout
+    assert_equal "recording_studio/default_layout", @configuration.full_page_layout
   end
 
   def test_configure_without_block_is_safe

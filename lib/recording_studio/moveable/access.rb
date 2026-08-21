@@ -19,7 +19,7 @@ module RecordingStudio
         rescue LoadError => e
           raise LoadError, <<~MESSAGE.squish
             RecordingStudio Moveable built-in authorization requires the recording_studio_accessible gem.
-            Ensure `gem "recording_studio_accessible", "~> 0.3"` is available in your bundle.
+            Ensure `gem "recording_studio_accessible", "~> 0.6"` is available in your bundle.
             Original error: #{e.message}
           MESSAGE
         end

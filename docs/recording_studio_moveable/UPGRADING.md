@@ -1,6 +1,65 @@
+# Upgrading RecordingStudio Moveable
+
+## Upgrading to Moveable 3.0 / RecordingStudio 4.2
+
+Moveable 3.0 requires RecordingStudio `~> 4.2` and Accessible `~> 0.6`. The host verb is now keyword-only `.to`, which wraps core's enablement factory. Move behavior itself is unchanged: destination parent types still come from core declarations, and Moveable still owns same-root / cross-root rules, authorization, UI, and move event logging.
+
+### Dependency bump
+
+```ruby
+gem "recording_studio", "~> 4.2"
+gem "recording_studio_accessible", "~> 0.6"
+gem "recording_studio_moveable", "~> 3.0"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.129"
+```
+
+Stay on Moveable `2.1.x` if the host must remain on RecordingStudio 3.
+
+### Switch to the `.to` host verb
+
+```ruby
+class RecordingStudioPage < ApplicationRecord
+  recording_studio_recordable \
+    label: "Page",
+    root: false,
+    allowed_parent_types: ["Workspace", "RecordingStudioFolder"]
+
+  include RecordingStudio::Capabilities::Moveable.to(allow_cross_root: true)
+end
+```
+
+`.to` is a thin wrapper around `RecordingStudio::Capabilities.include_for(:movable, **options)`. Installing the gem still does not enable `:movable` on any type. Parent rules stay on `recording_studio_recordable`.
+
+`.enabled(...)` remains as an alias of `.to`. Positional destination types still raise:
+
+```ruby
+include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudioFolder")
+```
+
+### RecordingStudio 4 host steps
+
+1. Run `bin/rails generate recording_studio:migrations` and `bin/rails db:migrate` so the harden / unique-root indexes are installed.
+2. Replace any reliance on Recording's old implicit newest-first order with `.recent` or an explicit `order:`.
+3. Keep Event history append-only; use SQL `delete_all` for intentional purges.
+4. Configure Accessible actor allowlisting before creating new grants:
+
+```ruby
+RecordingStudioAccessible.configure do |config|
+  config.access_actor_types = ["User"]
+end
+```
+
+### Optional API
+
+Moveable still registers an optional `move` action when `recording_studio_api` is present. Re-enable that engine in host apps only after API declares RecordingStudio `~> 4.2`. Until then, keep Moveable UI and Accessible authorization as the supported path.
+
+Full-page move screens now default to `recording_studio/default_layout`. Set `RecordingStudioMoveable.configuration.full_page_layout` if you still need a host shell.
+
+---
+
 # Upgrading RecordingStudio Moveable for RecordingStudio 3
 
-The next RecordingStudio Moveable compatibility release targets RecordingStudio core V3. Moveable no longer defines destination parent types.
+The RecordingStudio Moveable 2.x line targets RecordingStudio core V3. Moveable no longer defines destination parent types.
 
 ## What changed
 
@@ -10,7 +69,7 @@ The next RecordingStudio Moveable compatibility release targets RecordingStudio 
 - The move write path calls `RecordingStudio.assert_parent_allowed!`, so core hierarchy validation is enforced before hierarchy fields are updated.
 - Root recordables should be created through `RecordingStudio.root_recording_for(recordable)`.
 
-## Replace `Moveable.to(...)`
+## Replace positional `Moveable.to(...)`
 
 Before:
 
@@ -24,7 +83,7 @@ class RecordingStudioPage < ApplicationRecord
 end
 ```
 
-After:
+After (Moveable 3 / RecordingStudio 4.2):
 
 ```ruby
 class RecordingStudioPage < ApplicationRecord
@@ -33,7 +92,7 @@ class RecordingStudioPage < ApplicationRecord
     root: false,
     allowed_parent_types: ["Workspace", "RecordingStudioFolder"]
 
-  include RecordingStudio::Capabilities::Moveable.enabled(allow_cross_root: true)
+  include RecordingStudio::Capabilities::Moveable.to(allow_cross_root: true)
 end
 ```
 
@@ -69,4 +128,4 @@ include RecordingStudio::Capabilities::Moveable.to("Workspace", "RecordingStudio
 include RecordingStudio::Capabilities::Movable.to("Workspace", "RecordingStudioFolder")
 ```
 
-If `.to` is present, it raises an `ArgumentError` explaining that destination parent types moved to core declarations and callers should use `Moveable.enabled(...)`.
+Positional `.to` raises an `ArgumentError` explaining that destination parent types moved to core declarations and callers should use keyword-only `Moveable.to(allow_cross_root: ...)`.

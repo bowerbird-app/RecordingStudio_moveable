@@ -5,8 +5,9 @@
 ## What this addon provides
 
 - Addon-owned capability module with addon-facing naming:
-  - `RecordingStudio::Capabilities::Moveable.enabled(...)` (preferred)
-  - `RecordingStudio::Capabilities::Movable.enabled(...)` (compat alias)
+  - `RecordingStudio::Capabilities::Moveable.to(allow_cross_root: ...)` (host verb)
+  - `RecordingStudio::Capabilities::Moveable.enabled(...)` (alias of `.to`)
+  - `RecordingStudio::Capabilities::Movable.to(...)` (compat alias)
 - `move_to!` behavior equivalent to legacy `movable` behavior:
   - remains in the same root by default
   - can transfer across roots when `allow_cross_root: true`
@@ -30,10 +31,10 @@
 Add to your Gemfile:
 
 ```ruby
-gem "recording_studio", "~> 3.0"
-gem "recording_studio_accessible", "~> 0.3"
+gem "recording_studio", "~> 4.2"
+gem "recording_studio_accessible", "~> 0.6"
 gem "recording_studio_moveable"
-gem "flat_pack", github: "bowerbird-app/flatpack"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.129"
 ```
 
 Then bundle install and mount the moveable engine UI routes:
@@ -60,7 +61,7 @@ class RecordingStudioFolder < ApplicationRecord
     root: false,
     allowed_parent_types: ["Workspace", "RecordingStudioFolder"]
 
-  include RecordingStudio::Capabilities::Moveable.enabled
+  include RecordingStudio::Capabilities::Moveable.to
 end
 
 class RecordingStudioPage < ApplicationRecord
@@ -69,13 +70,15 @@ class RecordingStudioPage < ApplicationRecord
     root: false,
     allowed_parent_types: ["Workspace", "RecordingStudioFolder"]
 
-  include RecordingStudio::Capabilities::Moveable.enabled(allow_cross_root: true)
+  include RecordingStudio::Capabilities::Moveable.to(allow_cross_root: true)
 end
 ```
 
 Moveable no longer owns destination type definitions. Set `allow_cross_root: true` only for recordables that should be transferable between workspace roots; same-root moves remain the default.
 
-`Moveable.to(...)` and `Movable.to(...)` are no longer supported. If present, they raise an `ArgumentError` that directs callers to core `recording_studio_recordable allowed_parent_types:` declarations and `Moveable.enabled(...)`.
+`.to` is keyword-only and wraps `RecordingStudio::Capabilities.include_for(:movable, **options)`. Installing the gem registers `:movable` but does not enable it on any recordable type. Parent rules stay on `recording_studio_recordable`. Positional destination types still raise.
+
+`.enabled(...)` remains as an alias of `.to`. Keep using `.to` in host apps.
 
 ### Migration note from legacy built-in gate
 
@@ -85,7 +88,7 @@ This addon registers `:movable` without a legacy feature gate so it can continue
 
 ### Default (built-in) mode
 
-Install `recording_studio_accessible` `~> 0.3` and enable the Accessible capability on root recordables that should accept direct access grants. In this mode:
+Install `recording_studio_accessible` `~> 0.6` and enable the Accessible capability on root recordables that should accept direct access grants. In this mode:
 
 - source requires `:edit`
 - destination requires `:edit`
@@ -180,7 +183,7 @@ The addon enforces access checks inside the gem-owned move controller.
 
 ## Dummy app demo
 
-The dummy app explicitly installs `recording_studio` `~> 3.0`, `recording_studio_accessible` `~> 0.3`, and `recording_studio_moveable`. It includes:
+The dummy app explicitly installs `recording_studio` `~> 4.2`, `recording_studio_accessible` `~> 0.6`, and `recording_studio_moveable`. It includes:
 
 - `Workspace` root recordable
 - `RecordingStudioFolder` and `RecordingStudioPage` (move-enabled)

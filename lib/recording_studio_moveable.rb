@@ -3,21 +3,23 @@
 require "recording_studio_moveable/version"
 require "recording_studio_moveable/configuration"
 require "recording_studio_moveable/hooks"
-require "recording_studio_moveable/labels"
 require "recording_studio_moveable/root_label"
 require "recording_studio_moveable/services/base_service"
 require "recording_studio_moveable/services/example_service"
 require "recording_studio"
 
-module RecordingStudio
-  AccessDenied = Class.new(StandardError) unless const_defined?(:AccessDenied)
-end
-
+# Load core Labels before the addon fallback so RecordingStudio 4 owns the constant.
 begin
   require "recording_studio/labels"
 rescue LoadError => e
   warn(e.message) if ENV["RECORDING_STUDIO_MOVEABLE_DEBUG"] == "true"
 end
+require "recording_studio_moveable/labels"
+
+module RecordingStudio
+  AccessDenied = Class.new(StandardError) unless const_defined?(:AccessDenied)
+end
+
 require "recording_studio/moveable"
 require "recording_studio_moveable/engine"
 

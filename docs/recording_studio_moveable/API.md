@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** August 3, 2026
+> *   **Last Updated:** August 21, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -10,8 +10,9 @@
 
 `recording_studio_moveable` works without `recording_studio_api`. When the host application installs
 `RecordingStudioApi`, Moveable registers a member `move` action for the `:movable` capability during engine
-initialization. With RecordingStudio API 0.2.0, it registers the action independently in the public API and every
-configured named API without replacing actions already registered by the host or another addon.
+initialization. Current RecordingStudio API releases still require RecordingStudio `~> 3.0`, so this optional
+integration is deferred until that gem declares RecordingStudio 4 support. Keep the adapter in host apps that
+already have a compatible API engine.
 
 The action contract is version `1.0.0`, uses `POST`, and requires `:edit`. A surface exposes it only when the
 recordable type enables `:movable` **and** that API surface's recordable-type registration explicitly allowlists
@@ -30,11 +31,11 @@ class RecordingStudioPage < ApplicationRecord
     allowed_parent_types: ["Workspace", "RecordingStudioFolder"]
   )
 
-  include RecordingStudio::Capabilities::Moveable.enabled
+  include RecordingStudio::Capabilities::Moveable.to
 end
 ```
 
-Pass `allow_cross_root: true` to `enabled` only when the recordable may move between roots. A request must still
+Pass `allow_cross_root: true` to `.to` only when the recordable may move between roots. A request must still
 target an accessible, editable destination whose type is listed in `allowed_parent_types`.
 
 ## Install the Optional API Engine

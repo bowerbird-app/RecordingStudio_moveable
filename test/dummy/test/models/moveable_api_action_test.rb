@@ -15,6 +15,10 @@ class MoveableApiActionTest < ActiveSupport::TestCase
 
   ApiPrincipal = Struct.new(:id)
 
+  setup do
+    skip "recording_studio_api is deferred until it supports RecordingStudio 4" unless defined?(RecordingStudioApi)
+  end
+
   test "registers the Moveable-owned move action before the API fallback" do
     action = RecordingStudioApi.capability_action(:move, version: "v1")
 

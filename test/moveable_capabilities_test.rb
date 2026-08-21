@@ -138,67 +138,60 @@ class MoveableCapabilitiesTest < Minitest::Test
     assert_equal({ allow_cross_root: false }, capabilities.capability_options({}))
   end
 
-  def test_apply_capability_registers_capability_and_options
-    capabilities = RecordingStudio::Moveable::Capabilities::Moveable
-    base = Struct.new(:name).new("ExampleType")
-    enabled = []
-    configured = []
-
-    RecordingStudio.stub(:enable_capability, ->(*args, **kwargs) { enabled << [args, kwargs] }) do
-      RecordingStudio.stub(:set_capability_options, ->(*args, **kwargs) { configured << [args, kwargs] }) do
-        capabilities.apply_capability(base, allow_cross_root: true)
-      end
-    end
-
-    assert_equal [[[:movable], { on: "ExampleType" }]], enabled
-    assert_equal [[[:movable], {
-      on: "ExampleType",
-      allow_cross_root: true
-    }]], configured
-  end
-
-  def test_build_capability_module_applies_capability_when_included
-    capabilities = RecordingStudio::Moveable::Capabilities::Moveable
-    applied = nil
-    options = { allow_cross_root: false }
-    mod = capabilities.build_capability_module(options)
-    klass = Class.new do
-      def self.name
-        "ExampleType"
-      end
-    end
-
-    capabilities.stub(:apply_capability, lambda { |base, received_options|
-      applied = [base.name, received_options]
-    }) do
-      klass.include(mod)
-    end
-
-    assert_equal ["ExampleType", options], applied
-  end
-
-  def test_enabled_builds_capability_module_with_moveable_options
+  def test_to_wraps_include_for_with_validated_keyword_options
     capabilities = RecordingStudio::Moveable::Capabilities::Moveable
     captured = nil
 
-    capabilities.stub(:build_capability_module, lambda { |options|
-      captured = options
-      :built_module
+    RecordingStudio::Capabilities.stub(:include_for, lambda { |name, **options|
+      captured = [name, options]
+      :factory_module
+    }) do
+      result = capabilities.to(allow_cross_root: true)
+
+      assert_equal :factory_module, result
+    end
+
+    assert_equal [:movable, { allow_cross_root: true }], captured
+  end
+
+  def test_enabled_aliases_to
+    capabilities = RecordingStudio::Moveable::Capabilities::Moveable
+
+    assert_equal capabilities.method(:to), capabilities.method(:enabled)
+  end
+
+  def test_enabled_delegates_keyword_options_to_include_for
+    capabilities = RecordingStudio::Moveable::Capabilities::Moveable
+    captured = nil
+
+    RecordingStudio::Capabilities.stub(:include_for, lambda { |name, **options|
+      captured = [name, options]
+      :alias_module
     }) do
       result = capabilities.enabled(allow_cross_root: true)
 
-      assert_equal :built_module, result
+      assert_equal :alias_module, result
     end
 
-    assert_equal({ allow_cross_root: true }, captured)
+    assert_equal [:movable, { allow_cross_root: true }], captured
   end
 
-  def test_enabled_rejects_unknown_options
+  def test_to_rejects_unknown_options
     error = assert_raises(ArgumentError) do
-      RecordingStudio::Capabilities::Moveable.enabled(foo: true)
+      RecordingStudio::Capabilities::Moveable.to(foo: true)
     end
 
     assert_match(/Unknown Moveable option\(s\): foo/, error.message)
+  end
+
+  def test_to_rejects_positional_destination_types
+    error = assert_raises(ArgumentError) do
+      RecordingStudio::Capabilities::Moveable.to("Workspace", allow_cross_root: true)
+    end
+
+    assert_equal RecordingStudio::Moveable::Capabilities::Moveable::DESTINATION_API_REMOVED_MESSAGE, error.message
+    assert_match(/recording_studio_recordable allowed_parent_types/, error.message)
+    assert_match(/Moveable\.to\(allow_cross_root:/, error.message)
   end
 
   def test_enabled_rejects_positional_destination_types
@@ -206,42 +199,38 @@ class MoveableCapabilitiesTest < Minitest::Test
       RecordingStudio::Capabilities::Moveable.enabled("Workspace")
     end
 
-    assert_match(/recording_studio_recordable allowed_parent_types/, error.message)
-    assert_match(/Moveable.enabled/, error.message)
+    assert_equal RecordingStudio::Moveable::Capabilities::Moveable::DESTINATION_API_REMOVED_MESSAGE, error.message
   end
 
-  def test_to_hard_fails_with_upgrade_message
-    error = assert_raises(ArgumentError) do
-      RecordingStudio::Capabilities::Moveable.to("Workspace", allow_cross_root: true)
-    end
-
-    assert_match(/recording_studio_recordable allowed_parent_types/, error.message)
-    assert_match(/Moveable.enabled/, error.message)
-  end
-
-  def test_legacy_movable_alias_delegates_to_enabled_capability_builder
+  def test_legacy_movable_alias_delegates_to_the_same_methods
     moveable = RecordingStudio::Moveable::Capabilities::Moveable
-    delegated = nil
+    captured = nil
 
-    moveable.stub(:enabled, lambda { |**options|
-      delegated = options
+    moveable.stub(:to, lambda { |*args, **options|
+      captured = [args, options]
       :legacy_module
     }) do
-      result = RecordingStudio::Capabilities::Movable.enabled(allow_cross_root: true)
+      result = RecordingStudio::Capabilities::Movable.to(allow_cross_root: true)
 
       assert_equal :legacy_module, result
+      assert_equal :legacy_module, RecordingStudio::Capabilities::Movable.enabled(allow_cross_root: true)
     end
 
-    assert_equal({ allow_cross_root: true }, delegated)
+    assert_equal [[], { allow_cross_root: true }], captured
   end
 
-  def test_legacy_movable_to_hard_fails
+  def test_legacy_movable_to_rejects_positional_destination_types
     error = assert_raises(ArgumentError) do
       RecordingStudio::Capabilities::Movable.to("Workspace")
     end
 
-    assert_match(/recording_studio_recordable allowed_parent_types/, error.message)
-    assert_match(/Moveable.enabled/, error.message)
+    assert_equal RecordingStudio::Moveable::Capabilities::Moveable::DESTINATION_API_REMOVED_MESSAGE, error.message
+  end
+
+  def test_installing_the_gem_registers_movable_without_enabling_it
+    assert RecordingStudio.registered_capabilities.key?(:movable)
+    refute RecordingStudio.capability_enabled?(:movable, for: "Workspace")
+    refute RecordingStudio.capability_enabled?(:movable, for: "RecordingStudioArchiveBox")
   end
 
   def test_recording_methods_expose_cross_root_flag

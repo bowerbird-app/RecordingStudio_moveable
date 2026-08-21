@@ -3,7 +3,8 @@
 module RecordingStudioMoveable
   class ApplicationController < (defined?(::ApplicationController) ? ::ApplicationController : ActionController::Base)
     protect_from_forgery with: :exception if superclass == ActionController::Base
-    layout "application" if superclass == ActionController::Base
+    include RecordingStudio::UsesDefaultLayout if defined?(RecordingStudio::UsesDefaultLayout)
+    layout "application" if superclass == ActionController::Base && !defined?(RecordingStudio::UsesDefaultLayout)
     include Rails.application.routes.url_helpers
 
     helper Rails.application.routes.url_helpers
