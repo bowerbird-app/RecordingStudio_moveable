@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** December 11, 2025
+> *   **Last Updated:** August 21, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -251,16 +251,11 @@ test/dummy/
 5.2 Tailwind Entry Point
 ------------------------------------------------------------
 
-The file `test/dummy/app/assets/tailwind/application.css` configures Tailwind:
+The file `test/dummy/app/assets/tailwind/application.css` configures Tailwind with `source(none)` and explicit `@source` globs. Dummy views, this engine's views, and vendored Flatpack / RecordingStudio / Accessible templates all need to be scanned so utility classes used by those components keep.
 
-```css
-@import "tailwindcss";
+Dummy's bundle path is `test/dummy/vendor/bundle` (three levels up from the Tailwind entry). CI may also install gems into `/usr/local/bundle`, so the dummy entry scans both.
 
-/* Include the engine's views in the Tailwind build */
-@source "../../../../../app/views/**/*.erb";
-```
-
-> **Note:** The relative path `../../../../../app/views/**/*.erb` points from the dummy app up to the engine's `app/views` folder so Tailwind can detect classes used in engine templates. Host applications will use the gem path instead.
+> **Note:** Host applications should `@source` the installed gem paths for Flatpack, RecordingStudio, and this engine rather than copying dummy-relative vendor globs.
 
 ------------------------------------------------------------
 5.3 Auto-Rebuild in Development

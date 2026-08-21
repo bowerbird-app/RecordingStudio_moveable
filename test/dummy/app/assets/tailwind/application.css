@@ -1,7 +1,17 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none);
 
-/* Include FlatPack component sources for Tailwind CSS */
-@source "../../vendor/bundle/**/flatpack/app/components/**/*.{rb,erb}";
+/*
+ * Flatpack / Recording Studio templates live in vendored gems. Dummy bundle is
+ * test/dummy/vendor/bundle (three levels up from this file). CI/cloud installs
+ * may also land in /usr/local/bundle. Scan both so utilities used by those
+ * templates keep.
+ */
+@source "../../../vendor/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
+@source "../../../vendor/bundle/ruby/*/bundler/gems/RecordingStudio-*/app/views/**/*.erb";
+@source "../../../vendor/bundle/ruby/*/bundler/gems/RecordingStudio_accessible-*/app/views/**/*.erb";
+@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
+@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/RecordingStudio-*/app/views/**/*.erb";
+@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/RecordingStudio_accessible-*/app/views/**/*.erb";
 
 /* Extend Tailwind theme with the FlatPack tokens used by the dummy app. */
 @theme {
@@ -67,13 +77,5 @@
 /* Include dummy app views for Tailwind CSS */
 @source "../../views/**/*.erb";
 
-/* Include RecordingStudio engine views for Tailwind CSS */
-@source "../../vendor/bundle/**/recording_studio/app/views/**/*.erb";
-
-
-/* Tailwind CSS - Scan FlatPack components for classes */
-@source "../../../../../../usr/local/bundle/ruby/**/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
-
 /* Include the engine's views in the Tailwind build */
 @source "../../../../../app/views/**/*.erb";
-
