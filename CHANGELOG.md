@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Pin development and dummy bundles to RecordingStudio `v4.2.0`, Accessible `v0.6.0`, and FlatPack `v0.1.129`.
+- Dummy Tailwind `@source` globs scan vendored Flatpack and RecordingStudio templates so demo CSS compiles.
 - Default full-page move screens to RecordingStudio's `recording_studio/default_layout`.
 - Defer the optional RecordingStudio API dummy integration until that gem declares RecordingStudio `~> 4.2`. The Moveable API adapter remains and still registers when the API engine is loaded.
 
