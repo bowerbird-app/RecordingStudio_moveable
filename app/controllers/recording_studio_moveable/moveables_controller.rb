@@ -350,7 +350,7 @@ module RecordingStudioMoveable
     def full_page_layout
       return false unless @display == :full_page
 
-      RecordingStudioMoveable.configuration.full_page_layout.presence || "recording_studio_moveable"
+      RecordingStudioMoveable.configuration.full_page_layout.presence || "recording_studio/default_layout"
     end
   end
   # rubocop:enable Metrics/ClassLength

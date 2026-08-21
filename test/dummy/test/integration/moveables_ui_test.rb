@@ -45,6 +45,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "aria-label=\"Page navigation\""
     refute_includes response.body, "aria-label=\"Breadcrumb\""
     assert_includes response.body, %(href="/")
+    assert_includes response.body, 'data-recording-studio-default-layout="true"'
     assert_includes response.body, %(data-controller="flat-pack--page-nav")
     assert_includes response.body, "Search destinations"
     assert_includes response.body, @workspace.name
@@ -179,6 +180,8 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">Move<"
     assert_includes response.body, ">Modal<"
     assert_includes response.body, 'data-recording-studio-moveable-modal="true"'
+    assert_includes response.body, "aria-label=\"Page navigation\""
+    refute_includes response.body, "aria-label=\"Breadcrumb\""
   end
 
   def test_page_show_renders_page_level_move_buttons

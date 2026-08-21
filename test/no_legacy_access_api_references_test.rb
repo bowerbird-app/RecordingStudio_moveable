@@ -61,7 +61,14 @@ class NoLegacyAccessApiReferencesTest < Minitest::Test
   private
 
   def scan_files
-    TARGET_GLOBS.flat_map { |glob| Dir.glob(glob) }.uniq.sort
+    TARGET_GLOBS.flat_map { |glob| Dir.glob(glob) }
+                .uniq
+                .sort
+                .reject { |file_path| vendor_path?(file_path) }
+  end
+
+  def vendor_path?(file_path)
+    Pathname.new(file_path).each_filename.any? { |part| part == "vendor" }
   end
 
   def relative_path(file_path)

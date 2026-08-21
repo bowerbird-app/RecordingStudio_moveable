@@ -17,6 +17,13 @@ class MoveableCapabilityTest < ActiveSupport::TestCase
     @archive_box = @root.record(RecordingStudioArchiveBox, actor: @actor, parent_recording: @root) { |a| a.name = "Archive" }
   end
 
+  def test_installing_the_gem_does_not_enable_movable_until_included
+    refute RecordingStudio.capability_enabled?(:movable, for: Workspace)
+    refute RecordingStudio.capability_enabled?(:movable, for: RecordingStudioArchiveBox)
+    assert RecordingStudio.capability_enabled?(:movable, for: RecordingStudioFolder)
+    assert RecordingStudio.capability_enabled?(:movable, for: RecordingStudioPage)
+  end
+
   def test_move_to_allows_configured_destination_and_logs_metadata
     @page.move_to!(new_parent: @target_folder, actor: @actor, metadata: { "reason" => "reorg" })
 

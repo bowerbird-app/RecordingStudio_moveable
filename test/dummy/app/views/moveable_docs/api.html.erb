@@ -4,12 +4,10 @@
     subtitle: "Expose the Moveable action only for recordables and API surfaces that are ready to authorize it."
   ) %>
 
-  <%= render FlatPack::Button::Component.new(
-    text: "API docs",
-    style: :primary,
-    size: :sm,
-    url: moveable_api_scalar_docs_path,
-    data: { turbo: false }
+  <%= render FlatPack::Alert::Component.new(
+    title: "Demo note",
+    description: "This demo app currently ships without recording_studio_api because that gem still requires RecordingStudio 3. Moveable still registers the optional move action automatically once a host installs a RecordingStudio-4-compatible API release.",
+    style: :warning
   ) %>
 
   <section class="space-y-4">
@@ -32,7 +30,7 @@
             allowed_parent_types: ["Workspace", "RecordingStudioFolder"]
           )
 
-          include RecordingStudio::Capabilities::Moveable.enabled
+          include RecordingStudio::Capabilities::Moveable.to
         end
 
         # config/initializers/recording_studio_api.rb

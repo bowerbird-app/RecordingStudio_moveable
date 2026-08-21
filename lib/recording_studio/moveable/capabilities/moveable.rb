@@ -8,35 +8,16 @@ module RecordingStudio
         DESTINATION_API_REMOVED_MESSAGE = "RecordingStudio::Capabilities::Moveable.to no longer accepts " \
                                           "destination types. Define structural parent rules with " \
                                           "recording_studio_recordable allowed_parent_types: [...] and use " \
-                                          "RecordingStudio::Capabilities::Moveable.enabled(...)."
+                                          "RecordingStudio::Capabilities::Moveable.to(allow_cross_root: ...)."
 
-        def self.enabled(*args, **options)
+        def self.to(*args, **options)
           raise ArgumentError, DESTINATION_API_REMOVED_MESSAGE if args.any?
 
-          build_capability_module(capability_options(options))
+          RecordingStudio::Capabilities.include_for(:movable, **capability_options(options))
         end
 
-        def self.to(*, **)
-          raise ArgumentError, DESTINATION_API_REMOVED_MESSAGE
-        end
-
-        def self.build_capability_module(options)
-          Module.new do
-            extend ActiveSupport::Concern
-
-            included do |base|
-              RecordingStudio::Moveable::Capabilities::Moveable.apply_capability(base, options)
-            end
-          end
-        end
-
-        def self.apply_capability(base, options)
-          RecordingStudio.enable_capability(:movable, on: base.name)
-          RecordingStudio.set_capability_options(
-            :movable,
-            on: base.name,
-            allow_cross_root: options[:allow_cross_root]
-          )
+        class << self
+          alias enabled to
         end
 
         def self.capability_options(options)
@@ -186,13 +167,14 @@ module RecordingStudio
 
     module Movable
       singleton_class.send(:remove_method, :to) if singleton_class.method_defined?(:to)
-
-      def self.enabled(*, **)
-        RecordingStudio::Moveable::Capabilities::Moveable.enabled(*, **)
-      end
+      singleton_class.send(:remove_method, :enabled) if singleton_class.method_defined?(:enabled)
 
       def self.to(*, **)
         RecordingStudio::Moveable::Capabilities::Moveable.to(*, **)
+      end
+
+      class << self
+        alias enabled to
       end
     end
   end

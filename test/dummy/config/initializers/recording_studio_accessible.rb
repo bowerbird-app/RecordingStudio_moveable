@@ -14,6 +14,9 @@ dummy_access_authorizer = lambda do |recording:, actor:, **|
 end
 
 RecordingStudioAccessible.configure do |config|
+  # Accessible 0.5+ fails closed for new grants unless actor types are allowlisted.
+  config.access_actor_types = ["User"]
+
   config.access_management_authorizer = dummy_access_authorizer
   config.mounted_page_authorizer = dummy_access_authorizer
 end

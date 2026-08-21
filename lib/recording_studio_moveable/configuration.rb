@@ -37,7 +37,7 @@ module RecordingStudioMoveable
       @move_modal_prefetch_delay_ms = 80
       @move_modal_prefetch_ttl_ms = 10_000
       @move_modal_reuse_shell = true
-      @full_page_layout = "recording_studio_moveable"
+      @full_page_layout = "recording_studio/default_layout"
       initialize_context_resolvers
       @hooks = Hooks.new
     end

@@ -11,7 +11,7 @@ class RecordingStudioFolder < ApplicationRecord
     name: "folder",
     variant: :outline
 
-  include RecordingStudio::Capabilities::Moveable.enabled(allow_cross_root: true)
+  include RecordingStudio::Capabilities::Moveable.to(allow_cross_root: true)
 
   validates :name, presence: true
 

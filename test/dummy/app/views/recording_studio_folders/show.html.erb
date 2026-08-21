@@ -1,7 +1,7 @@
 <div class="space-y-8">
-  <%= render FlatPack::Breadcrumb::Component.new(
-    items: [{ text: "All folders", href: root_path, icon: "chevron-left" }],
-    class: "mb-3"
+  <%= render FlatPack::PageNav::Component.new(
+    anchor_url: root_path,
+    anchor_label: "All folders"
   ) %>
 
   <%= render FlatPack::PageTitle::Component.new(

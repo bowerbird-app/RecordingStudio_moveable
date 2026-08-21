@@ -1,9 +1,9 @@
 <div class="space-y-4">
-  <%= render FlatPack::PageNav::Component.new(
-    anchor_url: move_back_path,
-    anchor_label: "Return to previous page",
-    class: "mb-3"
+  <% recording_studio_page_nav(
+    page_nav_anchor_url: move_back_path,
+    page_nav_anchor_label: "Return to previous page"
   ) %>
+  <% default_layout_head { recording_studio_moveable_meta_tags } if respond_to?(:default_layout_head) %>
 
   <%= render FlatPack::PageTitle::Component.new(
     title: "Change #{moveable_root_label}",

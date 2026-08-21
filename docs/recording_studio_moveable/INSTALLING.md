@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** August 3, 2026
+> *   **Last Updated:** August 21, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -15,7 +15,7 @@ This guide explains how to install the RecordingStudioMoveable engine in your Ra
 ## Prerequisites
 
 - Rails 8.1+ application
-- RecordingStudio core 3.0+
+- RecordingStudio core 4.2+
 - PostgreSQL (recommended for UUID compatibility)
 - TailwindCSS (optional, for styling engine views)
 
@@ -28,8 +28,8 @@ This guide explains how to install the RecordingStudioMoveable engine in your Ra
 Add to your `Gemfile`:
 
 ```ruby
-gem "recording_studio", "~> 3.0"
-gem "recording_studio_accessible", "~> 0.3"
+gem "recording_studio", "~> 4.2"
+gem "recording_studio_accessible", "~> 0.6"
 # From GitHub
 gem "recording_studio_moveable", github: "bowerbird-app/RecordingStudio_moveable"
 
@@ -51,7 +51,7 @@ bundle install
 RecordingStudioMoveable depends on `recording_studio_accessible` for built-in authorization. Keep it in your Gemfile explicitly if your application manages access grants directly:
 
 ```ruby
-gem "recording_studio_accessible", "~> 0.3"
+gem "recording_studio_accessible", "~> 0.6"
 ```
 
 Then run the Accessible setup if your application does not already have the required access tables:
@@ -66,7 +66,7 @@ Enable the Accessible capability on root recordables that should accept direct g
 
 ### 2.6 Declare RecordingStudio Core Hierarchy
 
-RecordingStudio core owns structural hierarchy in V3. Every configured recordable type should declare `recording_studio_recordable`, and child recordables should list allowed parent types there:
+RecordingStudio core owns structural hierarchy in V4. Every configured recordable type should declare `recording_studio_recordable`, and child recordables should list allowed parent types there:
 
 ```ruby
 class Workspace < ApplicationRecord
@@ -81,7 +81,7 @@ class RecordingStudioPage < ApplicationRecord
     root: false,
     allowed_parent_types: ["Workspace", "RecordingStudioFolder"]
 
-  include RecordingStudio::Capabilities::Moveable.enabled(allow_cross_root: true)
+  include RecordingStudio::Capabilities::Moveable.to(allow_cross_root: true)
 end
 ```
 
