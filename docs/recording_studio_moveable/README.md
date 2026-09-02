@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** August 21, 2026
+> *   **Last Updated:** September 2, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -64,6 +64,7 @@ Addon-owned move behavior and UI for RecordingStudio.
 | [Engine Hooks](HOOKS.md) | Guide to customizing engine behavior using lifecycle and service hooks. |
 | [Asset Architecture](CSS_JS_ASSETS_ARCHITECTURE.md) | Details on TailwindCSS setup and asset pipeline integration. |
 | [Security](SECURITY.md) | Security considerations. |
+| [Cursor skills in Cloud Agents](../cursor-skills.md) | How Cloud Agent Builds fetch skills and start the dummy app. |
 | [Changelog](../../CHANGELOG.md) | Version history. |
 
 ---

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.1] - 2026-09-02
+
+Cloud Agent Builds match RecordingStudio_billing v0.9.13.
+
+### Added
+- Tracked `.cursor/` boot files: `environment.json`, `install.sh`, `fetch-skills.sh`, and `start.sh`.
+- `test/cursor_install_test.rb` plus a dummy boot-files test that environment terminals point at `test/dummy`.
+- [Cursor skills in Cloud Agents](docs/cursor-skills.md).
+
+### Upgrade Notes
+- No host or schema changes. Rebuild the Cloud Agent environment with Draft off so Build loads the pack.
+
 ## [3.0.0] - 2026-08-21
 
 ### Breaking
@@ -72,7 +84,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.0.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.0.1...HEAD
+[3.0.1]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.0.0...3.0.1
 [3.0.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.1.1...3.0.0
 [2.1.1]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.1.0...2.1.1
 [2.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.0.0...2.1.0
