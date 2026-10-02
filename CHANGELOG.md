@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Pin development and dummy bundles to RecordingStudio `v4.2.2`.
+
 ## [3.0.1] - 2026-09-02
 
 Cloud Agent Builds match RecordingStudio_billing v0.9.13.
