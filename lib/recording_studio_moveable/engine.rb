@@ -1,10 +1,20 @@
 # frozen_string_literal: true
 
 require_relative "../../app/helpers/recording_studio_moveable/moveables_helper"
+require_relative "flat_pack_compat"
 
 module RecordingStudioMoveable
   class Engine < ::Rails::Engine
     isolate_namespace RecordingStudioMoveable
+
+    initializer "recording_studio_moveable.flat_pack_compat" do
+      config.to_prepare do
+        next unless defined?(FlatPack::PageNav::Component)
+        next if FlatPack::PageNav::Component < RecordingStudioMoveable::FlatPackPageNavCompat
+
+        FlatPack::PageNav::Component.prepend(RecordingStudioMoveable::FlatPackPageNavCompat)
+      end
+    end
 
     initializer "recording_studio_moveable.view_helpers" do
       ActiveSupport.on_load(:action_view) do

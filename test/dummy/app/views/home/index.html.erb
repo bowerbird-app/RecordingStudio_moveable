@@ -53,13 +53,13 @@
                     text: "Move",
                     style: :secondary,
                     size: :sm,
-                    url: recording_studio_moveable.move_recording_path(recording_id: item_recording.id)
+                    href: recording_studio_moveable.move_recording_path(recording_id: item_recording.id)
                   ) %>
                   <%= render FlatPack::Button::Component.new(
                     text: "Modal",
                     style: :secondary,
                     size: :sm,
-                    url: recording_studio_moveable.move_recording_path(recording_id: item_recording.id),
+                    href: recording_studio_moveable.move_recording_path(recording_id: item_recording.id),
                     data: { recording_studio_moveable_modal: true }
                   ) %>
                 </div>
