@@ -6,17 +6,25 @@ module RecordingStudioMoveable
   # so moveable hosts can bump FlatPack without waiting on a RecordingStudio cut.
   module FlatPackPageNavCompat
     def initialize(**kwargs)
-      if kwargs.key?(:anchor_url) && !kwargs.key?(:anchor_href)
-        kwargs[:anchor_href] = kwargs.delete(:anchor_url)
-      end
+      remap_legacy_page_nav_kwargs!(kwargs)
+      # Remapped kwargs must be forwarded explicitly; bare `super` would replay the
+      # caller's original keywords (including the pre-rename names).
+      super(**kwargs) # rubocop:disable Style/SuperArguments
+    end
 
-      if kwargs.key?(:secondary_anchor_url) && !kwargs.key?(:secondary_anchor_href)
-        kwargs[:secondary_anchor_href] = kwargs.delete(:secondary_anchor_url)
-      end
+    private
 
+    def remap_legacy_page_nav_kwargs!(kwargs)
+      take_legacy_href!(kwargs, from: :anchor_url, to: :anchor_href)
+      take_legacy_href!(kwargs, from: :secondary_anchor_url, to: :secondary_anchor_href)
       kwargs.delete(:back_url)
+    end
 
-      super(**kwargs)
+    def take_legacy_href!(kwargs, from:, to:)
+      return unless kwargs.key?(from)
+      return if kwargs.key?(to)
+
+      kwargs[to] = kwargs.delete(from)
     end
   end
 end
