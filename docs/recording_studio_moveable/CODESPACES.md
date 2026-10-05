@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** December 12, 2025
+> *   **Last Updated:** October 5, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -86,6 +86,8 @@ Set automatically inside the container:
 | `DB_PASSWORD` | `postgres` |
 | `REDIS_URL` | `redis://redis:6379/0` |
 | `CODESPACES` | `true` |
+
+Dummy credentials are not set automatically. Put the shared RecordingStudio_* dummy master key in a Codespaces secret named `RAILS_MASTER_KEY`, or write it to `test/dummy/config/master.key`. Keep `test/dummy/config/credentials.yml.enc`; do not generate a new key.
 
 ---
 
