@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Pin development and dummy bundles to RecordingStudio `v4.2.2`.
 - Pin development and dummy bundles to RecordingStudioAccessible `v0.11.1`.
+- Upgrade the dummy app to Accessible `0.11`: string `role` values, `depends_on_recording_id`, access invitations, first-owner `bootstrap_owner_access!`, and later grants through `RecordingStudioAccessible.grant_access`.
 
 ## [3.0.1] - 2026-09-02
 
