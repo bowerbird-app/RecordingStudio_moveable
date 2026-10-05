@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Pin development and dummy bundles to RecordingStudio `v4.2.2`.
+- Pin development and dummy bundles to RecordingStudioAccessible `v0.11.1`.
 
 ## [3.0.1] - 2026-09-02
 
