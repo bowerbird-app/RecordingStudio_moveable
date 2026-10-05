@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** December 12, 2025
+> *   **Last Updated:** October 5, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -23,3 +23,5 @@ The repository still includes `bin/rename_gem`, but it is no longer part of the 
 ## If You Fork This Repository
 
 If you intentionally want to repurpose this repository as a different gem, review `bin/rename_gem` and `test/rename_verification_test.rb` first, then run the rename in a clean working tree and rerun the full test suite.
+
+Dummy credentials (`test/dummy/config/credentials.yml.enc`) stay as the shared Recording Studio dummy file. After rename, set `RAILS_MASTER_KEY` (or `test/dummy/config/master.key`) to the shared development key. Do not mint a new master key.

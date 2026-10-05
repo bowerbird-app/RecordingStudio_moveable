@@ -89,6 +89,17 @@ start_postgres() {
   sudo -u postgres psql -tAc "ALTER USER postgres PASSWORD 'postgres';" >/dev/null 2>&1 || true
 }
 
+# Dummy credentials (shared RecordingStudio_* development master key)
+# The committed credentials.yml.enc is reused across gems. Set
+# RAILS_MASTER_KEY in the environment, or write test/dummy/config/master.key.
+# Do not generate a per-repo master key. Never commit the key.
+if [ -n "${RAILS_MASTER_KEY:-}" ]; then
+  log "Writing dummy master.key from RAILS_MASTER_KEY"
+  umask 077
+  mkdir -p "${ROOT}/test/dummy/config"
+  printf '%s' "${RAILS_MASTER_KEY}" > "${ROOT}/test/dummy/config/master.key"
+fi
+
 if ruby_ok && bundle_ok && postgres_ok; then
   log "Ruby ${RUBY_VERSION}, bundle, and Postgres already usable; skipping apt, ruby-build, db:prepare, and tailwind"
 else
