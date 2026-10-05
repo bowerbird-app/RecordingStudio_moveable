@@ -20,9 +20,15 @@ class AccessibleGrantTest < ActiveSupport::TestCase
     editor = create_user
     grant_root_access(root: root, actor: owner, role: :admin)
 
-    access_recording = grant_root_access(root: root, actor: editor, role: :edit)
+    result = RecordingStudioAccessible.grant_access(
+      recording: root,
+      actor: editor,
+      role: :edit,
+      manager_actor: owner
+    )
+    raise result.error if result.failure?
 
-    assert_equal "edit", access_recording.recordable.role
+    assert_equal "edit", result.value.recordable.role
     assert_equal :edit, RecordingStudioAccessible.role_for(actor: editor, recording: root).to_sym
     assert RecordingStudioAccessible.authorized?(actor: editor, recording: root, role: :view)
     refute RecordingStudioAccessible.authorized?(actor: editor, recording: root, role: :admin)
