@@ -2,7 +2,7 @@
 
 ## Changes Made
 
-1. ✅ Updated `recording_studio` to `~> 4.2` and RecordingStudio tag `v4.2.0`.
+1. ✅ Updated `recording_studio` to `~> 4.2` and RecordingStudio tag `v4.2.2`.
 2. ✅ Updated `recording_studio_accessible` to `~> 0.6` and tag `v0.6.0`.
 3. ✅ Converted the host verb to keyword-only `Moveable.to(allow_cross_root: ...)`, wrapping `RecordingStudio::Capabilities.include_for(:movable, **options)`.
 4. ✅ Kept `register_capability` at boot. Installing the gem does not enable `:movable`.
