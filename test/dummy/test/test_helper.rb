@@ -3,10 +3,10 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../../dummy/config/environment"
 require "rails/test_help"
+require "minitest/mock"
 
 module DummyMoveableTestHelpers
   def compatible_access_model
-    return RecordingStudioAccessible::Access if defined?(RecordingStudioAccessible::Access)
     return RecordingStudio.const_get(:Access) if defined?(RecordingStudio) && RecordingStudio.const_defined?(:Access)
 
     nil
@@ -37,12 +37,23 @@ module DummyMoveableTestHelpers
   end
 
   def grant_root_access(root:, actor:, role: :admin)
-    RecordingStudioAccessible.grant_access(
-      recording: root,
-      actor: actor,
-      role: role,
-      manager_actor: actor
-    ).value!
+    result = if first_admin_grant?(root, role)
+               RecordingStudioAccessible.bootstrap_owner_access!(recording: root, actor: actor)
+             else
+               RecordingStudioAccessible.grant_access(
+                 recording: root,
+                 actor: actor,
+                 role: role,
+                 manager_actor: actor
+               )
+             end
+    raise result.error if result.failure?
+
+    result.value
+  end
+
+  def first_admin_grant?(root, role)
+    role.to_s == "admin" && RecordingStudioAccessible.access_recordings_for(root).none?
   end
 end
 
@@ -53,6 +64,9 @@ class ActiveSupport::TestCase
   setup do
     RecordingStudio::Event.delete_all
     RecordingStudio::DeviceSession.delete_all if defined?(RecordingStudio::DeviceSession)
+    if defined?(RecordingStudioAccessible::AccessInvitation)
+      RecordingStudioAccessible::AccessInvitation.delete_all
+    end
     RecordingStudio::Recording.delete_all
     compatible_access_model&.delete_all
     RecordingStudioFolder.delete_all

@@ -104,12 +104,29 @@ module MoveableDemo
     end
 
     def ensure_root_access!(root_recording)
-      RecordingStudioAccessible.grant_access(
-        recording: root_recording,
+      already_admin = RecordingStudioAccessible.authorized?(
         actor: actor,
-        role: :admin,
-        manager_actor: actor
-      ).value!
+        recording: root_recording,
+        role: :admin
+      )
+      return if already_admin
+
+      result = if RecordingStudioAccessible.access_recordings_for(root_recording).none?
+                 RecordingStudioAccessible.bootstrap_owner_access!(
+                   recording: root_recording,
+                   actor: actor
+                 )
+               else
+                 RecordingStudioAccessible.grant_access(
+                   recording: root_recording,
+                   actor: actor,
+                   role: :admin,
+                   manager_actor: actor
+                 )
+               end
+      raise result.error if result.failure?
+
+      result.value
     end
 
     def ensure_demo_tree!(root_recording, workspace_data)
