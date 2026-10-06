@@ -1,6 +1,6 @@
 <div class="space-y-8">
   <%= render FlatPack::PageNav::Component.new(
-    anchor_url: root_path,
+    anchor_href: root_path,
     anchor_label: "All folders"
   ) %>
 
@@ -57,13 +57,13 @@
                     text: "Move",
                     style: :secondary,
                     size: :sm,
-                    url: recording_studio_moveable.move_recording_path(recording_id: child_recording.id)
+                    href: recording_studio_moveable.move_recording_path(recording_id: child_recording.id)
                   ) %>
                   <%= render FlatPack::Button::Component.new(
                     text: "Modal",
                     style: :secondary,
                     size: :sm,
-                    url: recording_studio_moveable.move_recording_path(recording_id: child_recording.id),
+                    href: recording_studio_moveable.move_recording_path(recording_id: child_recording.id),
                     data: { recording_studio_moveable_modal: true }
                   ) %>
                 </div>
