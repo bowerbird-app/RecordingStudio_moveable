@@ -10,63 +10,63 @@
   <% sidebar.items do %>
     <nav class="py-4 space-y-1" aria-label="Main navigation">
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Home",
+        text: "Home",
         href: "/",
         icon: "home",
         active: current_page?("/")
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Events",
+        text: "Events",
         href: main_app.events_path,
         icon: "calendar-days",
         active: current_page?(main_app.events_path)
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Data",
+        text: "Data",
         href: main_app.data_path,
         icon: "circle-stack",
         active: current_page?(main_app.data_path)
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Recordables",
+        text: "Recordables",
         href: main_app.recordables_path,
         icon: "squares-2x2",
         active: current_page?(main_app.recordables_path)
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Destinations",
+        text: "Destinations",
         href: main_app.access_docs_path,
         icon: "lock-closed",
         active: current_page?(main_app.access_docs_path)
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Setup",
+        text: "Setup",
         href: main_app.setup_docs_path,
         icon: "wrench-screwdriver",
         active: current_page?(main_app.setup_docs_path)
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Methods",
+        text: "Methods",
         href: main_app.methods_docs_path,
         icon: "code-bracket-square",
         active: current_page?(main_app.methods_docs_path)
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Redirects",
+        text: "Redirects",
         href: main_app.redirects_docs_path,
         icon: "arrow-right-on-rectangle",
         active: current_page?(main_app.redirects_docs_path)
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "API action",
+        text: "API action",
         href: main_app.api_docs_path,
         icon: "code-bracket",
         active: current_page?(main_app.api_docs_path)
@@ -78,7 +78,7 @@
   <% sidebar.footer do %>
     <%= render FlatPack::Sidebar::Footer::Component.new(class: "text-sm text-[var(--surface-muted-content-color)]") do %>
       <%= render FlatPack::Sidebar::Item::Component.new(
-        label: "Sign out",
+        text: "Sign out",
         href: main_app.destroy_user_session_path,
         icon: "arrow-right-on-rectangle",
         class: "mx-0",

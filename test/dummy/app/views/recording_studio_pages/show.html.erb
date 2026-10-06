@@ -9,7 +9,7 @@
          text: "Move (full page)",
          style: :primary,
          size: :sm,
-         url: recording_studio_moveable.move_recording_path(recording_id: @recording.id)
+         href: recording_studio_moveable.move_recording_path(recording_id: @recording.id)
        )
      ) %>
   <% group.button(
@@ -17,7 +17,7 @@
          text: "Move (modal mode)",
          style: :ghost,
          size: :sm,
-         url: recording_studio_moveable.move_recording_path(recording_id: @recording.id),
+         href: recording_studio_moveable.move_recording_path(recording_id: @recording.id),
          data: { recording_studio_moveable_modal: true }
        )
      ) %>

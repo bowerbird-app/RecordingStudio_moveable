@@ -34,7 +34,7 @@ Add to your Gemfile:
 gem "recording_studio", "~> 4.2"
 gem "recording_studio_accessible", "~> 0.6"
 gem "recording_studio_moveable"
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.129"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.198"
 ```
 
 Then bundle install and mount the moveable engine UI routes:
