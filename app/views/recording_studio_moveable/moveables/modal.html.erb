@@ -1,4 +1,7 @@
-<div data-recording-studio-moveable-modal-root="true">
+<div data-recording-studio-moveable-modal-root="true"
+     data-recording-studio-moveable-updating="<%= moveable_t("js.updating") %>"
+     data-recording-studio-moveable-moving="<%= moveable_t("js.moving") %>"
+     data-recording-studio-moveable-load-error="<%= moveable_t("js.load_error") %>">
   <%= render FlatPack::Modal::Component.new(
     id: "recording-studio-moveable-modal",
     size: :lg,

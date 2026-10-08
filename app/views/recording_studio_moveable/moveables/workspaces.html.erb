@@ -1,12 +1,12 @@
 <div class="space-y-4">
   <% recording_studio_page_nav(
     page_nav_anchor_url: move_back_path,
-    page_nav_anchor_label: "Return to previous page"
+    page_nav_anchor_label: moveable_t("dialog.back")
   ) %>
   <% default_layout_head { recording_studio_moveable_meta_tags } if respond_to?(:default_layout_head) %>
 
   <%= render FlatPack::PageTitle::Component.new(
-    title: "Change #{moveable_root_label}",
+    title: moveable_t("dialog.change_workspace_title", workspace: moveable_root_label),
     class: "pb-0 mb-0"
   ) %>
 </div>
@@ -21,12 +21,12 @@
     auto_confirm: true,
     accepted_kinds: ["workspace"],
     searchable: true,
-    search_placeholder: "Search #{moveable_root_label(count: 2)}",
+    search_placeholder: moveable_t("dialog.search_workspaces", workspaces: moveable_root_label(count: 2)),
     search_mode: :local,
     results_layout: :list,
     output_mode: :field,
     modal: false,
-    empty_state_text: "No other #{moveable_root_label(count: 2)} are available for this move.",
+    empty_state_text: moveable_t("dialog.empty_workspaces", workspaces: moveable_root_label(count: 2)),
     form: {
       url: move_recording_path_for(
         recording_id: @recording.id,

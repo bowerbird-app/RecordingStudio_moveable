@@ -2,14 +2,14 @@
   <% if @display == :full_page %>
     <% recording_studio_page_nav(
       page_nav_anchor_url: move_back_path,
-      page_nav_anchor_label: "Return to previous page"
+      page_nav_anchor_label: moveable_t("dialog.back")
     ) %>
     <% default_layout_head { recording_studio_moveable_meta_tags } if respond_to?(:default_layout_head) %>
   <% end %>
 
   <%= render FlatPack::PageTitle::Component.new(
     title: title,
-    subtitle: "Choose destination",
+    subtitle: moveable_t("dialog.subtitle"),
     class: "pb-0 mb-0"
   ) %>
 </div>
@@ -18,7 +18,7 @@
   <% if @workspace_selection_path.present? %>
     <div class="mb-4 flex flex-wrap items-center gap-2 text-sm text-(--surface-muted-content-color)">
       <strong><%= moveable_label_for(@target_root || @current_root) %></strong>
-      <%= link_to "Change", @workspace_selection_path, class: "font-medium text-[var(--color-primary)] hover:underline" %>
+      <%= link_to moveable_t("dialog.change"), @workspace_selection_path, class: "font-medium text-[var(--color-primary)] hover:underline" %>
     </div>
   <% end %>
 
@@ -31,12 +31,12 @@
     auto_confirm: true,
     accepted_kinds: ["record"],
     searchable: true,
-    search_placeholder: "Search destinations",
+    search_placeholder: moveable_t("dialog.search_destinations"),
     search_mode: :local,
     results_layout: :list,
     output_mode: :field,
     modal: false,
-    empty_state_text: "No allowed destinations found. Try a different search term or review your move permissions.",
+    empty_state_text: moveable_t("dialog.empty_destinations"),
     form: {
       url: move_recording_path_for(
         recording_id: @recording.id,

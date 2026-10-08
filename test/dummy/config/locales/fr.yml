@@ -1,0 +1,131 @@
+# Dummy-only host translations. The engine ships English defaults; other
+# languages belong to the host. This file covers every engine
+# recording_studio.moveable key plus dummy chrome and Flatpack kit copy.
+fr:
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      long: "%d %B %Y"
+      short: "%d %b"
+  recording_studio:
+    internationalization:
+      selector:
+        label: Langue
+        submit: Changer de langue
+    moveable:
+      layout:
+        title: "Déplacer"
+      dialog:
+        title: "Déplacer %{name}"
+        subtitle: "Choisir une destination"
+        change: "Changer"
+        change_workspace_title: "Changer : %{workspace}"
+        search_destinations: "Rechercher une destination"
+        search_workspaces: "Rechercher des %{workspaces}"
+        empty_destinations: "Aucune destination autorisée. Essayez un autre mot ou vérifiez vos droits."
+        empty_workspaces: "Aucun autre %{workspaces} n’est disponible pour ce déplacement."
+        back: "Retour à la page précédente"
+        workspace_description: "Choisir une destination dans %{name}"
+      roots:
+        one: "espace"
+        other: "espaces"
+      flashes:
+        moved: "Déplacé."
+      js:
+        updating: "Mise à jour des destinations…"
+        moving: "Déplacement…"
+        load_error: "Impossible d’ouvrir le déplacement. Réessayez."
+      errors:
+        actor_required: "Vous devez être connecté pour déplacer un élément"
+        destination_not_allowed: "Cette destination n’est pas autorisée"
+        cannot_move_under_itself: "Impossible de déplacer un élément dans lui-même"
+        cannot_move_under_descendant: "Impossible de déplacer un élément dans un de ses dossiers"
+        destination_wrong_root: "La destination doit rester dans le même espace"
+        hook_denied: "Vous n’avez pas le droit de faire ce déplacement"
+        source_edit_denied: "Vous ne pouvez pas déplacer cet élément"
+        destination_edit_denied: "Vous ne pouvez pas déplacer vers cette destination"
+  dummy:
+    nav:
+      toggle_sidebar: "Afficher le menu"
+  flatpack:
+    chat:
+      placeholder: Écrire un message…
+      send: Envoyer
+      back: Retour
+      back_to_conversations: Retour aux conversations
+      loading_older: Chargement des messages plus anciens…
+      jump_to_latest: Aller au plus récent
+      jump_to_latest_message: Aller au message le plus récent
+      sending: Envoi…
+      failed: Échec
+      edit: Modifier
+      delete: Supprimer
+      typing: Quelqu’un écrit
+      outgoing_images: Images envoyées
+      incoming_images: Images reçues
+      image: Image
+      you: Vous
+      attachment: Pièce jointe
+    timestamp:
+      fallback: "-"
+      in: Dans %{distance}
+      ago: "il y a %{distance}"
+      just_now: À l’instant
+      a_min_ago: il y a 1 min
+      minutes_ago: "il y a %{count} minutes"
+      hours_ago: "il y a %{count} heures"
+      yesterday: Hier
+      days_ago: "il y a %{count} jours"
+      weeks_ago: "il y a %{count} semaines"
+      months_ago: "il y a %{count} mois"
+      short_a_min_ago: il y a 1 min
+      short_min_ago: "il y a %{count} min"
+      short_hr_ago: "il y a %{count} h"
+      short_yesterday: il y a 1 j
+      short_d_ago: "il y a %{count} j"
+      short_wk_ago: "il y a %{count} sem"
+      short_mo_ago: "il y a %{count} mois"
+    page_nav:
+      back: Retour
+      close: Fermer
+      previous: Page précédente
+      label: Navigation de page
+    search:
+      placeholder: Rechercher…
+      no_results: Aucun résultat
+      clear: Effacer la recherche
+      searching: Recherche…
+      result_fallback: Résultat
+    search_input:
+      clear: Effacer la recherche
+    select:
+      placeholder: Choisir
+      search: Rechercher…
+      remove: Retirer %{label}
+      type_to_search: Tapez au moins %{count} caractères
+      searching: Recherche…
+      empty: Aucune option
+    common:
+      close: Fermer
+      search: Rechercher
+      previous: Préc.
+      next: Suiv.
+      back: Retour
+      save: Enregistrer
+    modal:
+      close: Fermer
+    alert:
+      dismiss: Fermer
+    button:
+      loading: Chargement
+    notification:
+      bell: Notifications
+      empty: Aucune notification récente
+      fallback: Notification
+      see_all: Voir toutes les notifications
+      overflow: 9+
+    picker:
+      search: Rechercher
+      empty: Aucun résultat
+      confirm: Confirmer
+      clear: Effacer

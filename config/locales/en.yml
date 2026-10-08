@@ -1,5 +1,34 @@
 en:
-  recording_studio_moveable:
-    moveables:
-      update:
-        notice: Moved successfully.
+  recording_studio:
+    moveable:
+      layout:
+        title: "Move"
+      dialog:
+        title: "Move %{name}"
+        subtitle: "Choose destination"
+        change: "Change"
+        change_workspace_title: "Change %{workspace}"
+        search_destinations: "Search destinations"
+        search_workspaces: "Search %{workspaces}"
+        empty_destinations: "No allowed destinations found. Try a different search term or review your move permissions."
+        empty_workspaces: "No other %{workspaces} are available for this move."
+        back: "Return to previous page"
+        workspace_description: "Choose destinations in %{name}"
+      roots:
+        one: "workspace"
+        other: "workspaces"
+      flashes:
+        moved: "Moved successfully."
+      js:
+        updating: "Updating destinations..."
+        moving: "Moving item..."
+        load_error: "Unable to load the move view right now. Please try again."
+      errors:
+        actor_required: "A current actor is required to move recordings"
+        destination_not_allowed: "Destination is not allowed for this move"
+        cannot_move_under_itself: "Cannot move a recording under itself"
+        cannot_move_under_descendant: "Cannot move a recording under its descendant"
+        destination_wrong_root: "Destination must belong to this root recording"
+        hook_denied: "Move authorization hook denied this move"
+        source_edit_denied: "Actor does not have edit access on the source recording"
+        destination_edit_denied: "Actor does not have edit access on the target recording"

@@ -43,7 +43,7 @@ module RecordingStudio
 
         return true if custom_allowed?(destination: destination)
 
-        raise RecordingStudio::AccessDenied, "Move authorization hook denied this move"
+        raise RecordingStudio::AccessDenied, RecordingStudioMoveable::Copy.t("errors.hook_denied")
       end
 
       private
@@ -51,11 +51,11 @@ module RecordingStudio
       def built_in_move_allowed!(destination:)
         assert_edit_access!(
           recording: source,
-          message: "Actor does not have edit access on the source recording"
+          message: RecordingStudioMoveable::Copy.t("errors.source_edit_denied")
         )
         assert_edit_access!(
           recording: destination,
-          message: "Actor does not have edit access on the target recording"
+          message: RecordingStudioMoveable::Copy.t("errors.destination_edit_denied")
         )
       end
 

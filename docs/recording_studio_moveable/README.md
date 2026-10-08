@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** September 2, 2026
+> *   **Last Updated:** October 8, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -56,7 +56,7 @@ Addon-owned move behavior and UI for RecordingStudio.
 | [Renaming](RENAMING.md) | Notes on the historical rename away from the generic engine template. |
 | [Installation](INSTALLING.md) | Step-by-step guide for installing this engine in a host Rails application. |
 | [Upgrading](UPGRADING.md) | Breaking changes for RecordingStudio 4.2, the `.to` host verb, and Accessible 0.6. |
-| [Configuration](CONFIGURATION.md) | Details on configuring the gem, including move redirect modes and custom redirect resolution. |
+| [Configuration](CONFIGURATION.md) | Details on configuring the gem, including move redirect modes, custom redirect resolution, and translating copy. |
 | [Optional API Action](API.md) | Installing and configuring the optional RecordingStudioApi move action. |
 | [Private Gems](PRIVATE_GEMS.md) | How to authenticate and access private gem dependencies in Codespaces, local, and production environments. |
 | [Database Migrations](MIGRATIONS.md) | How to generate and manage database migrations for the engine. |

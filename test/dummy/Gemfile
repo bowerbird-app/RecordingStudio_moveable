@@ -6,6 +6,10 @@ gem "recording_studio_moveable", path: "../.."
 # RecordingStudio engine
 gem "recording_studio", "~> 4.2", github: "bowerbird-app/RecordingStudio", tag: "v4.3.0"
 gem "recording_studio_accessible", "~> 0.6", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.11.1"
+
+# Dummy-only language switching. Moveable ships English; hosts own other languages.
+gem "recording_studio_internationalization",
+    github: "bowerbird-app/RecordingStudio_Internationalization", tag: "v0.1.2"
 # RecordingStudio API still requires recording_studio ~> 3.0, so it is deferred until
 # that gem declares RecordingStudio 4 support. Moveable's optional API adapter remains
 # in the gem and registers only when the API engine is loaded.
@@ -35,7 +39,7 @@ gem "tailwindcss-rails"
 
 # FlatPack UI component library [https://github.com/bowerbird-app/flatpack]
 # Pin to the same FlatPack release as the gem development Gemfile.
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.198"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.209"
 gem "recording_studio_icons", github: "bowerbird-app/RecordingStudio_icons"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]

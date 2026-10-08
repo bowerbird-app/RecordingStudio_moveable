@@ -2,6 +2,8 @@
 
 module RecordingStudioMoveable
   module MoveablesHelper
+    include CopyHelper
+
     def recording_studio_moveable_meta_tags
       tag.meta(name: "recording-studio-moveable", content: "enabled")
     end
@@ -16,7 +18,7 @@ module RecordingStudioMoveable
     end
 
     def recording_studio_moveable_modal_template
-      content_tag(:div, data: { recording_studio_moveable_modal_root: true }) do
+      content_tag(:div, data: recording_studio_moveable_modal_root_data) do
         recording_studio_moveable_modal_component
       end
     end
@@ -34,7 +36,7 @@ module RecordingStudioMoveable
     end
 
     def moveable_title_for(recording)
-      "Move #{moveable_label_for(recording).delete_prefix('📁 ')}"
+      Copy.t("dialog.title", name: moveable_label_for(recording).delete_prefix("📁 "))
     end
 
     def moveable_root_label(count: 1)
@@ -57,7 +59,7 @@ module RecordingStudioMoveable
       workspace_roots.map do |workspace_root|
         moveable_picker_item_attributes(workspace_root).merge(
           kind: "workspace",
-          description: "Choose destinations in #{moveable_label_for(workspace_root)}"
+          description: Copy.t("dialog.workspace_description", name: moveable_label_for(workspace_root))
         )
       end
     end
@@ -80,6 +82,10 @@ module RecordingStudioMoveable
         label: label,
         payload: { id: recording.id }
       }
+    end
+
+    def recording_studio_moveable_modal_root_data
+      { recording_studio_moveable_modal_root: true }.merge(moveable_modal_copy_data)
     end
 
     def recordable_labels

@@ -7,10 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-10-08
+
+### Added
+- Customer move-dialog, flash, helper, and user-facing error copy uses Rails I18n under `recording_studio.moveable.*`. The gem ships English only in `config/locales/en.yml`.
+- Dummy app adds Recording Studio Internationalization (dummy only) with a French locale file covering every engine key.
+
 ### Changed
-- Pin development and dummy bundles to RecordingStudio `v4.2.2`.
+- Success flash key moves from `recording_studio_moveable.moveables.update.notice` to `recording_studio.moveable.flashes.moved`. A host override of the old key still wins.
+- Dummy pins FlatPack `v0.1.209`.
+- Pin development and dummy bundles to RecordingStudio `v4.2.2` / tag `v4.3.0`.
 - Pin development and dummy bundles to RecordingStudioAccessible `v0.11.1`.
 - Upgrade the dummy app to Accessible `0.11`: string `role` values, `depends_on_recording_id`, access invitations, first-owner `bootstrap_owner_access!`, and later grants through `RecordingStudioAccessible.grant_access`.
+
+### Upgrade Notes
+- Install Moveable `3.1.0`. No migration. This is a minor release: the old notice key still works as a fallback, so hosts that overrode it are not silently broken.
+- Copy `recording_studio.moveable.*` into host locale files for other languages.
+- Helper override `recording_studio_moveable_root_label` and host I18n overrides still win over locale defaults.
+- Recording and folder names stay data and are not translated.
+- Support's HEAD gemspec pins `recording_studio_moveable ~> 3.0`, which includes `3.1.0` (`>= 3.0` and `< 4.0`). It does not exclude this version.
 
 ## [3.0.1] - 2026-09-02
 
@@ -89,7 +104,8 @@ Cloud Agent Builds match RecordingStudio_billing v0.9.13.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.0.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.1.0...HEAD
+[3.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.0.1...3.1.0
 [3.0.1]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.0.0...3.0.1
 [3.0.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.1.1...3.0.0
 [2.1.1]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.1.0...2.1.1

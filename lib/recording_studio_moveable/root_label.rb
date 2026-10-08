@@ -13,7 +13,7 @@ module RecordingStudioMoveable
     end
 
     def default(count: 1)
-      count.to_i == 1 ? "workspace" : "workspaces"
+      Copy.t("roots", count: count.to_i)
     end
   end
 end

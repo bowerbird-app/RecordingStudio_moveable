@@ -100,7 +100,7 @@ module RecordingStudioMoveable
     def ensure_actor!
       return if current_recording_studio_actor.present?
 
-      raise RecordingStudio::AccessDenied, "A current actor is required to move recordings"
+      raise RecordingStudio::AccessDenied, Copy.t("errors.actor_required")
     end
 
     def filtered_destinations
@@ -125,7 +125,7 @@ module RecordingStudioMoveable
     def find_destination!(destination_id)
       destination = RecordingStudio::Recording.find(destination_id)
       unless destination_search.allowed_destination?(destination)
-        raise RecordingStudio::AccessDenied, "Destination is not allowed for this move"
+        raise RecordingStudio::AccessDenied, Copy.t("errors.destination_not_allowed")
       end
 
       destination
@@ -289,7 +289,7 @@ module RecordingStudioMoveable
     end
 
     def move_success_notice
-      I18n.t("recording_studio_moveable.moveables.update.notice", default: "Moved successfully.")
+      Copy.t("flashes.moved")
     end
 
     def recording_redirect_path_for(recording, mode:)

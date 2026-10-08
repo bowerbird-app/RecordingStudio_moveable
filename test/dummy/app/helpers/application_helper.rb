@@ -1,4 +1,6 @@
 module ApplicationHelper
+  include DummyLayoutHelper
+
   def moveable_demo_icon_classes(size: :md)
     case size.to_sym
     when :lg

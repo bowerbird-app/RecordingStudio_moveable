@@ -150,6 +150,9 @@ class MoveablesHelperTest < Minitest::Test
     html = render_helper.recording_studio_moveable_modal_template
 
     assert_includes html, 'data-recording-studio-moveable-modal-root="true"'
+    assert_includes html, "data-recording-studio-moveable-updating="
+    assert_includes html, "data-recording-studio-moveable-moving="
+    assert_includes html, "data-recording-studio-moveable-load-error="
     assert_includes html, "<modal-body />"
   end
 
