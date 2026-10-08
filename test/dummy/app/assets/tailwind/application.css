@@ -12,6 +12,10 @@
 @source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
 @source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/RecordingStudio-*/app/views/**/*.erb";
 @source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/RecordingStudio_accessible-*/app/views/**/*.erb";
+@source "../../../../../../usr/local/lib/ruby/gems/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
+@source "../../../../../../usr/local/lib/ruby/gems/*/bundler/gems/RecordingStudio-*/app/views/**/*.erb";
+@source "../../../../../../usr/local/lib/ruby/gems/*/bundler/gems/RecordingStudio_accessible-*/app/views/**/*.erb";
+@source "../../../../../../usr/local/lib/ruby/gems/*/bundler/gems/RecordingStudio_Internationalization-*/app/**/*.{rb,erb}";
 
 /* Extend Tailwind theme with the FlatPack tokens used by the dummy app. */
 @theme {

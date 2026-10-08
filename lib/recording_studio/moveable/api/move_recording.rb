@@ -4,10 +4,10 @@ module RecordingStudio
   module Moveable
     module Api
       class MoveRecording
-        MOVE_CONFLICT_MESSAGES = [
-          "Cannot move a recording under itself",
-          "Cannot move a recording under its descendant",
-          "Destination must belong to this root recording"
+        MOVE_CONFLICT_KEYS = %w[
+          errors.cannot_move_under_itself
+          errors.cannot_move_under_descendant
+          errors.destination_wrong_root
         ].freeze
 
         def self.call(context)
@@ -94,7 +94,7 @@ module RecordingStudio
         end
 
         def known_move_conflict?(error)
-          MOVE_CONFLICT_MESSAGES.include?(error.message)
+          MOVE_CONFLICT_KEYS.any? { |key| error.message == RecordingStudioMoveable::Copy.t(key) }
         end
 
         def invalid_move_input_error(error)

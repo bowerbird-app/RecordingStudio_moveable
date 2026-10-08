@@ -38,7 +38,7 @@ class MoveModalLauncher {
     const formData = new FormData(form)
     const requestId = ++this.requestSequence
 
-    this.renderLoading(method === "GET" ? "Updating destinations..." : "Moving item...")
+    this.renderLoading(method === "GET" ? this.copy("updating") : this.copy("moving"))
 
     await this.load(form.action, {
       method,
@@ -156,7 +156,7 @@ class MoveModalLauncher {
 
     body.innerHTML = `
       <div class="rounded-2xl border border-red-500/20 bg-red-500/10 px-5 py-4 text-sm text-red-700">
-        Unable to load the move view right now. Please try again.
+        ${this.copy("loadError")}
       </div>
     `
   }
@@ -194,6 +194,17 @@ class MoveModalLauncher {
     }
 
     return headers
+  }
+
+  copy(name) {
+    const fallbacks = {
+      updating: "Updating destinations...",
+      moving: "Moving item...",
+      loadError: "Unable to load the move view right now. Please try again."
+    }
+    const root = this.rootElement()
+    const datasetKey = `recordingStudioMoveable${name.charAt(0).toUpperCase()}${name.slice(1)}`
+    return root?.dataset?.[datasetKey] || fallbacks[name] || ""
   }
 
   shouldHandleClick(event, trigger) {

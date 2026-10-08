@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** April 28, 2026
+> *   **Last Updated:** October 8, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -117,6 +117,14 @@ The resolver receives:
 - `mode`: the active redirect mode (`moved_record` or `destination`).
 
 ---
+
+## Translating copy
+
+The gem ships English under `recording_studio.moveable.*`. Hosts add other languages in their own locale files. `recording_studio_moveable_root_label` and host I18n overrides still win. The old flash key `recording_studio_moveable.moveables.update.notice` is still read when present.
+
+Stored names (pages, folders, workspaces) stay data.
+
+See the [README internationalization section](../../README.md#internationalization).
 
 ## Configuration Methods
 

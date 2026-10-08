@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative "../../app/helpers/recording_studio_moveable/copy_helper"
 require_relative "../../app/helpers/recording_studio_moveable/moveables_helper"
 
 module RecordingStudioMoveable
@@ -8,6 +9,7 @@ module RecordingStudioMoveable
 
     initializer "recording_studio_moveable.view_helpers" do
       ActiveSupport.on_load(:action_view) do
+        include RecordingStudioMoveable::CopyHelper
         include RecordingStudioMoveable::MoveablesHelper
       end
     end

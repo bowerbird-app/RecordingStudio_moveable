@@ -47,7 +47,7 @@ module RecordingStudio
               assert_parent_recording_not_self_or_descendant!(new_parent)
 
               if cross_root?(new_parent) && !moveable_allows_cross_root?
-                raise ArgumentError, "Destination must belong to this root recording"
+                raise ArgumentError, RecordingStudioMoveable::Copy.t("errors.destination_wrong_root")
               end
 
               assert_recording_belongs_to_root!(new_parent) unless cross_root_move?(new_parent)
@@ -101,11 +101,13 @@ module RecordingStudio
           end
 
           def assert_parent_recording_not_self_or_descendant!(new_parent)
-            raise ArgumentError, "Cannot move a recording under itself" if new_parent.id == id
+            if new_parent.id == id
+              raise ArgumentError, RecordingStudioMoveable::Copy.t("errors.cannot_move_under_itself")
+            end
 
             return unless descendant_ids.include?(new_parent.id)
 
-            raise ArgumentError, "Cannot move a recording under its descendant"
+            raise ArgumentError, RecordingStudioMoveable::Copy.t("errors.cannot_move_under_descendant")
           end
 
           def cross_root_move?(new_parent)

@@ -1,5 +1,20 @@
 # Upgrading RecordingStudio Moveable
 
+## Upgrading to Moveable 3.1
+
+Moveable 3.1 adds Rails I18n for customer-facing move copy. No migration. This is a minor release because the old success-flash key still works.
+
+```ruby
+gem "recording_studio_moveable", "~> 3.1"
+```
+
+1. Copy `recording_studio.moveable.*` from this gem's `config/locales/en.yml` into the host's `config/locales/<locale>.yml` for every language you offer.
+2. Leave `recording_studio_moveable_root_label` and any host I18n override as they are. Those still win over locale defaults.
+3. If the host overrode `recording_studio_moveable.moveables.update.notice`, that string still shows. New overrides should use `recording_studio.moveable.flashes.moved`.
+4. Do not add `RecordingStudio_Internationalization` to this gem. Add it on the host when you want a language selector.
+
+Recording and folder names stay untranslated.
+
 ## Upgrading to Moveable 3.0 / RecordingStudio 4.2
 
 Moveable 3.0 requires RecordingStudio `~> 4.2` and Accessible `~> 0.6`. The host verb is now keyword-only `.to`, which wraps core's enablement factory. Move behavior itself is unchanged: destination parent types still come from core declarations, and Moveable still owns same-root / cross-root rules, authorization, UI, and move event logging.

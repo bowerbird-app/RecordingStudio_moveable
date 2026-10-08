@@ -8,6 +8,10 @@ module RecordingStudioMoveable
     include Rails.application.routes.url_helpers
 
     helper Rails.application.routes.url_helpers
+    helper RecordingStudioMoveable::CopyHelper
+    helper RecordingStudioMoveable::MoveablesHelper
+    include RecordingStudioMoveable::CopyHelper
+    include RecordingStudioMoveable::MoveablesHelper
 
     private
 

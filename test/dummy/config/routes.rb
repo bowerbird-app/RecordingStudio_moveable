@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  mount RecordingStudioInternationalization::Engine, at: "/recording_studio_internationalization"
   devise_for :users
 
   # RecordingStudio engine is data/API-focused and has no browser root route.

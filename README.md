@@ -34,7 +34,7 @@ Add to your Gemfile:
 gem "recording_studio", "~> 4.2"
 gem "recording_studio_accessible", "~> 0.6"
 gem "recording_studio_moveable"
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.198"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.209"
 ```
 
 Then bundle install and mount the moveable engine UI routes:
@@ -181,9 +181,29 @@ The addon enforces access checks inside the gem-owned move controller.
 - The write path still re-checks authorization inside `move_to!`; UI filtering is not the only enforcement layer.
 - The write path calls `RecordingStudio.assert_parent_allowed!` before updating hierarchy.
 
+## Internationalization
+
+The gem ships **English only** in `config/locales/en.yml`. Keys nest under `recording_studio.moveable.*`:
+
+```ruby
+t("recording_studio.moveable.dialog.title", name: "Lyric Draft")
+t("recording_studio.moveable.flashes.moved")
+t("recording_studio.moveable.errors.destination_not_allowed")
+```
+
+Hosts own other languages. Copy `recording_studio.moveable.*` into `config/locales/<locale>.yml` and list that locale in `config.i18n.available_locales`. Do not add `RecordingStudio_Internationalization` as a dependency of this gem — it is optional on the host (the dummy uses it to switch English/French).
+
+A host override of `recording_studio_moveable.moveables.update.notice` still wins for the success flash. New hosts should set `recording_studio.moveable.flashes.moved`.
+
+`recording_studio_moveable_root_label` and any host I18n override still win over locale defaults. Stored names stay data: recording titles, folder names, and workspace names are not translated.
+
+Engine demo/docs pages, generator text, API action developer errors (`parent_id is required for move`, destination-not-found in API scope, move-not-supported for a type), and capability setup errors stay English.
+
+Add [Recording Studio Internationalization](https://github.com/bowerbird-app/RecordingStudio_Internationalization) on the host when you want a language selector.
+
 ## Dummy app demo
 
-The dummy app explicitly installs `recording_studio` `~> 4.2` (tag `v4.3.0`), `recording_studio_accessible` (tag `v0.11.1`), and `recording_studio_moveable`. Hosts still depend on Accessible `~> 0.6`. The dummy itself is on Accessible `0.11`, so its schema stores access `role` as a string (`view` / `edit` / `admin`), keeps `depends_on_recording_id`, and has access invitations. Seeds and tests grant the first owner with `RecordingStudioAccessible.bootstrap_owner_access!` and later grants with `grant_access`.
+The dummy app explicitly installs `recording_studio` `~> 4.2` (tag `v4.3.0`), `recording_studio_accessible` (tag `v0.11.1`), and `recording_studio_moveable`. Hosts still depend on Accessible `~> 0.6`. The dummy itself is on Accessible `0.11`, so its schema stores access `role` as a string (`view` / `edit` / `admin`), keeps `depends_on_recording_id`, and has access invitations. Seeds and tests grant the first owner with `RecordingStudioAccessible.bootstrap_owner_access!` and later grants with `grant_access`. Dummy pins FlatPack `v0.1.209` and (dummy only) Recording Studio Internationalization `v0.1.2`. Dummy offers English and French. The language selector sits in the top nav, to the left of the workspace switcher. French keys live in `test/dummy/config/locales/fr.yml`. The engine does not ship French.
 
 It includes:
 
