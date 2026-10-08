@@ -4,7 +4,7 @@ source "https://rubygems.org"
 gem "recording_studio_moveable", path: "../.."
 
 # RecordingStudio engine
-gem "recording_studio", "~> 4.2", github: "bowerbird-app/RecordingStudio", tag: "v4.2.2"
+gem "recording_studio", "~> 4.2", github: "bowerbird-app/RecordingStudio", tag: "v4.3.0"
 gem "recording_studio_accessible", "~> 0.6", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.11.1"
 # RecordingStudio API still requires recording_studio ~> 3.0, so it is deferred until
 # that gem declares RecordingStudio 4 support. Moveable's optional API adapter remains

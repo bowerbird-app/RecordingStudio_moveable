@@ -183,7 +183,7 @@ The addon enforces access checks inside the gem-owned move controller.
 
 ## Dummy app demo
 
-The dummy app explicitly installs `recording_studio` `~> 4.2` (tag `v4.2.2`), `recording_studio_accessible` (tag `v0.11.1`), and `recording_studio_moveable`. Hosts still depend on Accessible `~> 0.6`. The dummy itself is on Accessible `0.11`, so its schema stores access `role` as a string (`view` / `edit` / `admin`), keeps `depends_on_recording_id`, and has access invitations. Seeds and tests grant the first owner with `RecordingStudioAccessible.bootstrap_owner_access!` and later grants with `grant_access`.
+The dummy app explicitly installs `recording_studio` `~> 4.2` (tag `v4.3.0`), `recording_studio_accessible` (tag `v0.11.1`), and `recording_studio_moveable`. Hosts still depend on Accessible `~> 0.6`. The dummy itself is on Accessible `0.11`, so its schema stores access `role` as a string (`view` / `edit` / `admin`), keeps `depends_on_recording_id`, and has access invitations. Seeds and tests grant the first owner with `RecordingStudioAccessible.bootstrap_owner_access!` and later grants with `grant_access`.
 
 It includes:
 
