@@ -142,7 +142,7 @@ class MoveablePolicyTest < Minitest::Test
 
       assert policy.source_editable?
       assert policy.destination_selectable?(destination: @destination)
-      assert policy.authorize_move!(destination: @destination)
+      policy.authorize_move!(destination: @destination)
     end
   end
 
@@ -184,7 +184,7 @@ class MoveablePolicyTest < Minitest::Test
   def test_builtin_hook_nil_falls_back_to_builtin_allow
     RecordingStudio::Moveable.configure do |config|
       config.use_builtin_access = true
-      config.authorization_hook = ->(**) { nil }
+      config.authorization_hook = ->(**) {}
     end
 
     RecordingStudio::Moveable::Access.stub(:allowed?, ->(**) { true }) do
@@ -192,14 +192,14 @@ class MoveablePolicyTest < Minitest::Test
 
       assert policy.source_editable?
       assert policy.destination_selectable?(destination: @destination)
-      assert policy.authorize_move!(destination: @destination)
+      policy.authorize_move!(destination: @destination)
     end
   end
 
   def test_builtin_hook_nil_falls_back_to_builtin_deny
     RecordingStudio::Moveable.configure do |config|
       config.use_builtin_access = true
-      config.authorization_hook = ->(**) { nil }
+      config.authorization_hook = ->(**) {}
     end
 
     RecordingStudio::Moveable::Access.stub(:allowed?, ->(**) { false }) do

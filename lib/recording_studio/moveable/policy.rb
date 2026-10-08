@@ -53,9 +53,7 @@ module RecordingStudio
 
         decision = hook_decision(destination: destination)
         return true if decision == true
-        if decision == false
-          raise RecordingStudio::AccessDenied, RecordingStudioMoveable::Copy.t("errors.hook_denied")
-        end
+        raise RecordingStudio::AccessDenied, RecordingStudioMoveable::Copy.t("errors.hook_denied") if decision == false
 
         built_in_move_allowed!(destination: destination)
       end
