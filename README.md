@@ -17,6 +17,7 @@
   - supports `actor`, optional `impersonator`, optional `metadata`
 - Authorization modes:
   - **Built-in mode (default):** uses `recording_studio_accessible` public access API to resolve roles and direct grants, and raises `RecordingStudio::AccessDenied` on failures
+  - **Optional hook with built-in fallback:** keep built-in mode on and set `authorization_hook`; `true` allows, `false` denies, `nil` falls through to the Accessible `:edit` checks
   - **Custom hook mode:** disable built-in mode and provide your own `authorization_hook`
 - Gem-provided reusable move UI:
   - full-page mode
@@ -123,6 +124,21 @@ Move screens read the acting principal from `Current.actor` by default. If your 
 ```ruby
 RecordingStudioMoveable.configure do |config|
   config.current_actor_resolver = ->(controller:) { controller.current_user }
+end
+```
+
+### Authorization hook with built-in fallback
+
+Keep `use_builtin_access = true` and set `authorization_hook` when a host rule should allow or deny a move before Accessible `:edit` is checked. Return `true` to allow without tree access, `false` to deny even when the actor has `:edit`, or `nil` to use the built-in source and destination edit checks. The move UI (`source_editable?`, `destination_selectable?`) and `authorize_move!` share this order.
+
+```ruby
+RecordingStudio::Moveable.configure do |config|
+  config.use_builtin_access = true
+  config.authorization_hook = lambda do |actor:, source:, destination:, impersonator:, metadata:|
+    next true if actor.respond_to?(:staff?) && actor.staff? && actor.allowed_to?(:edit)
+    next false if actor.blank?
+    nil
+  end
 end
 ```
 

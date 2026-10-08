@@ -3,7 +3,8 @@
 module RecordingStudio
   module Moveable
     class Configuration
-      attr_accessor :use_builtin_access, :authorization_hook, :redirect_resolver
+      attr_accessor :use_builtin_access, :redirect_resolver
+      attr_reader :authorization_hook
       attr_writer :default_redirect_path, :default_redirect_mode
 
       def initialize
@@ -11,9 +12,19 @@ module RecordingStudio
         @use_builtin_access = true
         # Safe default: custom mode denies unless the host app explicitly allows.
         @authorization_hook = ->(**) { false }
+        @authorization_hook_set = false
         @default_redirect_path = "/"
         @default_redirect_mode = :previous_page
         @redirect_resolver = nil
+      end
+
+      def authorization_hook=(hook)
+        @authorization_hook_set = true
+        @authorization_hook = hook
+      end
+
+      def authorization_hook_set?
+        @authorization_hook_set
       end
 
       def default_redirect_path

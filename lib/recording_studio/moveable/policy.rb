@@ -19,6 +19,9 @@ module RecordingStudio
       def source_editable?
         return custom_allowed?(destination: source) unless built_in_access?
 
+        decision = hook_decision(destination: source)
+        return decision unless decision.nil?
+
         editable_recording?(source)
       end
 
@@ -29,7 +32,10 @@ module RecordingStudio
       def destination_selectable?(destination:)
         return custom_allowed?(destination: destination) unless built_in_access?
 
-        source_editable? && editable_recording?(destination)
+        decision = hook_decision(destination: destination)
+        return decision unless decision.nil?
+
+        editable_recording?(source) && editable_recording?(destination)
       end
 
       def filter_visible_destinations(destinations:)
@@ -39,11 +45,19 @@ module RecordingStudio
       end
 
       def authorize_move!(destination:)
-        return built_in_move_allowed!(destination: destination) if built_in_access?
+        unless built_in_access?
+          return true if custom_allowed?(destination: destination)
 
-        return true if custom_allowed?(destination: destination)
+          raise RecordingStudio::AccessDenied, RecordingStudioMoveable::Copy.t("errors.hook_denied")
+        end
 
-        raise RecordingStudio::AccessDenied, RecordingStudioMoveable::Copy.t("errors.hook_denied")
+        decision = hook_decision(destination: destination)
+        return true if decision == true
+        if decision == false
+          raise RecordingStudio::AccessDenied, RecordingStudioMoveable::Copy.t("errors.hook_denied")
+        end
+
+        built_in_move_allowed!(destination: destination)
       end
 
       private
@@ -81,6 +95,16 @@ module RecordingStudio
           impersonator: impersonator,
           metadata: metadata
         )
+      end
+
+      def hook_decision(destination:)
+        return nil unless RecordingStudio::Moveable.configuration.authorization_hook_set?
+
+        result = custom_allowed?(destination: destination)
+        return true if result == true
+        return false if result == false
+
+        nil
       end
     end
   end
