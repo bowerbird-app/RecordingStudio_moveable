@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Success flash key moves from `recording_studio_moveable.moveables.update.notice` to `recording_studio.moveable.flashes.moved`. A host override of the old key still wins.
-- Dummy pins FlatPack `v0.1.209`.
+- Dummy pins FlatPack `v0.1.209`. Destination and workspace pickers pass `empty_text` so I18n empty-state copy shows.
 - Pin development and dummy bundles to RecordingStudio `v4.2.2` / tag `v4.3.0`.
 - Pin development and dummy bundles to RecordingStudioAccessible `v0.11.1`.
 - Upgrade the dummy app to Accessible `0.11`: string `role` values, `depends_on_recording_id`, access invitations, first-owner `bootstrap_owner_access!`, and later grants through `RecordingStudioAccessible.grant_access`.

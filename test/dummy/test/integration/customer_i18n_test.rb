@@ -43,6 +43,7 @@ class CustomerI18nTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Choose destination"
     assert_includes response.body, "Search destinations"
     assert_includes response.body, ">Change<"
+    assert_includes response.body, "No allowed destinations found"
     assert_includes response.body, "Move Me"
     refute_includes response.body, "Choisir une destination"
   end
@@ -57,6 +58,7 @@ class CustomerI18nTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Choisir une destination"
     assert_includes response.body, "Rechercher une destination"
     assert_includes response.body, ">Changer<"
+    assert_includes response.body, "Aucune destination autorisée"
     assert_includes response.body, "Move Me"
     refute_includes response.body, "Choose destination"
     refute_includes response.body, "Search destinations"
