@@ -135,6 +135,86 @@ class MoveablePolicyTest < Minitest::Test
 
     assert_equal "Move authorization hook denied this move", error.message
   end
+
+  def test_builtin_mode_without_hook_still_uses_edit_access
+    RecordingStudio::Moveable::Access.stub(:allowed?, ->(**) { true }) do
+      policy = RecordingStudio::Moveable::Policy.new(actor: @actor, source: @source)
+
+      assert policy.source_editable?
+      assert policy.destination_selectable?(destination: @destination)
+      policy.authorize_move!(destination: @destination)
+    end
+  end
+
+  def test_builtin_hook_true_allows_without_tree_access
+    RecordingStudio::Moveable.configure do |config|
+      config.use_builtin_access = true
+      config.authorization_hook = ->(**) { true }
+    end
+
+    RecordingStudio::Moveable::Access.stub(:allowed?, ->(**) { false }) do
+      policy = RecordingStudio::Moveable::Policy.new(actor: @actor, source: @source)
+
+      assert policy.source_editable?
+      assert policy.destination_selectable?(destination: @destination)
+      assert policy.authorize_move!(destination: @destination)
+    end
+  end
+
+  def test_builtin_hook_false_denies_even_with_tree_access
+    RecordingStudio::Moveable.configure do |config|
+      config.use_builtin_access = true
+      config.authorization_hook = ->(**) { false }
+    end
+
+    RecordingStudio::Moveable::Access.stub(:allowed?, ->(**) { true }) do
+      policy = RecordingStudio::Moveable::Policy.new(actor: @actor, source: @source)
+
+      assert_not policy.source_editable?
+      assert_not policy.destination_selectable?(destination: @destination)
+
+      error = assert_raises(RecordingStudio::AccessDenied) do
+        policy.authorize_move!(destination: @destination)
+      end
+
+      assert_equal "Move authorization hook denied this move", error.message
+    end
+  end
+
+  def test_builtin_hook_nil_falls_back_to_builtin_allow
+    RecordingStudio::Moveable.configure do |config|
+      config.use_builtin_access = true
+      config.authorization_hook = ->(**) {}
+    end
+
+    RecordingStudio::Moveable::Access.stub(:allowed?, ->(**) { true }) do
+      policy = RecordingStudio::Moveable::Policy.new(actor: @actor, source: @source)
+
+      assert policy.source_editable?
+      assert policy.destination_selectable?(destination: @destination)
+      policy.authorize_move!(destination: @destination)
+    end
+  end
+
+  def test_builtin_hook_nil_falls_back_to_builtin_deny
+    RecordingStudio::Moveable.configure do |config|
+      config.use_builtin_access = true
+      config.authorization_hook = ->(**) {}
+    end
+
+    RecordingStudio::Moveable::Access.stub(:allowed?, ->(**) { false }) do
+      policy = RecordingStudio::Moveable::Policy.new(actor: @actor, source: @source)
+
+      assert_not policy.source_editable?
+      assert_not policy.destination_selectable?(destination: @destination)
+
+      error = assert_raises(RecordingStudio::AccessDenied) do
+        policy.authorize_move!(destination: @destination)
+      end
+
+      assert_equal "Actor does not have edit access on the source recording", error.message
+    end
+  end
 end
 
 class MoveableAuthorizationTest < Minitest::Test

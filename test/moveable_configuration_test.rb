@@ -13,6 +13,7 @@ class MoveableConfigurationTest < Minitest::Test
 
   def test_default_configuration_uses_builtin_access
     assert RecordingStudio::Moveable.configuration.use_builtin_access
+    assert_not RecordingStudio::Moveable.configuration.authorization_hook_set?
   end
 
   def test_default_redirect_mode_defaults_to_previous_page

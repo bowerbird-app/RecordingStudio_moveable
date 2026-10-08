@@ -42,4 +42,13 @@ RecordingStudio::Moveable.configure do |config|
 
   # Override how host-app URLs are generated for moved records and destinations.
   # config.redirect_resolver = ->(recording:, helpers:, fallback:, mode:) { fallback }
+
+  # Optional move-permission rule. With use_builtin_access = true (the default),
+  # return true to allow, false to deny, or nil to fall through to Accessible :edit
+  # on the source and destination. With use_builtin_access = false the hook decides
+  # alone (nil/false deny).
+  # config.authorization_hook = lambda do |actor:, source:, destination:, impersonator:, metadata:|
+  #   next true if actor.respond_to?(:admin?) && actor.admin?
+  #   nil
+  # end
 end

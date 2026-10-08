@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.0] - 2026-10-08
+
+### Added
+- When `use_builtin_access` is true and a host sets `authorization_hook`, the hook runs first: `true` allows, `false` denies, `nil` falls through to the existing Accessible `:edit` checks on source and destination. The move UI and `authorize_move!` share this order.
+
+### Upgrade Notes
+- Install Moveable `3.2.0`. No migration. Hosts that leave the hook unset keep built-in-only behavior. Hosts that set `use_builtin_access = false` still let the hook decide alone.
+
 ## [3.1.0] - 2026-10-08
 
 ### Added
@@ -104,7 +112,8 @@ Cloud Agent Builds match RecordingStudio_billing v0.9.13.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.1.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.2.0...HEAD
+[3.2.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.1.0...3.2.0
 [3.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.0.1...3.1.0
 [3.0.1]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.0.0...3.0.1
 [3.0.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/2.1.1...3.0.0
