@@ -17,11 +17,11 @@ require "yaml"
 # seed the backend from en.yml without touching the load path.
 I18n.available_locales = Array(I18n.available_locales) | %i[en]
 I18n.default_locale = :en
-_gem_english = YAML.safe_load_file(
+gem_english = YAML.safe_load_file(
   File.expand_path("../config/locales/en.yml", __dir__),
   aliases: true
 ).fetch("en")
-I18n.backend.store_translations(:en, _gem_english)
+I18n.backend.store_translations(:en, gem_english)
 
 module Minitest
   module Assertions
