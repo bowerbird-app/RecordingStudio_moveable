@@ -1,5 +1,19 @@
 # Upgrading RecordingStudio Moveable
 
+## Upgrading to Moveable 3.3
+
+Moveable 3.3 hardens host locale overrides for Rails 8.1. No migration.
+
+```ruby
+gem "recording_studio_moveable", "~> 3.3"
+```
+
+1. Override copy by defining the same `recording_studio.moveable.*` keys in the host's `config/locales`. The engine does not append its own `i18n.load_path`.
+2. The legacy flash key `recording_studio_moveable.moveables.update.notice` is **deprecated**. It still wins when present; new overrides should use `recording_studio.moveable.flashes.moved`.
+3. Do not add `RecordingStudio_Internationalization` to this gem. Add it on the host when you want a language selector.
+
+Recording and folder names stay untranslated.
+
 ## Upgrading to Moveable 3.1
 
 Moveable 3.1 adds Rails I18n for customer-facing move copy. No migration. This is a minor release because the old success-flash key still works.
@@ -10,7 +24,7 @@ gem "recording_studio_moveable", "~> 3.1"
 
 1. Copy `recording_studio.moveable.*` from this gem's `config/locales/en.yml` into the host's `config/locales/<locale>.yml` for every language you offer.
 2. Leave `recording_studio_moveable_root_label` and any host I18n override as they are. Those still win over locale defaults.
-3. If the host overrode `recording_studio_moveable.moveables.update.notice`, that string still shows. New overrides should use `recording_studio.moveable.flashes.moved`.
+3. If the host overrode `recording_studio_moveable.moveables.update.notice` (deprecated), that string still shows. New overrides should use `recording_studio.moveable.flashes.moved`.
 4. Do not add `RecordingStudio_Internationalization` to this gem. Add it on the host when you want a language selector.
 
 Recording and folder names stay untranslated.

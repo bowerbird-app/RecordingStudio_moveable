@@ -1,0 +1,7 @@
+# Test-only host English override. Kept outside config/locales so the default
+# dummy UI stays on gem English. Loaded only inside HostLocaleOverrideTest.
+en:
+  recording_studio:
+    moveable:
+      js:
+        load_error: "HOST unable to load the move view."

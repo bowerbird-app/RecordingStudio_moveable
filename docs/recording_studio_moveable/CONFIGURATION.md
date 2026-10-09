@@ -120,7 +120,7 @@ The resolver receives:
 
 ## Translating copy
 
-The gem ships English under `recording_studio.moveable.*`. Hosts add other languages in their own locale files. `recording_studio_moveable_root_label` and host I18n overrides still win. The old flash key `recording_studio_moveable.moveables.update.notice` is still read when present.
+The gem ships English under `recording_studio.moveable.*`. Hosts add other languages (and English overrides) by defining the same keys in their own `config/locales`. The engine does not append its own `i18n.load_path`. `recording_studio_moveable_root_label` and host I18n overrides still win. The legacy flash key `recording_studio_moveable.moveables.update.notice` is deprecated but still read when present.
 
 Stored names (pages, folders, workspaces) stay data.
 
