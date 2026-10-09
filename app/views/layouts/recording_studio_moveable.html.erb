@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html <%= tag.attributes(moveable_document_attributes({ "data-theme" => "rounded", class: "light" })) %>>
   <head>
-    <title><%= content_for(:title) || moveable_t("layout.title") %></title>
+    <title><%= content_for(:title) || moveable_t("layout.title", default: "Move") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="<%= moveable_t("layout.title") %>">
+    <meta name="application-name" content="<%= moveable_t("layout.title", default: "Move") %>">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>

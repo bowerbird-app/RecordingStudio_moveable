@@ -1,0 +1,11 @@
+# Dummy-host English override. Rails loads config/locales automatically, so this
+# file wins over the gem's en.yml without any explicit load-path append. Proves
+# the engine does not re-add its locales after the host (which would clobber this).
+#
+# Overrides js.load_error only (modal data attribute). Visible move chrome stays
+# on gem English so default UI and existing rendered tests are unchanged.
+en:
+  recording_studio:
+    moveable:
+      js:
+        load_error: "HOST unable to load the move view."

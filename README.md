@@ -207,9 +207,9 @@ t("recording_studio.moveable.flashes.moved")
 t("recording_studio.moveable.errors.destination_not_allowed")
 ```
 
-Hosts own other languages. Copy `recording_studio.moveable.*` into `config/locales/<locale>.yml` and list that locale in `config.i18n.available_locales`. Do not add `RecordingStudio_Internationalization` as a dependency of this gem — it is optional on the host (the dummy uses it to switch English/French).
+Hosts own other languages. Copy `recording_studio.moveable.*` into `config/locales/<locale>.yml` and list that locale in `config.i18n.available_locales`. Hosts override gem English by defining the same keys in their own `config/locales`. The engine does not append its own `i18n.load_path`. Do not add `RecordingStudio_Internationalization` as a dependency of this gem — it is optional on the host (the dummy uses it to switch English/French).
 
-A host override of `recording_studio_moveable.moveables.update.notice` still wins for the success flash. New hosts should set `recording_studio.moveable.flashes.moved`.
+**Deprecated:** `recording_studio_moveable.moveables.update.notice`. A host override of that legacy key still wins for the success flash. New hosts should set `recording_studio.moveable.flashes.moved`. The gem does not ship English under the legacy namespace.
 
 `recording_studio_moveable_root_label` and any host I18n override still win over locale defaults. Stored names stay data: recording titles, folder names, and workspace names are not translated.
 
