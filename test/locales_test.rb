@@ -20,11 +20,18 @@ class LocalesTest < Minitest::Test
     end
   end
 
-  def test_engine_does_not_append_i18n_load_path_in_an_initializer
-    engine_source = File.read(File.expand_path("../lib/recording_studio_moveable/engine.rb", __dir__))
+  def test_lib_sources_do_not_append_i18n_load_path
+    lib_dir = File.expand_path("../lib", __dir__)
+    ruby_files = Dir[File.join(lib_dir, "**", "*.rb")]
 
-    refute_includes engine_source, "i18n.load_path"
-    refute_includes engine_source, "I18n.load_path"
+    refute_empty ruby_files, "expected lib/**/*.rb files to scan"
+
+    ruby_files.each do |path|
+      source = File.read(path)
+
+      refute_includes source, "i18n.load_path", "#{path} must not touch i18n.load_path"
+      refute_includes source, "I18n.load_path", "#{path} must not touch I18n.load_path"
+    end
   end
 
   def test_dummy_french_covers_every_engine_english_key
@@ -187,9 +194,9 @@ class LocalesTest < Minitest::Test
     { recording_studio_moveable: { moveables: { update: { notice: nil } } } }
   end
 
-  # Gem English assertions must ignore dummy host overrides under
-  # test/dummy/config/locales. Always restore I18n.load_path, then re-seed
-  # the unit-suite backend (unit tests do not put gem locales on the load path).
+  # Gem English assertions load only the engine en.yml. Always restore
+  # I18n.load_path, then re-seed the unit-suite backend (unit tests do not put
+  # gem locales on the load path).
   def with_gem_english_locale_only
     previous = I18n.load_path.dup
     I18n.load_path = [File.join(engine_locales_dir, "en.yml")]

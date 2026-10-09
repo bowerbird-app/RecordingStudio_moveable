@@ -10,8 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [3.3.0] - 2026-10-09
 
 ### Added
-- Host English override coverage: dummy `config/locales/moveable_host_override.en.yml` plus an integration test that a nested `recording_studio.moveable.*` key wins on a real move modal without any engine `i18n.load_path` append.
-- Locale regression: engine source must not mention `i18n.load_path` / `I18n.load_path`; layout title / `application-name` meta pass an English `default:` so non-HTML surfaces never emit “Translation missing”.
+- Host English override coverage: test-only fixture `test/dummy/test/locales/host_override.en.yml` plus an integration test that appends it last to `I18n.load_path`, reloads, asserts a nested `recording_studio.moveable.*` key wins on a real move modal, then restores the load path. The default dummy UI stays on gem English.
+- Locale regression: every `lib/**/*.rb` file must not mention `i18n.load_path` / `I18n.load_path`; layout title / `application-name` meta pass an English `default:` so non-HTML surfaces never emit “Translation missing”.
 
 ### Changed
 - Document the deprecated legacy flash key `recording_studio_moveable.moveables.update.notice` and that hosts override by defining the same nested keys in their own `config/locales` (the engine does not re-append its locales).
