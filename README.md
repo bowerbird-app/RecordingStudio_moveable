@@ -219,7 +219,7 @@ Add [Recording Studio Internationalization](https://github.com/bowerbird-app/Rec
 
 ## Dummy app demo
 
-The dummy app explicitly installs `recording_studio` `~> 4.2` (tag `v4.3.0`), `recording_studio_accessible` (tag `v0.11.1`), and `recording_studio_moveable`. Hosts still depend on Accessible `~> 0.6`. The dummy itself is on Accessible `0.11`, so its schema stores access `role` as a string (`view` / `edit` / `admin`), keeps `depends_on_recording_id`, and has access invitations. Seeds and tests grant the first owner with `RecordingStudioAccessible.bootstrap_owner_access!` and later grants with `grant_access`. Dummy pins FlatPack `v0.1.209` and (dummy only) Recording Studio Internationalization `v0.1.2`. Dummy offers English and French. The language selector sits in the top nav, to the left of the workspace switcher. French keys live in `test/dummy/config/locales/fr.yml`. The engine does not ship French.
+The dummy app explicitly installs `recording_studio` `~> 4.2` (tag `v4.5.0`), `recording_studio_accessible` (tag `v0.13.0`), and `recording_studio_moveable`. Hosts still depend on Accessible `~> 0.6`. The dummy itself is on Accessible `0.13`, so its schema stores access `role` as a string (`view` / `edit` / `admin`), keeps `depends_on_recording_id`, and has access invitations. Seeds and tests grant the first owner with `RecordingStudioAccessible.bootstrap_owner_access!` and later grants with `grant_access`. Dummy pins FlatPack `v0.1.209` and (dummy only) Recording Studio Internationalization `v0.1.2`. Dummy offers English and French. The language selector sits in the top nav, to the left of the workspace switcher. French keys live in `test/dummy/config/locales/fr.yml`. The engine does not ship French.
 
 It includes:
 
