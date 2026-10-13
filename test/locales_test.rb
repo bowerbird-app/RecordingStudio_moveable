@@ -13,10 +13,18 @@ class LocalesTest < Minitest::Test
   end
 
   def test_rails_i18n_load_path_includes_the_gem_english_locale_file
-    with_gem_english_locale_only do
-      locale_path = File.join(engine_locales_dir, "en.yml")
+    # Real guard: never append i18n.load_path from lib (the previous body set
+    # I18n.load_path then asserted inclusion, which always passed).
+    lib_dir = File.expand_path("../lib", __dir__)
+    ruby_files = Dir[File.join(lib_dir, "**", "*.rb")]
 
-      assert_includes I18n.load_path.map { |path| File.expand_path(path) }, File.expand_path(locale_path)
+    refute_empty ruby_files, "expected lib/**/*.rb files to scan"
+
+    ruby_files.each do |path|
+      source = File.read(path)
+
+      refute_includes source, "i18n.load_path", "#{path} must not touch i18n.load_path"
+      refute_includes source, "I18n.load_path", "#{path} must not touch I18n.load_path"
     end
   end
 
@@ -32,6 +40,39 @@ class LocalesTest < Minitest::Test
       refute_includes source, "i18n.load_path", "#{path} must not touch i18n.load_path"
       refute_includes source, "I18n.load_path", "#{path} must not touch I18n.load_path"
     end
+  end
+
+  def test_copy_t_passes_english_defaults_for_every_shipped_key
+    Copy::DEFAULTS.each_key do |key|
+      assert Copy::DEFAULTS[key], "expected DEFAULTS entry for #{key}"
+    end
+
+    with_isolated_backend do
+      I18n.with_locale(:en) do
+        assert_equal "Moved successfully.", Copy.t("flashes.moved")
+        assert_equal "Choose destination", Copy.t("dialog.subtitle")
+        assert_equal "workspace", Copy.t("roots", count: 1)
+        assert_equal "workspaces", Copy.t("roots", count: 2)
+        assert_equal "Destination is not allowed for this move", Copy.t("errors.destination_not_allowed")
+      end
+    end
+  end
+
+  def test_copy_defaults_match_engine_en_yml_leaves
+    tree = locale_tree(File.join(engine_locales_dir, "en.yml"), "en")
+    leaves = flatten_leaf_values(tree)
+
+    leaves.each do |key, english|
+      default = Copy::DEFAULTS.fetch(key)
+      if default.is_a?(Hash)
+        assert_equal english.fetch("one"), default.fetch(:one), key
+        assert_equal english.fetch("other"), default.fetch(:other), key
+      else
+        assert_equal english, default, key
+      end
+    end
+
+    assert_equal leaves.keys.sort, Copy::DEFAULTS.keys.sort
   end
 
   def test_dummy_french_covers_every_engine_english_key
@@ -210,5 +251,29 @@ class LocalesTest < Minitest::Test
 
   def gem_english_tree
     YAML.safe_load_file(File.join(engine_locales_dir, "en.yml"), aliases: true).fetch("en")
+  end
+
+  def flatten_leaf_values(hash, prefix = [])
+    hash.each_with_object({}) do |(key, value), leaves|
+      path = prefix + [key.to_s]
+      if value.is_a?(Hash) && !(value.key?("one") || value.key?(:one))
+        leaves.merge!(flatten_leaf_values(value, path))
+      else
+        leaves[path.join(".")] = value
+      end
+    end
+  end
+
+  # Snapshot and restore the backend so callers that wipe translations cannot
+  # leak into later tests (order-independent).
+  def with_isolated_backend
+    previous_backend = I18n.backend
+    previous_locale = I18n.locale
+    I18n.backend = I18n::Backend::Simple.new
+    I18n.locale = :en
+    yield
+  ensure
+    I18n.backend = previous_backend
+    I18n.locale = previous_locale
   end
 end

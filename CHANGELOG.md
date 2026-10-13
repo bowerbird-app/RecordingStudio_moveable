@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0] - 2026-10-13
+
+### Added
+- English `default:` on every `Copy.t` lookup (`Copy::DEFAULTS`) so a host locale without a fallback never shows “translation missing”.
+- Always-loaded dummy boot-order host override on the rarely shown `errors.destination_not_allowed` key (`test/dummy/config/locales/recording_studio_moveable_host.en.yml`), with a real-page flash assertion. Default move chrome stays on gem English.
+- English controller-level coverage that a legacy `recording_studio_moveable.moveables.update.notice` host override still wins for the success flash.
+
+### Changed
+- `test_rails_i18n_load_path_includes_the_gem_english_locale_file` is a real `lib/**/*.rb` scan for `i18n.load_path` / `I18n.load_path` (it previously set the load path and then asserted inclusion).
+
+### Upgrade Notes
+- Install Moveable `3.4.0`. No migration. Host overrides of `recording_studio.moveable.*` and the legacy notice key keep working. Copy nested keys into host locale files for other languages. English output is unchanged from `3.3.x`.
+
 ## [3.3.0] - 2026-10-09
 
 ### Added
@@ -124,7 +137,9 @@ Cloud Agent Builds match RecordingStudio_billing v0.9.13.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.2.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v3.4.0...HEAD
+[3.4.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v3.3.0...v3.4.0
+[3.3.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v3.2.0...v3.3.0
 [3.2.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.1.0...3.2.0
 [3.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.0.1...3.1.0
 [3.0.1]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.0.0...3.0.1

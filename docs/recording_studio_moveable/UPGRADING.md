@@ -1,5 +1,20 @@
 # Upgrading RecordingStudio Moveable
 
+## Upgrading to Moveable 3.4
+
+Moveable 3.4 finishes i18n wave 2 for non-view copy hardening. No migration. English output is unchanged from 3.3.x.
+
+```ruby
+gem "recording_studio_moveable", "~> 3.4"
+```
+
+1. Every `Copy.t` lookup now carries an English `default:` so a host locale without a fallback never shows “translation missing”.
+2. Override copy by defining the same `recording_studio.moveable.*` keys in the host's `config/locales`. The engine does not append its own `i18n.load_path`.
+3. The legacy flash key `recording_studio_moveable.moveables.update.notice` remains deprecated and still wins when present.
+4. Do not add `RecordingStudio_Internationalization` to this gem. Add it on the host when you want a language selector.
+
+Recording and folder names stay untranslated.
+
 ## Upgrading to Moveable 3.3
 
 Moveable 3.3 hardens host locale overrides for Rails 8.1. No migration.

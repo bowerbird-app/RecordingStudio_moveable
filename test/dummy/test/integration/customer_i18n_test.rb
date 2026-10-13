@@ -91,6 +91,27 @@ class CustomerI18nTest < ActionDispatch::IntegrationTest
     assert_equal @target_folder.id, @page.reload.parent_recording_id
   end
 
+  def test_legacy_notice_override_still_wins_in_english
+    I18n.t("recording_studio.moveable.flashes.moved")
+    I18n.backend.store_translations(:en, {
+      recording_studio_moveable: { moveables: { update: { notice: "Host moved it." } } }
+    })
+    assert_equal "Host moved it.", RecordingStudioMoveable::Copy.t("flashes.moved")
+
+    post recording_studio_moveable.move_recording_path(recording_id: @page.id), params: {
+      destination_id: @target_folder.id
+    }
+
+    assert_equal "Host moved it.", flash[:notice]
+    follow_redirect!
+    assert_includes response.body, "Host moved it."
+    refute_includes response.body, "Moved successfully."
+  ensure
+    I18n.backend.store_translations(:en, {
+      recording_studio_moveable: { moveables: { update: { notice: nil } } }
+    })
+  end
+
   def test_legacy_notice_override_still_wins_in_french
     I18n.backend.store_translations(:fr, {
       recording_studio_moveable: { moveables: { update: { notice: "Host moved it." } } }

@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** October 8, 2026
+> *   **Last Updated:** October 13, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -120,7 +120,7 @@ The resolver receives:
 
 ## Translating copy
 
-The gem ships English under `recording_studio.moveable.*`. Hosts add other languages (and English overrides) by defining the same keys in their own `config/locales`. The engine does not append its own `i18n.load_path`. `recording_studio_moveable_root_label` and host I18n overrides still win. The legacy flash key `recording_studio_moveable.moveables.update.notice` is deprecated but still read when present.
+The gem ships English under `recording_studio.moveable.*`. Every `Copy.t` lookup passes an English `default:` so a host locale without a fallback never shows “translation missing”. Hosts add other languages (and English overrides) by defining the same keys in their own `config/locales`. The engine does not append its own `i18n.load_path`. `recording_studio_moveable_root_label` and host I18n overrides still win. The legacy flash key `recording_studio_moveable.moveables.update.notice` is deprecated but still read when present.
 
 Stored names (pages, folders, workspaces) stay data.
 
