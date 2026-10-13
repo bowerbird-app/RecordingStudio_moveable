@@ -1,0 +1,7 @@
+# Always-loaded host override for the real boot-order guard.
+# Overrides a rarely shown error flash so the default move UI stays on gem English.
+en:
+  recording_studio:
+    moveable:
+      errors:
+        destination_not_allowed: "HOST Destination is not allowed for this move"

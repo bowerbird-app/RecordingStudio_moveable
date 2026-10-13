@@ -13,10 +13,18 @@ class LocalesTest < Minitest::Test
   end
 
   def test_rails_i18n_load_path_includes_the_gem_english_locale_file
-    with_gem_english_locale_only do
-      locale_path = File.join(engine_locales_dir, "en.yml")
+    # Real guard: never append i18n.load_path from lib (the previous body set
+    # I18n.load_path then asserted inclusion, which always passed).
+    lib_dir = File.expand_path("../lib", __dir__)
+    ruby_files = Dir[File.join(lib_dir, "**", "*.rb")]
 
-      assert_includes I18n.load_path.map { |path| File.expand_path(path) }, File.expand_path(locale_path)
+    refute_empty ruby_files, "expected lib/**/*.rb files to scan"
+
+    ruby_files.each do |path|
+      source = File.read(path)
+
+      refute_includes source, "i18n.load_path", "#{path} must not touch i18n.load_path"
+      refute_includes source, "I18n.load_path", "#{path} must not touch I18n.load_path"
     end
   end
 
@@ -32,6 +40,39 @@ class LocalesTest < Minitest::Test
       refute_includes source, "i18n.load_path", "#{path} must not touch i18n.load_path"
       refute_includes source, "I18n.load_path", "#{path} must not touch I18n.load_path"
     end
+  end
+
+  def test_copy_t_missing_key_matches_main_translation_missing_string
+    # Copy.t must not inject English defaults: a locale with no key and no
+    # fallbacks returns the same "Translation missing: ..." string as I18n.t.
+    previous_available = I18n.available_locales.dup
+    previous_default = I18n.default_locale
+    previous_locale = I18n.locale
+    previous_backend = I18n.backend
+    previous_exception_handler = I18n.exception_handler if I18n.respond_to?(:exception_handler)
+
+    I18n.backend = I18n::Backend::Simple.new
+    I18n.available_locales = %i[zz en]
+    I18n.default_locale = :zz
+    I18n.locale = :zz
+    I18n.exception_handler = I18n::ExceptionHandler.new if I18n.respond_to?(:exception_handler=)
+
+    expected = I18n.t("recording_studio.moveable.flashes.moved")
+    assert_equal "Translation missing: zz.recording_studio.moveable.flashes.moved", expected
+    assert_equal expected, Copy.t("flashes.moved")
+
+    assert_raises(I18n::MissingTranslationData) do
+      I18n.t("recording_studio.moveable.flashes.moved", raise: true)
+    end
+    assert_raises(I18n::MissingTranslationData) do
+      Copy.t("flashes.moved", raise: true)
+    end
+  ensure
+    I18n.backend = previous_backend
+    I18n.available_locales = previous_available
+    I18n.default_locale = previous_default
+    I18n.locale = previous_locale
+    I18n.exception_handler = previous_exception_handler if previous_exception_handler
   end
 
   def test_dummy_french_covers_every_engine_english_key

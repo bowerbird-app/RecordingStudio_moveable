@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** October 8, 2026
+> *   **Last Updated:** October 13, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
