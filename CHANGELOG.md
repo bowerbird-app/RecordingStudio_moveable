@@ -10,15 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [3.4.0] - 2026-10-13
 
 ### Added
-- English `default:` on every `Copy.t` lookup (`Copy::DEFAULTS`) so a host locale without a fallback never shows “translation missing”.
 - Always-loaded dummy boot-order host override on the rarely shown `errors.destination_not_allowed` key (`test/dummy/config/locales/recording_studio_moveable_host.en.yml`), with a real-page flash assertion. Default move chrome stays on gem English.
 - English controller-level coverage that a legacy `recording_studio_moveable.moveables.update.notice` host override still wins for the success flash.
+- Locale regression: a locale with no key and no fallbacks returns the same `Translation missing: ...` string from `Copy.t` as from `I18n.t` (no injected English defaults).
 
 ### Changed
 - `test_rails_i18n_load_path_includes_the_gem_english_locale_file` is a real `lib/**/*.rb` scan for `i18n.load_path` / `I18n.load_path` (it previously set the load path and then asserted inclusion).
 
 ### Upgrade Notes
-- Install Moveable `3.4.0`. No migration. Host overrides of `recording_studio.moveable.*` and the legacy notice key keep working. Copy nested keys into host locale files for other languages. English output is unchanged from `3.3.x`.
+- Install Moveable `3.4.0`. No migration. Host overrides of `recording_studio.moveable.*` and the legacy notice key keep working. Copy nested keys into host locale files for other languages. English output is unchanged from `3.3.x`. `Copy.t` still surfaces I18n “Translation missing” when a key is absent and no fallbacks are configured.
 
 ## [3.3.0] - 2026-10-09
 

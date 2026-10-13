@@ -42,37 +42,37 @@ class LocalesTest < Minitest::Test
     end
   end
 
-  def test_copy_t_passes_english_defaults_for_every_shipped_key
-    Copy::DEFAULTS.each_key do |key|
-      assert Copy::DEFAULTS[key], "expected DEFAULTS entry for #{key}"
+  def test_copy_t_missing_key_matches_main_translation_missing_string
+    # Copy.t must not inject English defaults: a locale with no key and no
+    # fallbacks returns the same "Translation missing: ..." string as I18n.t.
+    previous_available = I18n.available_locales.dup
+    previous_default = I18n.default_locale
+    previous_locale = I18n.locale
+    previous_backend = I18n.backend
+    previous_exception_handler = I18n.exception_handler if I18n.respond_to?(:exception_handler)
+
+    I18n.backend = I18n::Backend::Simple.new
+    I18n.available_locales = %i[zz en]
+    I18n.default_locale = :zz
+    I18n.locale = :zz
+    I18n.exception_handler = I18n::ExceptionHandler.new if I18n.respond_to?(:exception_handler=)
+
+    expected = I18n.t("recording_studio.moveable.flashes.moved")
+    assert_equal "Translation missing: zz.recording_studio.moveable.flashes.moved", expected
+    assert_equal expected, Copy.t("flashes.moved")
+
+    assert_raises(I18n::MissingTranslationData) do
+      I18n.t("recording_studio.moveable.flashes.moved", raise: true)
     end
-
-    with_isolated_backend do
-      I18n.with_locale(:en) do
-        assert_equal "Moved successfully.", Copy.t("flashes.moved")
-        assert_equal "Choose destination", Copy.t("dialog.subtitle")
-        assert_equal "workspace", Copy.t("roots", count: 1)
-        assert_equal "workspaces", Copy.t("roots", count: 2)
-        assert_equal "Destination is not allowed for this move", Copy.t("errors.destination_not_allowed")
-      end
+    assert_raises(I18n::MissingTranslationData) do
+      Copy.t("flashes.moved", raise: true)
     end
-  end
-
-  def test_copy_defaults_match_engine_en_yml_leaves
-    tree = locale_tree(File.join(engine_locales_dir, "en.yml"), "en")
-    leaves = flatten_leaf_values(tree)
-
-    leaves.each do |key, english|
-      default = Copy::DEFAULTS.fetch(key)
-      if default.is_a?(Hash)
-        assert_equal english.fetch("one"), default.fetch(:one), key
-        assert_equal english.fetch("other"), default.fetch(:other), key
-      else
-        assert_equal english, default, key
-      end
-    end
-
-    assert_equal leaves.keys.sort, Copy::DEFAULTS.keys.sort
+  ensure
+    I18n.backend = previous_backend
+    I18n.available_locales = previous_available
+    I18n.default_locale = previous_default
+    I18n.locale = previous_locale
+    I18n.exception_handler = previous_exception_handler if previous_exception_handler
   end
 
   def test_dummy_french_covers_every_engine_english_key
@@ -253,27 +253,4 @@ class LocalesTest < Minitest::Test
     YAML.safe_load_file(File.join(engine_locales_dir, "en.yml"), aliases: true).fetch("en")
   end
 
-  def flatten_leaf_values(hash, prefix = [])
-    hash.each_with_object({}) do |(key, value), leaves|
-      path = prefix + [key.to_s]
-      if value.is_a?(Hash) && !(value.key?("one") || value.key?(:one))
-        leaves.merge!(flatten_leaf_values(value, path))
-      else
-        leaves[path.join(".")] = value
-      end
-    end
-  end
-
-  # Snapshot and restore the backend so callers that wipe translations cannot
-  # leak into later tests (order-independent).
-  def with_isolated_backend
-    previous_backend = I18n.backend
-    previous_locale = I18n.locale
-    I18n.backend = I18n::Backend::Simple.new
-    I18n.locale = :en
-    yield
-  ensure
-    I18n.backend = previous_backend
-    I18n.locale = previous_locale
-  end
 end
