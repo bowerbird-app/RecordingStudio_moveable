@@ -30,6 +30,11 @@ Add to your `Gemfile`:
 ```ruby
 gem "recording_studio", "~> 4.2"
 gem "recording_studio_accessible", "~> 0.6"
+# Accessible >= 0.17 needs Trashable query helpers (prefer require: false).
+gem "recording_studio_trashable", github: "bowerbird-app/RecordingStudio_trashable",
+                                  tag: "v0.10.0", require: false
+gem "recording_studio_metrics", github: "bowerbird-app/RecordingStudio_metrics",
+                                tag: "v0.2.0", require: false
 # From GitHub
 gem "recording_studio_moveable", github: "bowerbird-app/RecordingStudio_moveable"
 
@@ -52,6 +57,11 @@ RecordingStudioMoveable depends on `recording_studio_accessible` for built-in au
 
 ```ruby
 gem "recording_studio_accessible", "~> 0.6"
+# Accessible >= 0.17: query-only Trashable pin (no Trashable engine/UI required).
+gem "recording_studio_trashable", github: "bowerbird-app/RecordingStudio_trashable",
+                                  tag: "v0.10.0", require: false
+gem "recording_studio_metrics", github: "bowerbird-app/RecordingStudio_metrics",
+                                tag: "v0.2.0", require: false
 ```
 
 Then run the Accessible setup if your application does not already have the required access tables:
