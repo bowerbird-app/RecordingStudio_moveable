@@ -252,5 +252,4 @@ class LocalesTest < Minitest::Test
   def gem_english_tree
     YAML.safe_load_file(File.join(engine_locales_dir, "en.yml"), aliases: true).fetch("en")
   end
-
 end
