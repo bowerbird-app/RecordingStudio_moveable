@@ -13,7 +13,8 @@ module RecordingStudioMoveable
 
     # English defaults for every shipped key so a host locale with no fallback
     # never shows "translation missing". Values must stay byte-identical to
-    # config/locales/en.yml.
+    # config/locales/en.yml. I18n interpolation uses %{name}-style tokens.
+    # rubocop:disable Style/FormatStringToken
     DEFAULTS = {
       "layout.title" => "Move",
       "dialog.title" => "Move %{name}",
@@ -41,23 +42,19 @@ module RecordingStudioMoveable
       "errors.source_edit_denied" => "Actor does not have edit access on the source recording",
       "errors.destination_edit_denied" => "Actor does not have edit access on the target recording"
     }.freeze
+    # rubocop:enable Style/FormatStringToken
 
     module_function
 
     def t(key, **options)
       full_key = "#{PREFIX}.#{key}"
       key_s = key.to_s
-      if !options.key?(:default) && DEFAULTS.key?(key_s)
-        options = options.merge(default: DEFAULTS.fetch(key_s))
-      end
+      options = with_english_default(key_s, options)
 
       legacy = LEGACY_KEYS[key_s]
       return I18n.t(legacy, **options) if legacy && I18n.exists?(legacy)
 
-      return I18n.t(full_key, **options) unless key_s.end_with?("_html")
-
-      escaped = options.transform_values { |value| value.is_a?(String) ? ERB::Util.html_escape(value) : value }
-      I18n.t(full_key, **escaped).to_s.html_safe
+      translate_nested(full_key, key_s, options)
     end
 
     def l(object, **)
@@ -79,5 +76,22 @@ module RecordingStudioMoveable
 
       value
     end
+
+    def with_english_default(key_s, options)
+      return options if options.key?(:default) || !DEFAULTS.key?(key_s)
+
+      options.merge(default: DEFAULTS.fetch(key_s))
+    end
+    module_function :with_english_default
+    private_class_method :with_english_default
+
+    def translate_nested(full_key, key_s, options)
+      return I18n.t(full_key, **options) unless key_s.end_with?("_html")
+
+      escaped = options.transform_values { |value| value.is_a?(String) ? ERB::Util.html_escape(value) : value }
+      I18n.t(full_key, **escaped).to_s.html_safe
+    end
+    module_function :translate_nested
+    private_class_method :translate_nested
   end
 end
