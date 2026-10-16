@@ -6,7 +6,7 @@ source "https://rubygems.org"
 gemspec
 
 gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.209"
-gem "recording_studio", "~> 4.2", github: "bowerbird-app/RecordingStudio", tag: "v4.6.0"
+gem "recording_studio", "~> 4.2", github: "bowerbird-app/RecordingStudio", tag: "v4.7.0"
 gem "recording_studio_accessible", "~> 0.6", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.18.0"
 gem "recording_studio_icons", github: "bowerbird-app/RecordingStudio_icons"
 # Trashable gemspec dep is git-only; pin for Bundler resolution.
@@ -15,7 +15,7 @@ gem "recording_studio_metrics", github: "bowerbird-app/RecordingStudio_metrics",
 # Accessible 0.17 query-only trash helpers (gemspec "~> 0.10"); require: false so Bundler
 # does not auto-load the Trashable engine.
 gem "recording_studio_trashable", github: "bowerbird-app/RecordingStudio_trashable",
-                                  tag: "v0.10.0", require: false
+                                  tag: "v0.11.0", require: false
 
 gem "puma"
 gem "sprockets-rails"
