@@ -1,8 +1,7 @@
+<% content_for :title, "Data" %>
+<% content_for :subtitle, "Browse the demo records for each primary data type." %>
+
 <div class="space-y-8">
-  <%= render FlatPack::PageTitle::Component.new(
-    title: "Data",
-    subtitle: "Browse the demo records for each primary data type."
-  ) %>
 
   <% @data_sections.each do |section| %>
     <section class="space-y-4">

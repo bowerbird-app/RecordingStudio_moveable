@@ -1,20 +1,15 @@
-<div class="space-y-8">
-  <%= render FlatPack::PageNav::Component.new(
-    anchor_href: root_path,
-    anchor_label: "All folders"
-  ) %>
+<% content_for :title, @folder.name %>
+<% content_for :subtitle, @children.one? ? "1 item in this folder" : "#{@children.count} items in this folder" %>
+<% flat_pack_page_nav(round: true, style: :default, anchor_href: root_path, anchor_tooltip: "All folders") %>
 
-  <%= render FlatPack::PageTitle::Component.new(
-    title: @folder.name,
-    subtitle: @children.one? ? "1 item in this folder" : "#{@children.count} items in this folder"
-  ) %>
+<div class="space-y-8">
 
   <section>
     <% if @children.any? %>
       <%= render FlatPack::Grid::Component.new(cols: 3, gap: :lg, align: :stretch) do %>
         <% @children.each do |child_recording| %>
           <% recordable_type = child_recording.recordable_type.sub(/^RecordingStudio/, "").underscore.humanize %>
-          <%= render FlatPack::Card::Component.new(style: :elevated, class: "h-full") do |card| %>
+          <%= render FlatPack::Card::Component.new(shadow: :md, class: "h-full") do |card| %>
             <% card.body do %>
               <div class="flex h-full flex-col gap-4">
                 <div class="min-w-0 space-y-3">

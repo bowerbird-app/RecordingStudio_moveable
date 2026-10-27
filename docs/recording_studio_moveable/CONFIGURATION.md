@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** October 13, 2026
+> *   **Last Updated:** October 27, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -37,6 +37,29 @@ This will:
 | `api_key`           | String  | `ENV["RECORDING_STUDIO_MOVEABLE_API_KEY"]` | API key for external service integration.  |
 | `enable_feature_x`  | Boolean | `false`                          | Toggle optional feature X.                 |
 | `timeout`           | Integer | `5`                              | Timeout (seconds) for external calls.      |
+| `layout`            | nil, false, String, or callable | `nil` | Full-page layout. See below. |
+
+---
+
+## Layout
+
+`config.layout` defaults to `nil`. Assignments go through `RecordingStudio::Layout.accept`.
+
+Lookup uses the first value that is not `nil`:
+
+1. `RecordingStudioMoveable.configuration.layout`
+2. `RecordingStudio.configuration.layout`
+3. `"recording_studio/default_layout"`
+
+`false` renders no layout and does not fall through. A callable is invoked as `call(controller:)` and returns a String, `nil`, or `false`. A positional parameter raises `ArgumentError`.
+
+```ruby
+RecordingStudioMoveable.configure do |config|
+  config.layout = ->(controller:) { controller.user_signed_in? ? "application" : false }
+end
+```
+
+The engine controller calls `recording_studio_layout { RecordingStudioMoveable.configuration.layout }`. Modal move responses pass `layout: false` for that action. Full-page views set `content_for :title` and `content_for :subtitle`, and call `flat_pack_page_nav` for the back control. Do not set `layout "recording_studio/default_layout"` on the controller.
 
 ---
 

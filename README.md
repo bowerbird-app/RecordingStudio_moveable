@@ -32,11 +32,14 @@
 Add to your Gemfile:
 
 ```ruby
-gem "recording_studio", "~> 4.2"
+gem "recording_studio", ">= 6.1.0"
 gem "recording_studio_accessible", "~> 0.6"
-gem "recording_studio_moveable"
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.209"
+gem "recording_studio_moveable", "~> 4.0"
+gem "flat_pack", github: "bowerbird-app/flatpack", ref: "1fcbafe94f8eb118f0a22182f63f5110fcc97a56"
+gem "view_component", ">= 4.14", "< 5"
 ```
+
+`flat_pack` is not on RubyGems. The ref above is `FlatPack::VERSION` `0.1.319`. The newest git tag is `v0.1.315`. Moveable 4.0 requires `flat_pack` `>= 0.1.315` and `recording_studio` `>= 6.1.0`.
 
 Then bundle install and mount the moveable engine UI routes:
 
@@ -186,6 +189,24 @@ Treat those values as untrusted request input in custom authorization hooks.
 
 The modal shell is rendered on demand by the gem. Host pages do not need to preload a FlatPack modal container.
 
+## Layout
+
+Full-page move screens use the first layout that is not `nil`:
+
+1. `RecordingStudioMoveable.configuration.layout`
+2. `RecordingStudio.configuration.layout`
+3. `"recording_studio/default_layout"`
+
+`false` renders no layout. A callable is invoked as `call(controller:)` and must return a String, `nil`, or `false`.
+
+```ruby
+RecordingStudioMoveable.configure do |config|
+  config.layout = "application"
+end
+```
+
+Leave `config.layout` as `nil` when the host layout set on RecordingStudio should wrap move screens too. The default layout reads `content_for :title` and `content_for :subtitle`, draws back and close from `flat_pack_page_nav`, and draws page actions from `register_page_nav`. Modal responses render with `layout: false` and keep the title inside the dialog.
+
 ## Move UI access rules
 
 The addon enforces access checks inside the gem-owned move controller.
@@ -219,7 +240,7 @@ Add [Recording Studio Internationalization](https://github.com/bowerbird-app/Rec
 
 ## Dummy app demo
 
-The dummy app explicitly installs `recording_studio` `~> 4.2` (tag `v4.6.0`), `recording_studio_accessible` (tag `v0.18.0`), and `recording_studio_moveable`. Hosts still depend on Accessible `~> 0.6`. The dummy itself is on Accessible `0.18`, so its schema stores access `role` as a string (`view` / `edit` / `admin`), keeps `depends_on_recording_id`, has access invitations, and includes Accessible `0.14` audience tables (`recording_studio_access_constraints`, `recording_studio_access_rules`). Accessible `0.18` resolves soft-trash filters through Trashable query helpers; the dummy pins `recording_studio_trashable` `v0.10.0` and `recording_studio_metrics` `v0.2.0` with `require: false` next to Accessible (query-only; no Trashable engine/UI). Seeds and tests grant the first owner with `RecordingStudioAccessible.bootstrap_owner_access!` and later grants with `grant_access`. Dummy pins FlatPack `v0.1.209` and (dummy only) Recording Studio Internationalization `v0.1.2`. Dummy offers English and French. The language selector sits in the top nav, to the left of the workspace switcher. French keys live in `test/dummy/config/locales/fr.yml`. The engine does not ship French.
+The dummy app installs `recording_studio` tag `v6.1.0`, `recording_studio_accessible` tag `v0.18.0`, and `recording_studio_moveable`. Hosts still depend on Accessible `~> 0.6`. The dummy itself is on Accessible `0.18`, so its schema stores access `role` as a string (`view` / `edit` / `admin`), keeps `depends_on_recording_id`, has access invitations, and includes Accessible `0.14` audience tables (`recording_studio_access_constraints`, `recording_studio_access_rules`). Accessible `0.18` resolves soft-trash filters through Trashable query helpers; the dummy pins `recording_studio_trashable` `v0.11.0` and `recording_studio_metrics` `v0.2.0` with `require: false` next to Accessible (query-only; no Trashable engine/UI). Those gems, and Internationalization `v0.1.2`, still declare `recording_studio` below 5. `test/support/widen_recording_studio_requirement.rb` rewrites that requirement to `>= 6.1.0` when Bundler loads the gemspecs. Newer tags through Accessible `v0.21.0`, Metrics `v0.6.1`, and Internationalization `v0.1.7` still declare the old requirement. Trashable `v0.12.0` already allows `recording_studio` `>= 6.1.0`. Seeds and tests grant the first owner with `RecordingStudioAccessible.bootstrap_owner_access!` and later grants with `grant_access`. Dummy pins FlatPack commit `1fcbafe94f8eb118f0a22182f63f5110fcc97a56` (`0.1.319`). Dummy offers English and French. The language selector sits in the top nav, to the left of the workspace switcher. French keys live in `test/dummy/config/locales/fr.yml`. The engine does not ship French.
 
 It includes:
 

@@ -1,9 +1,7 @@
+<% content_for :title, @workspace.name %>
+<% content_for :subtitle, "Browse folders and pages at the root, then drill into folders for nested content." %>
+
 <div class="space-y-8">
-  <%= render FlatPack::PageTitle::Component.new(
-    title: @workspace.name,
-    subtitle: "Browse folders and pages at the root, then drill into folders for nested content.",
-    variant: :h1
-  ) %>
 
   <section class="space-y-6">
     <% if @items.any? %>
@@ -26,7 +24,7 @@
                                   item_recording.recordable.body.presence || "No preview text available for this page yet."
                                 end %>
 
-          <%= render FlatPack::Card::Component.new(style: :elevated, padding: :none, class: "h-full") do |card| %>
+          <%= render FlatPack::Card::Component.new(shadow: :md, padding: :none, class: "h-full") do |card| %>
             <% card.body do %>
               <div class="flex h-full flex-col gap-4">
                 <div class="space-y-3 min-w-0">

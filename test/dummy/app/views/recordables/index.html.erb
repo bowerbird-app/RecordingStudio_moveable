@@ -1,8 +1,7 @@
+<% content_for :title, "Recordables" %>
+<% content_for :subtitle, "Recordable types registered by the demo application." %>
+
 <div class="space-y-8">
-  <%= render FlatPack::PageTitle::Component.new(
-    title: "Recordables",
-    subtitle: "Recordable types registered by the demo application."
-  ) %>
 
   <%= render FlatPack::Table::Component.new(data: @recordables) do |table| %>
     <% table.column(title: "Type", html: ->(recordable) {

@@ -1,15 +1,11 @@
-<div class="space-y-4">
-  <% recording_studio_page_nav(
-    page_nav_anchor_url: move_back_path,
-    page_nav_anchor_label: moveable_t("dialog.back")
-  ) %>
-  <% default_layout_head { recording_studio_moveable_meta_tags } if respond_to?(:default_layout_head) %>
-
-  <%= render FlatPack::PageTitle::Component.new(
-    title: moveable_t("dialog.change_workspace_title", workspace: moveable_root_label),
-    class: "pb-0 mb-0"
-  ) %>
-</div>
+<% content_for :title, moveable_t("dialog.change_workspace_title", workspace: moveable_root_label) %>
+<% flat_pack_page_nav(
+     round: true,
+     style: :default,
+     back_href: move_back_path,
+     back_tooltip: moveable_t("dialog.back")
+   ) %>
+<% default_layout_head { recording_studio_moveable_meta_tags } if respond_to?(:default_layout_head) %>
 
 <div class="mt-4 max-w-3xl">
   <%= render FlatPack::Picker::Component.new(

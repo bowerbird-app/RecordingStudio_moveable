@@ -22,9 +22,11 @@ RecordingStudioMoveable.configure do |config|
   # Reuse a single gem-owned modal shell between openings.
   # config.move_modal_reuse_shell = true
 
-  # Full-page move screens use RecordingStudio's default layout by default.
-  # Set this to a host-app layout name to embed move screens in your shell.
-  # config.full_page_layout = "recording_studio/default_layout"
+  # Full-page move screens use the first layout that is not nil:
+  # this setting, then RecordingStudio.configuration.layout, then
+  # "recording_studio/default_layout". false skips the layout.
+  # A callable is invoked as call(controller:) and returns a String, nil, or false.
+  # config.layout = nil
 
   # If your app does not populate Current.actor, resolve the acting principal here.
   # config.current_actor_resolver = ->(controller:) { controller.current_user }

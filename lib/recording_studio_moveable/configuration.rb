@@ -12,7 +12,7 @@ module RecordingStudioMoveable
       move_modal_prefetch_delay_ms
       move_modal_prefetch_ttl_ms
       move_modal_reuse_shell
-      full_page_layout
+      layout
       current_actor_resolver
       current_impersonator_resolver
     ].freeze
@@ -24,10 +24,9 @@ module RecordingStudioMoveable
                   :move_modal_prefetch_delay_ms,
                   :move_modal_prefetch_ttl_ms,
                   :move_modal_reuse_shell,
-                  :full_page_layout,
                   :current_actor_resolver,
                   :current_impersonator_resolver
-    attr_reader :hooks
+    attr_reader :hooks, :layout
 
     def initialize
       @api_key = ENV.fetch("RECORDING_STUDIO_MOVEABLE_API_KEY", nil)
@@ -37,9 +36,13 @@ module RecordingStudioMoveable
       @move_modal_prefetch_delay_ms = 80
       @move_modal_prefetch_ttl_ms = 10_000
       @move_modal_reuse_shell = true
-      @full_page_layout = "recording_studio/default_layout"
+      @layout = nil
       initialize_context_resolvers
       @hooks = Hooks.new
+    end
+
+    def layout=(value)
+      @layout = RecordingStudio::Layout.accept(value)
     end
 
     def to_h

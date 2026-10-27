@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 RecordingStudioMoveable.configure do |config|
-  config.full_page_layout = "recording_studio/default_layout"
+  # nil follows RecordingStudio.configuration.layout, then recording_studio/default_layout.
+  config.layout = nil
 end
 
 RecordingStudio::Moveable.configure do |config|

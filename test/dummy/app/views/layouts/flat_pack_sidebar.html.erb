@@ -15,9 +15,10 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "flat_pack/variables", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "flat_pack/application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "flat_pack/rich_text", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <% if recording_studio_moveable_asset_available?("tailwind.css") %>
       <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <% end %>
@@ -47,6 +48,17 @@
 
             <% if alert.present? %>
               <%= render FlatPack::Alert::Component.new(description: alert, style: :danger, dismissible: true, class: "mb-4") %>
+            <% end %>
+
+            <%= flat_pack_page_nav_tag %>
+            <% page_title = content_for(:title).presence %>
+            <% if page_title %>
+              <% title_args = { title: page_title } %>
+              <% page_subtitle = content_for(:subtitle).presence %>
+              <% title_args[:subtitle] = page_subtitle if page_subtitle %>
+              <div class="mb-8">
+                <%= render FlatPack::PageTitle::Component.new(**title_args) %>
+              </div>
             <% end %>
 
             <%= yield %>

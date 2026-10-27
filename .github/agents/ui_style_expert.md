@@ -23,7 +23,7 @@ Refer to the Flatpack gem documentation for the latest instructions and the comp
 ```erb
 <%= render FlatPack::Button::Component.new(text: "Save", style: :primary) %>
 
-<%= render FlatPack::Card::Component.new(style: :elevated) do |card| %>
+<%= render FlatPack::Card::Component.new(shadow: :md) do |card| %>
   <% card.header { "Title" } %>
   <% card.body { "Body content" } %>
 <% end %>

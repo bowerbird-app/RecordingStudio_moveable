@@ -38,6 +38,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     picker_index = response.body.index(%(id="move-destination-picker-#{@page.id}"))
 
     assert_includes response.body, "Move Move Me"
+    assert_select "h1", text: "Move Move Me", count: 1
     assert_includes response.body, "Choose destination"
     refute_includes response.body, "Move Move Me to..."
     refute_includes response.body, "Search or choose a destination below."
@@ -46,7 +47,7 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "aria-label=\"Breadcrumb\""
     assert_includes response.body, %(href="/")
     assert_includes response.body, 'data-recording-studio-default-layout="true"'
-    assert_includes response.body, %(data-controller="flat-pack--page-nav")
+    assert_includes response.body, 'aria-label="Return to previous page"'
     assert_includes response.body, "Search destinations"
     assert_includes response.body, @workspace.name
     assert_includes response.body, ">Change<"
@@ -71,8 +72,10 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'data-recording-studio-moveable-modal-body="true"'
     assert_includes response.body, 'data-recording-studio-moveable-modal-element="true"'
     assert_includes response.body, "Move Move Me"
+    assert_select "h1", text: "Move Move Me", count: 1
     assert_includes response.body, "Choose destination"
     refute_includes response.body, "Search or choose a destination below."
+    refute_includes response.body, "aria-label=\"Page navigation\""
     assert_includes response.body, %(data-controller="flat-pack--picker")
     assert_includes response.body, "!border-0 !bg-transparent !shadow-none !rounded-none !p-0 sm:!p-0"
     refute_includes response.body, "Main navigation"
