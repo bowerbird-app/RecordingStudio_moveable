@@ -1,18 +1,22 @@
-<div class="space-y-4">
-  <% if @display == :full_page %>
-    <% recording_studio_page_nav(
-      page_nav_anchor_url: move_back_path,
-      page_nav_anchor_label: moveable_t("dialog.back")
+<% if @display == :full_page %>
+  <% content_for :title, title %>
+  <% content_for :subtitle, moveable_t("dialog.subtitle") %>
+  <% flat_pack_page_nav(
+       round: true,
+       style: :default,
+       back_href: move_back_path,
+       back_tooltip: moveable_t("dialog.back")
+     ) %>
+  <% default_layout_head { recording_studio_moveable_meta_tags } if respond_to?(:default_layout_head) %>
+<% else %>
+  <div class="space-y-4">
+    <%= render FlatPack::PageTitle::Component.new(
+      title: title,
+      subtitle: moveable_t("dialog.subtitle"),
+      class: "pb-0 mb-0"
     ) %>
-    <% default_layout_head { recording_studio_moveable_meta_tags } if respond_to?(:default_layout_head) %>
-  <% end %>
-
-  <%= render FlatPack::PageTitle::Component.new(
-    title: title,
-    subtitle: moveable_t("dialog.subtitle"),
-    class: "pb-0 mb-0"
-  ) %>
-</div>
+  </div>
+<% end %>
 
 <div class="mt-4 max-w-3xl">
   <% if @workspace_selection_path.present? %>

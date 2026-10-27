@@ -16,7 +16,7 @@ module RecordingStudioMoveable
 
     def show
       prepare_show_state
-      render layout: full_page_layout
+      render_move_screen
     end
 
     def modal
@@ -30,7 +30,7 @@ module RecordingStudioMoveable
       @back_path = workspace_recording_path
       @workspace_roots = filtered_workspace_roots
 
-      render layout: full_page_layout
+      render_move_screen
     end
 
     def update
@@ -347,10 +347,12 @@ module RecordingStudioMoveable
       redirect_uri.port.blank? || redirect_uri.port == current_uri.port
     end
 
-    def full_page_layout
-      return false unless @display == :full_page
-
-      RecordingStudioMoveable.configuration.full_page_layout.presence || "recording_studio/default_layout"
+    def render_move_screen
+      if @display == :full_page
+        render
+      else
+        render layout: false
+      end
     end
   end
   # rubocop:enable Metrics/ClassLength

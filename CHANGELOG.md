@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-10-27
+
+### Breaking
+- Require `recording_studio` `>= 6.1.0` and `flat_pack` `>= 0.1.315`. Development and the dummy pin RecordingStudio tag `v6.1.0` and FlatPack commit `1fcbafe94f8eb118f0a22182f63f5110fcc97a56` (`FlatPack::VERSION` `0.1.319`). The newest FlatPack tag is `v0.1.315`.
+- Require `view_component` `>= 4.14`, `< 5`. The lock is `4.19.0`.
+- Remove `RecordingStudioMoveable.configuration.full_page_layout`. Full-page screens use `config.layout`, which defaults to `nil`.
+- Remove `RecordingStudio::UsesDefaultLayout` and hard-coded `layout "recording_studio/default_layout"`. Controllers call `recording_studio_layout { RecordingStudioMoveable.configuration.layout }`.
+- Remove `recording_studio_page_nav` and inline page titles on full-page move screens. The default layout renders one `FlatPack::PageTitle` from `content_for :title` and `content_for :subtitle`. Back uses `flat_pack_page_nav`. Modal responses still render the title inside the dialog and use `layout: false`.
+
+### Upgrade Notes
+- Install Moveable `4.0.0` with RecordingStudio `v6.1.0` and FlatPack `>= 0.1.315` (this repo pins commit `1fcbafe` for `0.1.319`). `flat_pack` is git-only.
+- Delete `config.full_page_layout`. Set `config.layout` only when this gem should use a different layout than `RecordingStudio.configuration.layout`. `nil` falls through to that setting, then `"recording_studio/default_layout"`. `false` skips the layout. A callable must be `->(controller:) { ... }` and return a String, `nil`, or `false`.
+- Replace `recording_studio_page_nav` with `flat_pack_page_nav(round: true, style: :default, back_href:, back_tooltip:, anchor_href:, anchor_tooltip:)`. Register page actions with `register_page_nav`. Put the visible title in `content_for :title` so the layout renders one `<h1>`.
+- `Card` no longer accepts `style:`. Use `background:`, `border:`, and `shadow:`.
+- Accessible `v0.21.0`, Metrics `v0.6.1`, Trashable `v0.11.0`, and Internationalization `v0.1.7` still require `recording_studio` below 5. This repo loads `test/support/widen_recording_studio_requirement.rb` so Bundler can resolve `6.1.0`. Trashable `v0.12.0` already allows `>= 6.1.0`.
+- Accessible `v0.18.0` manage screens do not render on FlatPack `0.1.319`. `user_invites.html.erb` passes `style:` to Card. `recording_accesses/index.html.erb` and `_form.html.erb` pass `anchor_href:` to `FlatPack::PageNav::Component`. `v0.21.0` and main `98e68a45` still pass `style: :default` to Card in `user_invites.html.erb`. Move behavior is unchanged. Same-root and descendant rules, `RecordingStudio.assert_parent_allowed!`, the hierarchy transaction, both authorization modes, and the 404 for an inaccessible source stay as they are.
+
 ## [3.4.0] - 2026-10-13
 
 ### Added

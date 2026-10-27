@@ -1,8 +1,7 @@
+<% content_for :title, "Events" %>
+<% content_for :subtitle, "Newest events first so move activity is visible immediately." %>
+
 <div class="space-y-8">
-  <%= render FlatPack::PageTitle::Component.new(
-    title: "Events",
-    subtitle: "Newest events first so move activity is visible immediately."
-  ) %>
 
   <% if @events.any? %>
     <%= render FlatPack::Table::Component.new(data: @events) do |table| %>

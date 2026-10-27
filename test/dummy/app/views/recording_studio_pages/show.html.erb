@@ -1,7 +1,5 @@
-<%= render FlatPack::PageTitle::Component.new(
-  title: @page.title,
-  subtitle: "Page demo"
-) %>
+<% content_for :title, @page.title %>
+<% content_for :subtitle, "Page demo" %>
 
 <%= render FlatPack::ButtonGroup::Component.new(class: "mt-4") do |group| %>
   <% group.button(

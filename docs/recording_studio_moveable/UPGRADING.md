@@ -1,5 +1,20 @@
 # Upgrading RecordingStudio Moveable
 
+## Upgrading to Moveable 4.0
+
+Moveable 4.0 requires RecordingStudio `>= 6.1.0` and FlatPack `>= 0.1.315`. `config.full_page_layout` is gone. See `MIGRATION_NOTES.md` for the host steps.
+
+```ruby
+gem "recording_studio_moveable", "~> 4.0"
+```
+
+1. Set `RecordingStudioMoveable.configuration.layout` instead of `full_page_layout`. `nil` follows `RecordingStudio.configuration.layout`, then `"recording_studio/default_layout"`.
+2. Remove `RecordingStudio::UsesDefaultLayout` and any hard-coded `layout "recording_studio/default_layout"`.
+3. Put full-page titles in `content_for :title` and `content_for :subtitle`. Use `flat_pack_page_nav` for back and close, and `register_page_nav` for page actions.
+4. Load FlatPack stylesheets before Tailwind.
+
+Move authorization, descendant protection, and the hierarchy transaction are unchanged.
+
 ## Upgrading to Moveable 3.4
 
 Moveable 3.4 finishes i18n wave 2 leftovers (boot-order host override guard, locales load-path scan, legacy notice coverage). No migration. English output is unchanged from 3.3.x. `Copy.t` does not inject English defaults; missing keys still surface I18n “Translation missing” when no fallbacks are configured.
