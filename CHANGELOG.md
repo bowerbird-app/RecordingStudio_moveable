@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Point the Unreleased compare link at `v4.0.1...HEAD`.
+- Replace leftover `gem_template` names in CI Postgres, RuboCop excludes, and GitHub agent docs.
+- Set gemspec authors to Bowerbird.
+- Align optional API docs with this gem's RecordingStudio `>= 6.1.0` requirement. Admin is not a Moveable dependency.
+- Remove stale `UPDATE_SUMMARY.md`.
+
 ## [4.0.1] - 2026-10-28
 
 ### Fixed
@@ -162,7 +169,7 @@ Cloud Agent Builds match RecordingStudio_billing v0.9.13.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v3.4.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.0.1...HEAD
 [3.4.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v3.3.0...v3.4.0
 [3.3.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v3.2.0...v3.3.0
 [3.2.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/3.1.0...3.2.0

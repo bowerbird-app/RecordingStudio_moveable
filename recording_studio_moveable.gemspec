@@ -5,7 +5,7 @@ require_relative "lib/recording_studio_moveable/version"
 Gem::Specification.new do |spec|
   spec.name        = "recording_studio_moveable"
   spec.version     = RecordingStudioMoveable::VERSION
-  spec.authors     = ["Your Name"]
+  spec.authors     = ["Bowerbird"]
   spec.email       = ["your.email@example.com"]
   spec.homepage    = "https://github.com/bowerbird-app/RecordingStudio_moveable"
   spec.summary     = "RecordingStudio move capability addon with reusable move UI"

@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** August 21, 2026
+> *   **Last Updated:** October 28, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -10,9 +10,8 @@
 
 `recording_studio_moveable` works without `recording_studio_api`. When the host application installs
 `RecordingStudioApi`, Moveable registers a member `move` action for the `:movable` capability during engine
-initialization. Current RecordingStudio API releases still require RecordingStudio `~> 3.0`, so this optional
-integration is deferred until that gem declares RecordingStudio 4 support. Keep the adapter in host apps that
-already have a compatible API engine.
+initialization. This gem requires RecordingStudio `>= 6.1.0`. RecordingStudio Admin is not a Moveable
+dependency. Keep the adapter in host apps that already have a compatible API engine.
 
 The action contract is version `1.0.0`, uses `POST`, and requires `:edit`. A surface exposes it only when the
 recordable type enables `:movable` **and** that API surface's recordable-type registration explicitly allowlists
@@ -40,12 +39,10 @@ target an accessible, editable destination whose type is listed in `allowed_pare
 
 ## Install the Optional API Engine
 
-Add the API and its browser-administration dependency to the **host application's** `Gemfile`. They are
-intentionally not dependencies of this gem.
+Add the API engine to the **host application's** `Gemfile`. It is intentionally not a dependency of this gem.
 
 ```ruby
 gem "recording_studio_api", github: "bowerbird-app/RecordingStudio_api", tag: "0.2.0"
-gem "recording_studio_admin", github: "bowerbird-app/RecordingStudio_admin", tag: "1.1.0"
 ```
 
 Then run the API generators from the host application directory:
