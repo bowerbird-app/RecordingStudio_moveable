@@ -22,7 +22,12 @@
   <% if @workspace_selection_path.present? %>
     <div class="mb-4 flex flex-wrap items-center gap-2 text-sm text-(--surface-muted-content-color)">
       <strong><%= moveable_label_for(@target_root || @current_root) %></strong>
-      <%= link_to moveable_t("dialog.change"), @workspace_selection_path, class: "font-medium text-[var(--color-primary)] hover:underline" %>
+      <%= render FlatPack::Button::Component.new(
+        text: moveable_t("dialog.change"),
+        href: @workspace_selection_path,
+        style: :ghost,
+        size: :sm
+      ) %>
     </div>
   <% end %>
 

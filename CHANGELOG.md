@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.2] - 2026-10-28
+
+### Changed
+- The move screen's Change control is `FlatPack::Button::Component` (`text:`, `href:`, `style: :ghost`, `size: :sm`) instead of a raw `link_to`. Label, destination, and authorization are unchanged.
+
+### Upgrade Notes
+- Install Moveable `4.0.2`. No migration. Hosts that restyle the Change link with CSS targeting the old unclassed `link_to` should target `.fp-button` instead.
+
 ## [4.0.1] - 2026-10-28
 
 ### Fixed
