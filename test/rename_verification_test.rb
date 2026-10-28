@@ -112,6 +112,13 @@ class RenameVerificationTest < Minitest::Test
                  "Gemspec should have name = '#{@gem_name}'")
   end
 
+  def test_gemspec_authors_are_bowerbird
+    content = read_gemspec
+    assert_match(/spec\.authors\s*=\s*\["Bowerbird"\]/,
+                 content,
+                 "Gemspec authors should match sibling Recording Studio gems")
+  end
+
   def test_gemspec_references_correct_version_module
     content = read_gemspec
     assert_match(/#{@pascal_name}::VERSION/, content,
@@ -249,6 +256,65 @@ class RenameVerificationTest < Minitest::Test
 
     assert files_with_old_refs.empty?,
            "Found old 'gem_template' references in:\n#{files_with_old_refs.join("\n")}"
+  end
+
+  def test_rubocop_excludes_do_not_reference_gem_template
+    skip if skip_old_name_cleanup_checks?
+
+    path = File.join(@root, ".rubocop.yml")
+    refute_includes File.read(path), "lib/gem_template",
+                    ".rubocop.yml should not exclude leftover lib/gem_template paths"
+  end
+
+  def test_ci_postgres_database_uses_gem_name
+    skip if skip_old_name_cleanup_checks?
+
+    content = File.read(File.join(@root, ".github", "workflows", "ci.yml"))
+    refute_includes content, "gem_template_test",
+                    "CI should not use the leftover gem_template_test database name"
+    assert_includes content, "POSTGRES_DB: #{@gem_name}_test"
+    assert_includes content, "DATABASE_URL: postgres://postgres:postgres@localhost:5432/#{@gem_name}_test"
+  end
+
+  def test_agent_docs_do_not_point_at_gem_template
+    skip if skip_old_name_cleanup_checks?
+
+    agent_dir = File.join(@root, ".github", "agents")
+    stale = Dir[File.join(agent_dir, "*.md")].select do |file|
+      File.read(file).include?("docs/gem_template")
+    end
+
+    assert stale.empty?,
+           "Agent files still point at docs/gem_template:\n#{stale.join("\n")}"
+  end
+
+  def test_changelog_unreleased_compare_uses_current_version
+    version_file = File.read(File.join(@root, "lib", @gem_name, "version.rb"))
+    version = version_file[/VERSION = "([^"]+)"/, 1]
+    changelog = File.read(File.join(@root, "CHANGELOG.md"))
+    expected = "compare/v#{version}...HEAD"
+
+    assert_includes changelog, "[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/#{expected}"
+    refute_match(/^\[#{Regexp.escape(version)}\]: /, changelog,
+                 "Do not add a [#{version}] footer while Unreleased compares from v#{version}")
+  end
+
+  def test_api_docs_match_gemspec_core_requirement
+    api = File.read(File.join(@root, "docs", "recording_studio_moveable", "API.md"))
+    gemspec = read_gemspec
+
+    assert_match(/recording_studio["'],\s*">= 6.1.0"/, gemspec)
+    assert_includes api, "RecordingStudio `>= 6.1.0`"
+    refute_includes api, "`~> 3.0`"
+    refute_includes api, 'tag: "1.1.0"'
+    refute_includes api, "browser-administration dependency"
+  end
+
+  def test_update_summary_file_removed
+    skip if skip_old_name_cleanup_checks?
+
+    refute File.exist?(File.join(@root, "UPDATE_SUMMARY.md")),
+           "UPDATE_SUMMARY.md is leftover release recap and should be removed"
   end
 
   def test_no_old_gem_template_directories

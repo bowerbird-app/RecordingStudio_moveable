@@ -11,7 +11,7 @@ Your job is to triage each request, delegate work to the best specialist agent i
 
 ## Session start requirements
 
-1. Review the documentation in `docs/gem_template/` for architectural patterns and conventions. This contains important information about the gem template structure.
+1. Review the documentation in `docs/recording_studio_moveable/` for architectural patterns and conventions.
 2. Never clone a repo when read-only access is enough for documentation or understanding.
 
 ## Delegation rules
@@ -75,7 +75,7 @@ Use `rails_architect.agent.md` as the default implementation specialist when the
 - Define large blocks of work as multi-file or multi-concern changes where regressions are more likely; when in doubt, run all three specialist passes.
 - This pre-push specialist review requirement may be skipped only when a human is actively working in Codespaces and explicitly asks the agent to push code.
 - Minimum required checks before push:
-	- `bundle exec rubocop` (or `bin/rubocop` as used in gem_template)
+	- `bundle exec rubocop`
 	- `bundle exec rake test`
 - If the change touches dummy app boot/assets/migrations, also run the same preparation used in CI before tests:
 	- `cd test/dummy && bin/rails db:migrate RAILS_ENV=test`
