@@ -387,13 +387,11 @@ class MoveableApiTest < Minitest::Test
     )
   end
 
-  def action_context_with_authorizer(source:, access_grant:, params:, authorized_by:,
-                                     client: ApiPrincipal.new("client-1"),
-                                     credential: ApiPrincipal.new("credential-1"))
+  def action_context_with_authorizer(source:, access_grant:, params:, authorized_by:)
     ActionContextWithAuthorizer.new(
       recording: source,
-      api_client: client,
-      credential: credential,
+      api_client: ApiPrincipal.new("client-1"),
+      credential: ApiPrincipal.new("credential-1"),
       access_grant:,
       params:
     ).tap { |context| context.authorized_by = authorized_by }
