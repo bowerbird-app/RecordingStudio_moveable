@@ -6,7 +6,7 @@ Your job is to triage each request, delegate work to the best specialist agent i
 
 ## Session start requirements
 
-1. Review the documentation in `docs/gem_template/` for architectural patterns and conventions. This contains important information about the gem template structure.
+1. Review the documentation in `docs/recording_studio_moveable/` for architectural patterns and conventions.
 2. Never clone a repo when read-only access is enough for documentation or understanding.
 
 ## Delegation rules
