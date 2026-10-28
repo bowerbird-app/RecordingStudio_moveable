@@ -23,6 +23,7 @@
   - full-page mode
   - modal mode
   - destination picker powered by `FlatPack::Picker::Component`
+  - Change (other workspace) is `FlatPack::Button::Component` with `href:`
   - only shows destinations that pass core parent rules, Moveable same-root/cross-root rules, self/descendant protection, and authorization
   - returns not found for inaccessible source recordings
   - move action redirects to root page with success flash
