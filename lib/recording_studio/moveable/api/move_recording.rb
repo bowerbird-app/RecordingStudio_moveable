@@ -86,11 +86,14 @@ module RecordingStudio
         end
 
         def move_metadata
-          {
+          metadata = {
             api_action: "move",
             api_client_id: context.api_client.id,
             api_credential_id: context.credential.id
           }
+          return metadata unless context.respond_to?(:with_authorized_by)
+
+          context.with_authorized_by(metadata)
         end
 
         def known_move_conflict?(error)

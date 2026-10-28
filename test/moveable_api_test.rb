@@ -5,6 +5,23 @@ require "test_helper"
 class MoveableApiTest < Minitest::Test
   ActionContext = Struct.new(:recording, :api_client, :credential, :access_grant, :params, keyword_init: true)
   ApiPrincipal = Struct.new(:id)
+  Authorizer = Struct.new(:id)
+
+  class ActionContextWithAuthorizer < ActionContext
+    attr_accessor :authorized_by
+
+    def with_authorized_by(metadata = {})
+      extra = if authorized_by.respond_to?(:id)
+                {
+                  authorized_by_type: authorized_by.class.name,
+                  authorized_by_id: authorized_by.id
+                }
+              else
+                {}
+              end
+      metadata.merge(extra)
+    end
+  end
 
   class AccessibleRecordings
     attr_reader :looked_up_ids
@@ -166,7 +183,59 @@ class MoveableApiTest < Minitest::Test
         },
         source.moved_with
       )
+      refute source.moved_with.fetch(:metadata).key?(:authorized_by_type)
+      refute source.moved_with.fetch(:metadata).key?(:authorized_by_id)
     end
+  end
+
+  def test_handler_stamps_oauth_authorized_by_on_move_metadata
+    destination = Recording.new(recordable_type: "RecordingStudioFolder")
+    source = Recording.new
+    authorizer = Authorizer.new(41)
+
+    with_fake_recording_studio_api do
+      RecordingStudio::Moveable::Api::MoveRecording.call(
+        action_context_with_authorizer(
+          source:,
+          access_grant: AccessGrant.new("destination" => destination),
+          params: { parent_id: "destination" },
+          authorized_by: authorizer
+        )
+      )
+    end
+
+    metadata = source.moved_with.fetch(:metadata)
+
+    assert_equal "move", metadata.fetch(:api_action)
+    assert_equal "client-1", metadata.fetch(:api_client_id)
+    assert_equal "credential-1", metadata.fetch(:api_credential_id)
+    assert_equal "MoveableApiTest::Authorizer", metadata.fetch(:authorized_by_type)
+    assert_equal 41, metadata.fetch(:authorized_by_id)
+  end
+
+  def test_handler_leaves_api_key_move_metadata_without_authorized_by
+    destination = Recording.new(recordable_type: "RecordingStudioFolder")
+    source = Recording.new
+
+    with_fake_recording_studio_api do
+      RecordingStudio::Moveable::Api::MoveRecording.call(
+        action_context_with_authorizer(
+          source:,
+          access_grant: AccessGrant.new("destination" => destination),
+          params: { parent_id: "destination" },
+          authorized_by: nil
+        )
+      )
+    end
+
+    assert_equal(
+      {
+        api_action: "move",
+        api_client_id: "client-1",
+        api_credential_id: "credential-1"
+      },
+      source.moved_with.fetch(:metadata)
+    )
   end
 
   def test_handler_accepts_legacy_destination_parameter_names
@@ -316,6 +385,16 @@ class MoveableApiTest < Minitest::Test
       access_grant:,
       params:
     )
+  end
+
+  def action_context_with_authorizer(source:, access_grant:, params:, authorized_by:)
+    ActionContextWithAuthorizer.new(
+      recording: source,
+      api_client: ApiPrincipal.new("client-1"),
+      credential: ApiPrincipal.new("credential-1"),
+      access_grant:,
+      params:
+    ).tap { |context| context.authorized_by = authorized_by }
   end
 
   def structural_failures(api)
