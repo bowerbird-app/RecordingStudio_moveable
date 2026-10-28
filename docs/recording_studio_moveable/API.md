@@ -150,7 +150,8 @@ Authorization: ******
 All other input keys are rejected. The handler limits destination lookup to the API access grant's accessible
 recordings and authorizes `:edit` access to both the source and destination before calling `move_to!`. It records
 the API action, API client ID, and credential ID as move metadata and returns the reloaded recording for API
-serialization.
+serialization. When the API action context responds to `with_authorized_by` (RecordingStudio API 0.16.0+), OAuth
+calls also stamp `authorized_by_type` and `authorized_by_id`. API-key and client-credentials writes do not.
 
 Structural move failures, including self/descendant destinations, invalid parent types, and prohibited
 cross-root moves, return `422 Unprocessable Entity`. Move policy denials return `403 Forbidden`.

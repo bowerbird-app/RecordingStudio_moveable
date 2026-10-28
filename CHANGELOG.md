@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.1] - 2026-10-28
+
+### Fixed
+- OAuth-driven API moves stamp `authorized_by_type` and `authorized_by_id` on the `moved` event when the API action context provides `with_authorized_by`. API-key and client-credentials calls stay on the existing `api_action` / `api_client_id` / `api_credential_id` metadata. Contexts without the helper are unchanged.
+
+### Upgrade Notes
+- Install Moveable `4.0.1`. No migration. Hosts on RecordingStudio API `0.16.0` or later get the OAuth authorizer on move events. Older API contexts and API-key writes keep the previous metadata.
+
 ## [4.0.0] - 2026-10-27
 
 ### Breaking
