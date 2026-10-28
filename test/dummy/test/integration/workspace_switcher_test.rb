@@ -21,6 +21,17 @@ class WorkspaceSwitcherTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Restricted Workspace"
   end
 
+  def test_move_ui_change_control_is_a_flatpack_button
+    page = RecordingStudioPage.find_by!(title: "Lyric Draft")
+    recording = RecordingStudio::Recording.find_by!(recordable: page)
+    workspace_selection_path = recording_studio_moveable.move_recording_workspaces_path(recording_id: recording.id)
+
+    get recording_studio_moveable.move_recording_path(recording_id: recording.id)
+
+    assert_response :success
+    assert_select ".fp-button[href=?]", workspace_selection_path
+  end
+
   def test_top_nav_uses_accessible_public_root_recording_ids_api_for_workspace_roots
     accessible_root_ids = Workspace.where(name: [ "Studio Workspace", "Client Workspace" ]).map do |workspace|
       RecordingStudio::Recording.find_by!(recordable: workspace, parent_recording_id: nil).id
