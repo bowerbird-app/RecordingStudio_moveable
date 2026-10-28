@@ -24,7 +24,11 @@ class WorkspaceSwitcherTest < ActionDispatch::IntegrationTest
   def test_move_ui_change_control_is_a_flatpack_button
     page = RecordingStudioPage.find_by!(title: "Lyric Draft")
     recording = RecordingStudio::Recording.find_by!(recordable: page)
-    workspace_selection_path = recording_studio_moveable.move_recording_workspaces_path(recording_id: recording.id)
+    workspace_selection_path = recording_studio_moveable.move_recording_workspaces_path(
+      recording_id: recording.id,
+      redirect_mode: "previous_page",
+      redirect_to: "/"
+    )
 
     get recording_studio_moveable.move_recording_path(recording_id: recording.id)
 
