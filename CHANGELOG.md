@@ -8,11 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- Point the Unreleased compare link at `v4.0.1...HEAD`.
+- Point the Unreleased compare link at `v4.1.0...HEAD`.
 - Replace leftover `gem_template` names in CI Postgres, RuboCop excludes, and GitHub agent docs.
 - Set gemspec authors to Bowerbird.
 - Align optional API docs with this gem's RecordingStudio `>= 6.1.0` requirement. Admin is not a Moveable dependency.
 - Remove stale `UPDATE_SUMMARY.md`.
+
+## [4.1.0] - 2026-10-30
+
+### Changed
+- Require `flat_pack` `>= 0.1.331`. Development and the dummy pin FlatPack tag `v0.1.331`.
+- Destination and workspace pickers pass `variant: :flush` instead of host `!border-0 !bg-transparent !shadow-none !rounded-none !p-0 sm:!p-0` class overrides. The flush body also uses `py-0` (was `py-4`).
+
+### Upgrade Notes
+- Install Moveable `4.1.0` with FlatPack `>= 0.1.331` (`tag: "v0.1.331"`). `flat_pack` is git-only. Rebuild host Tailwind so `border-0`, `bg-transparent`, `shadow-none`, `rounded-none`, `p-0`, and `py-0` are generated if the host did not already use them. RecordingStudio stays `>= 6.1.0`.
 
 ## [4.0.2] - 2026-10-28
 
@@ -177,7 +186,8 @@ Cloud Agent Builds match RecordingStudio_billing v0.9.13.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.0.2...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.1.0...HEAD
+[4.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.0.2...v4.1.0
 [4.0.2]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.0.1...v4.0.2
 [3.4.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v3.3.0...v3.4.0
 [3.3.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v3.2.0...v3.3.0
