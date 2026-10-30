@@ -28,6 +28,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "recording_studio_accessible", "~> 0.6"
   spec.add_dependency "recording_studio_icons", ">= 0.1.0"
   # flat_pack is not published to RubyGems. Hosts declare the git source.
-  spec.add_dependency "flat_pack", ">= 0.1.315"
+  spec.add_dependency "flat_pack", ">= 0.1.331"
   spec.add_dependency "view_component", ">= 4.14", "< 5"
 end

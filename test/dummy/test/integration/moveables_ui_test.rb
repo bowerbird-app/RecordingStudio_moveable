@@ -55,7 +55,10 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     assert_includes response.body, %(id="move-destination-picker-#{@page.id}")
     assert_operator root_index, :<, change_index
     assert_operator change_index, :<, picker_index
-    assert_includes response.body, "!border-0 !bg-transparent !shadow-none !rounded-none !p-0 sm:!p-0"
+    assert_includes response.body, %(data-flat-pack-picker-variant="flush")
+    assert_includes response.body, "p-0 bg-transparent rounded-none shadow-none border-0"
+    assert_includes response.body, "py-0"
+    refute_includes response.body, "!border-0 !bg-transparent !shadow-none !rounded-none !p-0 sm:!p-0"
     refute_includes response.body, "container mx-auto max-w-6xl px-4 pb-10 pt-6"
     refute_includes response.body, "Main navigation"
     refute_includes response.body, "Toggle sidebar"
@@ -77,7 +80,10 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Search or choose a destination below."
     refute_includes response.body, "aria-label=\"Page navigation\""
     assert_includes response.body, %(data-controller="flat-pack--picker")
-    assert_includes response.body, "!border-0 !bg-transparent !shadow-none !rounded-none !p-0 sm:!p-0"
+    assert_includes response.body, %(data-flat-pack-picker-variant="flush")
+    assert_includes response.body, "p-0 bg-transparent rounded-none shadow-none border-0"
+    assert_includes response.body, "py-0"
+    refute_includes response.body, "!border-0 !bg-transparent !shadow-none !rounded-none !p-0 sm:!p-0"
     refute_includes response.body, "Main navigation"
 
     get recording_studio_moveable.move_recording_path(recording_id: @page.id, display: "modal")

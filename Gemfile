@@ -7,8 +7,7 @@ require_relative "test/support/widen_recording_studio_requirement"
 # Specify your gem's dependencies in recording_studio_moveable.gemspec
 gemspec
 
-# v0.1.315 is the newest flatpack tag. This commit is FlatPack::VERSION 0.1.319.
-gem "flat_pack", github: "bowerbird-app/flatpack", ref: "1fcbafe94f8eb118f0a22182f63f5110fcc97a56"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.331"
 gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.1.0"
 gem "recording_studio_accessible", "~> 0.6", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.18.0"
 gem "recording_studio_icons", github: "bowerbird-app/RecordingStudio_icons"
