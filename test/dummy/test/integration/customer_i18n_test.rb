@@ -33,6 +33,8 @@ class CustomerI18nTest < ActionDispatch::IntegrationTest
     assert language_at, "expected a language selector in the top nav"
     assert switcher_at, "expected a workspace switcher in the top nav"
     assert language_at < switcher_at, "language selector should sit left of the workspace switcher"
+    assert_select "form.dummy-language-selector label", text: "Language"
+    assert_includes response.body, "[&_label]:sr-only"
   end
 
   def test_move_dialog_stays_english_by_default
