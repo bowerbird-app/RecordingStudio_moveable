@@ -66,6 +66,7 @@ class LayoutConfigurationTest < Minitest::Test
 
     assert_empty RecordingStudio::Layout.hardcoded_layout_paths(gem_root)
     assert_empty RecordingStudio::Layout.hardcoded_layout_paths(dummy_root)
+    refute File.exist?(File.join(gem_root, "app/views/layouts/recording_studio_moveable.html.erb"))
   end
 
   private
