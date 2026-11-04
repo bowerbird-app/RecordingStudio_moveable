@@ -9,10 +9,10 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_Internationalization.git
-  revision: 4786210f44df4afec47f2b158332457e7835993e
-  tag: v0.2.0
+  revision: 621f215761d062968f240489f6a31cf4a1a5bff1
+  tag: v0.2.1
   specs:
-    recording_studio_internationalization (0.2.0)
+    recording_studio_internationalization (0.2.1)
       rails (~> 8.1.0)
       recording_studio (>= 6.1, < 7)
 
@@ -630,7 +630,7 @@ CHECKSUMS
   recording_studio (6.3.0)
   recording_studio_accessible (0.24.0)
   recording_studio_icons (0.2.0)
-  recording_studio_internationalization (0.2.0)
+  recording_studio_internationalization (0.2.1)
   recording_studio_metrics (0.7.2)
   recording_studio_moveable (4.1.1)
   recording_studio_trashable (0.12.2)

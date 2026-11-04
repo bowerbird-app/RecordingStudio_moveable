@@ -18,7 +18,7 @@ gem "recording_studio_trashable", github: "bowerbird-app/RecordingStudio_trashab
 
 # Dummy-only language switching. Moveable ships English; hosts own other languages.
 gem "recording_studio_internationalization",
-    github: "bowerbird-app/RecordingStudio_Internationalization", tag: "v0.2.0"
+    github: "bowerbird-app/RecordingStudio_Internationalization", tag: "v0.2.1"
 # RecordingStudio API still requires recording_studio ~> 3.0, so it is deferred until
 # that gem declares RecordingStudio 4 support. Moveable's optional API adapter remains
 # in the gem and registers only when the API engine is loaded.
