@@ -36,11 +36,11 @@ Add to your Gemfile:
 gem "recording_studio", ">= 6.1.0"
 gem "recording_studio_accessible", "~> 0.6"
 gem "recording_studio_moveable", "~> 4.0"
-gem "flat_pack", github: "bowerbird-app/flatpack", ref: "1fcbafe94f8eb118f0a22182f63f5110fcc97a56"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.341"
 gem "view_component", ">= 4.14", "< 5"
 ```
 
-`flat_pack` is not on RubyGems. The ref above is `FlatPack::VERSION` `0.1.319`. The newest git tag is `v0.1.315`. Moveable 4.0 requires `flat_pack` `>= 0.1.315` and `recording_studio` `>= 6.1.0`.
+`flat_pack` is not on RubyGems. The tag above is `FlatPack::VERSION` `0.1.341`. Moveable 4.1 requires `flat_pack` `>= 0.1.331` and `recording_studio` `>= 6.1.0`.
 
 Then bundle install and mount the moveable engine UI routes:
 

@@ -1,5 +1,13 @@
 # Upgrading RecordingStudio Moveable
 
+## Upgrading to Moveable 4.1.1
+
+Moveable 4.1.1 drops the unused public layout view `app/views/layouts/recording_studio_moveable.html.erb`. Full-page move screens still wrap through `recording_studio_layout` (core default layout unless you set `config.layout`). Dummy Internationalization is tagged `v0.2.1`. No migration.
+
+```ruby
+gem "recording_studio_moveable", "~> 4.1"
+```
+
 ## Upgrading to Moveable 4.0
 
 Moveable 4.0 requires RecordingStudio `>= 6.1.0` and FlatPack `>= 0.1.315`. `config.full_page_layout` is gone. See `MIGRATION_NOTES.md` for the host steps.

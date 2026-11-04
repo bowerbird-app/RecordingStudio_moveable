@@ -5,7 +5,7 @@ module DummyLayoutHelper
     return unless respond_to?(:recording_studio_language_selector)
 
     recording_studio_language_selector(
-      class: "dummy-language-selector",
+      class: "dummy-language-selector [&_label]:sr-only",
       data: { turbo: false }
     )
   end

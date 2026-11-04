@@ -13,8 +13,6 @@ fr:
         label: Langue
         submit: Changer de langue
     moveable:
-      layout:
-        title: "Déplacer"
       dialog:
         title: "Déplacer %{name}"
         subtitle: "Choisir une destination"

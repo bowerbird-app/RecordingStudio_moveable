@@ -8,11 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- Point the Unreleased compare link at `v4.1.0...HEAD`.
 - Replace leftover `gem_template` names in CI Postgres, RuboCop excludes, and GitHub agent docs.
 - Set gemspec authors to Bowerbird.
 - Align optional API docs with this gem's RecordingStudio `>= 6.1.0` requirement. Admin is not a Moveable dependency.
 - Remove stale `UPDATE_SUMMARY.md`.
+
+## [4.1.1] - 2026-11-04
+
+### Changed
+- Development and dummy pins: RecordingStudio `v6.3.0`, FlatPack `v0.1.341`, Accessible `v0.24.0`, Icons `v0.2.0`, Metrics `v0.7.2`, Trashable `v0.12.2`, and dummy Internationalization `v0.2.1`. Gemspec floors stay `recording_studio` `>= 6.1.0` and `flat_pack` `>= 0.1.331`.
+- Remove unused public layout view `app/views/layouts/recording_studio_moveable.html.erb`. Controllers still use core's layout via `recording_studio_layout`.
+
+### Upgrade Notes
+- Install Moveable `4.1.1`. No migration. Point `flat_pack` at tag `v0.1.341`. Hosts can stay on RecordingStudio `>= 6.1.0`; this repo's development lock is `v6.3.0`.
 
 ## [4.1.0] - 2026-10-30
 
@@ -186,7 +194,8 @@ Cloud Agent Builds match RecordingStudio_billing v0.9.13.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.1.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.1.1...HEAD
+[4.1.1]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.1.0...v4.1.1
 [4.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.0.2...v4.1.0
 [4.0.2]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.0.1...v4.0.2
 [3.4.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v3.3.0...v3.4.0

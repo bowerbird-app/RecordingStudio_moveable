@@ -1,8 +1,6 @@
 en:
   recording_studio:
     moveable:
-      layout:
-        title: "Move"
       dialog:
         title: "Move %{name}"
         subtitle: "Choose destination"
