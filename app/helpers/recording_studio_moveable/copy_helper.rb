@@ -10,16 +10,6 @@ module RecordingStudioMoveable
       Copy.value(override, key, **)
     end
 
-    def moveable_document_attributes(extra = {})
-      extra = extra.to_h
-      attributes = { lang: I18n.locale.to_s }.merge(extra)
-      attributes.merge!(recording_studio_locale_attributes) if respond_to?(:recording_studio_locale_attributes)
-      return attributes unless respond_to?(:flat_pack_copy_data)
-
-      attributes[:data] = (attributes[:data] || {}).merge(flat_pack_copy_data)
-      attributes
-    end
-
     def moveable_modal_copy_data
       {
         recording_studio_moveable_updating: Copy.t("js.updating"),

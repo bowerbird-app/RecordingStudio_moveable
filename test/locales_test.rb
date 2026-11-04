@@ -99,7 +99,6 @@ class LocalesTest < Minitest::Test
         assert_equal "Unable to load the move view right now. Please try again.", Copy.t("js.load_error")
         assert_equal "Destination is not allowed for this move", Copy.t("errors.destination_not_allowed")
         assert_equal "Cannot move a recording under itself", Copy.t("errors.cannot_move_under_itself")
-        assert_equal "Move", Copy.t("layout.title", default: "Move")
       end
     end
   end
@@ -112,7 +111,6 @@ class LocalesTest < Minitest::Test
           dialog.search_destinations
           flashes.moved
           js.load_error
-          layout.title
           errors.destination_not_allowed
         ].each do |key|
           full_key = "recording_studio.moveable.#{key}"

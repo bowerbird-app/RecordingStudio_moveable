@@ -16,8 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.1.1] - 2026-11-04
 
 ### Changed
-- Development and dummy pins: RecordingStudio `v6.3.0`, FlatPack `v0.1.341`, Accessible `v0.24.0`, Icons `v0.2.0`, Metrics `v0.7.2`, Trashable `v0.12.2`, and dummy Internationalization `v0.2.0`. Gemspec floors stay `recording_studio` `>= 6.1.0` and `flat_pack` `>= 0.1.331`.
-- Remove unused engine layout `app/views/layouts/recording_studio_moveable.html.erb`. Controllers still use core's layout via `recording_studio_layout`.
+- Development and dummy pins: RecordingStudio `v6.3.0`, FlatPack `v0.1.341`, Accessible `v0.24.0`, Icons `v0.2.0`, Metrics `v0.7.2`, Trashable `v0.12.2`, and dummy Internationalization `v0.2.1`. Gemspec floors stay `recording_studio` `>= 6.1.0` and `flat_pack` `>= 0.1.331`.
+- Remove unused public layout view `app/views/layouts/recording_studio_moveable.html.erb`. Controllers still use core's layout via `recording_studio_layout`.
 
 ### Upgrade Notes
 - Install Moveable `4.1.1`. No migration. Point `flat_pack` at tag `v0.1.341`. Hosts can stay on RecordingStudio `>= 6.1.0`; this repo's development lock is `v6.3.0`.
