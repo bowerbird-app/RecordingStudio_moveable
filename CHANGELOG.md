@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- Development and dummy pins: RecordingStudio `v6.7.0`, FlatPack `v0.1.356`, Accessible `v0.32.0`, Icons `v0.2.1`, Metrics `v0.8.0`, and Trashable `v0.14.0`. Dummy Internationalization stays `v0.2.1`. Gemspec floors stay `recording_studio` `>= 6.1.0` and `flat_pack` `>= 0.1.331`.
+- Remove `test/support/widen_recording_studio_requirement.rb`. These tags already allow RecordingStudio 6.
+- Dummy Recording Studio config sets `authorize_write` and `allow_unauthorized_writes` for the 6.5 write gate. The dummy still creates recordings before a request actor exists.
+- Lockfiles pick up audit fixes inside existing constraints: Puma `7.2.2`, and in the dummy `net-ssh` `7.3.10`, bcrypt `3.1.22`, Devise `5.0.4`, msgpack `1.8.7`, and Brakeman `8.1.0`.
 - Replace leftover `gem_template` names in CI Postgres, RuboCop excludes, and GitHub agent docs.
 - Set gemspec authors to Bowerbird.
 - Align optional API docs with this gem's RecordingStudio `>= 6.1.0` requirement. Admin is not a Moveable dependency.

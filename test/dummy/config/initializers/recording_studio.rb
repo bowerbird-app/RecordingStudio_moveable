@@ -23,6 +23,14 @@ RecordingStudio.configure do |config|
 
   # Move behavior in this app comes from recording_studio_moveable addon capability
   # includes on the relevant recordable models.
+
+  # Recording Studio 6.5+ refuses a write with no authorizer, and a blank actor
+  # raises unless this flag is set. The dummy records and grants access before
+  # anyone is signed in.
+  config.authorize_write = lambda { |**|
+    true
+  }
+  config.allow_unauthorized_writes = true
 end
 
 RecordingStudioAccessible::Compatibility.load_missing_constants!(Rails.application)
