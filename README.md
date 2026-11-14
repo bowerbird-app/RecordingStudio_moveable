@@ -33,14 +33,14 @@
 Add to your Gemfile:
 
 ```ruby
-gem "recording_studio", ">= 6.1.0"
+gem "recording_studio", ">= 6.11.0"
 gem "recording_studio_accessible", "~> 0.6"
-gem "recording_studio_moveable", "~> 4.0"
+gem "recording_studio_moveable", "~> 4.2"
 gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.356"
 gem "view_component", ">= 4.14", "< 5"
 ```
 
-`flat_pack` is not on RubyGems. The tag above is `FlatPack::VERSION` `0.1.356`. Moveable 4.1 requires `flat_pack` `>= 0.1.331` and `recording_studio` `>= 6.1.0`.
+`flat_pack` is not on RubyGems. The tag above is `FlatPack::VERSION` `0.1.356`. Moveable 4.2 requires `flat_pack` `>= 0.1.331` and `recording_studio` `>= 6.11.0`. Moves lock through `RecordingStudio.lock_for_move!`.
 
 Then bundle install and mount the moveable engine UI routes:
 
@@ -241,7 +241,7 @@ Add [Recording Studio Internationalization](https://github.com/bowerbird-app/Rec
 
 ## Dummy app demo
 
-The dummy app installs `recording_studio` tag `v6.7.0`, `recording_studio_accessible` tag `v0.32.0`, `view_component` `4.19.0`, and `recording_studio_moveable`. Hosts still depend on Accessible `~> 0.6`. The dummy schema stores access `role` as a string (`view` / `edit` / `admin`), keeps `depends_on_recording_id`, has access invitations, and includes Accessible audience tables (`recording_studio_access_constraints`, `recording_studio_access_rules`). Accessible resolves soft-trash filters through Trashable query helpers; the dummy pins `recording_studio_trashable` `v0.14.0` and `recording_studio_metrics` `v0.8.0` with `require: false` next to Accessible (query-only; no Trashable engine/UI). Internationalization stays on tag `v0.2.1`. These tags already allow RecordingStudio 6, so the dummy does not rewrite gemspec requirements. Seeds and tests grant the first owner with `RecordingStudioAccessible.bootstrap_owner_access!` and later grants with `grant_access`. Dummy pins FlatPack tag `v0.1.356`. Recording Studio 6.5+ write checks are open in the dummy (`authorize_write` always allows, and `allow_unauthorized_writes` is true) because demo rows are created before a request actor exists. Dummy offers English and French. The language selector sits in the top nav, to the left of the workspace switcher. French keys live in `test/dummy/config/locales/fr.yml`. The engine does not ship French.
+The dummy app installs `recording_studio` tag `v6.11.0`, `recording_studio_accessible` tag `v0.32.0`, `view_component` `4.19.0`, and `recording_studio_moveable`. Hosts still depend on Accessible `~> 0.6`. The dummy schema stores access `role` as a string (`view` / `edit` / `admin`), keeps `depends_on_recording_id`, has access invitations, and includes Accessible audience tables (`recording_studio_access_constraints`, `recording_studio_access_rules`). Accessible resolves soft-trash filters through Trashable query helpers; the dummy pins `recording_studio_trashable` `v0.14.0` and `recording_studio_metrics` `v0.8.0` with `require: false` next to Accessible (query-only; no Trashable engine/UI). Internationalization stays on tag `v0.2.1`. These tags already allow RecordingStudio 6, so the dummy does not rewrite gemspec requirements. Seeds and tests grant the first owner with `RecordingStudioAccessible.bootstrap_owner_access!` and later grants with `grant_access`. Dummy pins FlatPack tag `v0.1.356`. Recording Studio 6.5+ write checks are open in the dummy (`authorize_write` always allows, and `allow_unauthorized_writes` is true) because demo rows are created before a request actor exists. Dummy offers English and French. The language selector sits in the top nav, to the left of the workspace switcher. French keys live in `test/dummy/config/locales/fr.yml`. The engine does not ship French.
 
 It includes:
 

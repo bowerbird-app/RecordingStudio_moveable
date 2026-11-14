@@ -7,15 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.2.0] - 2026-11-14
+
 ### Changed
-- Development and dummy pins: RecordingStudio `v6.7.0`, FlatPack `v0.1.356`, Accessible `v0.32.0`, Icons `v0.2.1`, Metrics `v0.8.0`, and Trashable `v0.14.0`. Dummy Internationalization stays `v0.2.1`. Gemspec floors stay `recording_studio` `>= 6.1.0` and `flat_pack` `>= 0.1.331`.
+- Require `recording_studio` `>= 6.11.0`. Development and the dummy pin RecordingStudio tag `v6.11.0`.
+- `move_to!` locks with `RecordingStudio.lock_for_move!` and uses the returned recording, parent, root, and descendant ids. Moveable no longer locks rows or walks descendants itself.
+- Cross-root moves `update_all` descendant `root_recording_id`s, then save the moved recording last so core rewrites event roots for the subtree, including the `moved` event.
+- Retry `RecordingStudio::MoveConflict` up to 5 times. The move screen flashes "The tree changed, please try again". The API move action returns 409.
+- The dummy app copies core's 6.9 migration so `recording_studio_events.root_recording_id` is `NOT NULL`.
+- Development and dummy pins besides RecordingStudio stay FlatPack `v0.1.356`, Accessible `v0.32.0`, Icons `v0.2.1`, Metrics `v0.8.0`, and Trashable `v0.14.0`. Dummy Internationalization stays `v0.2.1`. The `flat_pack` floor stays `>= 0.1.331`.
 - Remove `test/support/widen_recording_studio_requirement.rb`. These tags already allow RecordingStudio 6.
 - Dummy Recording Studio config sets `authorize_write` and `allow_unauthorized_writes` for the 6.5 write gate. The dummy still creates recordings before a request actor exists.
-- Lockfiles pick up audit fixes inside existing constraints: Puma `7.2.2`, and in the dummy `net-ssh` `7.3.10`, bcrypt `3.1.22`, Devise `5.0.4`, msgpack `1.8.7`, and Brakeman `8.1.0`.
+- Lockfiles pick up audit fixes inside existing constraints: Puma `7.2.2`, and in the dummy `net-ssh` `7.3.10`, bcrypt `3.1.22`, Devise `5.0.4`, msgpack `1.8.7`, and Brakeman `8.1.0`. Resolving RecordingStudio `v6.11.0` also moves `irb` to `1.19.0` and `tailwind_merge` to `1.5.6`.
 - Replace leftover `gem_template` names in CI Postgres, RuboCop excludes, and GitHub agent docs.
 - Set gemspec authors to Bowerbird.
-- Align optional API docs with this gem's RecordingStudio `>= 6.1.0` requirement. Admin is not a Moveable dependency.
+- Align optional API docs with this gem's RecordingStudio requirement. Admin is not a Moveable dependency.
 - Remove stale `UPDATE_SUMMARY.md`.
+
+### Upgrade Notes
+- Install Moveable `4.2.0` with RecordingStudio `>= 6.11.0` (this repo pins tag `v6.11.0`). No Moveable migration. Run core's migrations before booting code that writes events. See `docs/recording_studio_moveable/UPGRADING.md`.
 
 ## [4.1.1] - 2026-11-04
 

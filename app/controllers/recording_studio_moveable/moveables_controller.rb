@@ -37,6 +37,8 @@ module RecordingStudioMoveable
       destination = find_destination!(params[:destination_id])
       move_recording!(destination)
       redirect_to move_redirect_target(destination: destination), notice: move_success_notice
+    rescue RecordingStudio::MoveConflict
+      redirect_to failed_move_path, alert: Copy.t("flashes.tree_changed")
     rescue *move_failure_exceptions => e
       redirect_to failed_move_path, alert: e.message
     end

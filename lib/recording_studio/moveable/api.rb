@@ -10,6 +10,7 @@ module RecordingStudio
 
       class << self
         def register_capability_action!
+          MoveRecording.install_conflict_response!
           return unless recording_studio_api_available?
 
           if named_api_registration_supported?
@@ -105,6 +106,7 @@ module RecordingStudio
             responses: {
               "200" => { description: "Recording moved successfully." },
               "403" => { description: "API access is not authorized to move this recording." },
+              "409" => { description: "The tree changed while the move was locking. Retry the move." },
               "422" => { description: "Move request is invalid." }
             }
           }

@@ -3,12 +3,40 @@
 module RecordingStudio
   module Moveable
     module Api
+      # Exhausted lock retries. The API controller maps this to 409.
+      class Conflict < StandardError
+        STATUS = 409
+
+        attr_reader :details
+
+        def initialize(message, details:)
+          super(message)
+          @details = Array(details)
+        end
+      end
+
       class MoveRecording
         MOVE_CONFLICT_KEYS = %w[
           errors.cannot_move_under_itself
           errors.cannot_move_under_descendant
           errors.destination_wrong_root
         ].freeze
+
+        def self.install_conflict_response!
+          return if @conflict_response_installed || !api_hooks?
+
+          RecordingStudioApi.configuration.hooks.extend_controller(:ApiController) do
+            rescue_from RecordingStudio::Moveable::Api::Conflict do |error|
+              render_error(code: "conflict", message: error.message, status: :conflict, details: error.details)
+            end
+          end
+          @conflict_response_installed = true
+        end
+
+        def self.api_hooks?
+          defined?(RecordingStudioApi) &&
+            RecordingStudioApi.try(:configuration).try(:hooks).respond_to?(:extend_controller)
+        end
 
         def self.call(context)
           new(context).call
@@ -37,6 +65,8 @@ module RecordingStudio
 
         def move!(destination)
           perform_move!(destination)
+        rescue RecordingStudio::MoveConflict
+          raise conflict_error
         rescue RecordingStudio::AccessDenied => e
           raise RecordingStudioApi::AuthorizationError, e.message
         rescue RecordingStudio::InvalidParent, RecordingStudio::CapabilityDisabled => e
@@ -102,6 +132,11 @@ module RecordingStudio
 
         def invalid_move_input_error(error)
           RecordingStudioApi::InvalidActionInputError.new(error.message, details: [error.message])
+        end
+
+        def conflict_error
+          message = RecordingStudioMoveable::Copy.t("flashes.tree_changed")
+          Conflict.new(message, details: [message])
         end
 
         def domain_move_error(error)

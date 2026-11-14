@@ -19,25 +19,11 @@ class MoveableCapabilitiesTest < Minitest::Test
     end
   end
 
-  class FakeLock
-    attr_reader :looked_up_ids
-
-    def initialize(records)
-      @records = records
-      @looked_up_ids = []
-    end
-
-    def find(id)
-      looked_up_ids << id
-      @records.fetch(id)
-    end
-  end
-
   class FakeRecording
     include RecordingStudio::Moveable::Capabilities::Moveable::RecordingMethods
 
     class << self
-      attr_accessor :records, :lock_proxy
+      attr_accessor :records
 
       def transaction
         yield
@@ -45,10 +31,6 @@ class MoveableCapabilitiesTest < Minitest::Test
 
       def find(id)
         records.fetch(id)
-      end
-
-      def lock
-        self.lock_proxy ||= FakeLock.new(records)
       end
 
       def where(conditions)
@@ -68,7 +50,7 @@ class MoveableCapabilitiesTest < Minitest::Test
 
     attr_accessor :id, :parent_recording_id, :parent_recording, :root_recording_id, :recordable_type,
                   :updated_with, :logged_event, :asserted_capability, :root_checked_with,
-                  :descendant_guard_with
+                  :descendant_guard_with, :guarded_descendant_ids
 
     def initialize(id:, parent_recording_id: nil, root_recording_id: nil, recordable_type: "RecordingStudioFolder")
       @id = id
@@ -103,8 +85,9 @@ class MoveableCapabilitiesTest < Minitest::Test
       self.root_checked_with = recording
     end
 
-    def assert_parent_recording_not_self_or_descendant!(recording)
+    def assert_parent_recording_not_self_or_descendant!(recording, descendant_ids:)
       self.descendant_guard_with = recording
+      self.guarded_descendant_ids = descendant_ids
     end
   end
 
@@ -121,7 +104,41 @@ class MoveableCapabilitiesTest < Minitest::Test
 
   def setup
     FakeRecording.records = {}
-    FakeRecording.lock_proxy = nil
+    @lock_calls = []
+  end
+
+  def with_move_locks(&block)
+    root_lookup = lambda do |recording|
+      root_id = recording.root_recording_id || recording.id
+      FakeRecording.records[root_id] || FakeRecording.new(id: root_id)
+    end
+    locker = lambda do |recording, to_parent:, to_root:|
+      @lock_calls << [recording, to_parent, to_root]
+      {
+        recording: recording,
+        to_parent: to_parent,
+        to_root: to_root,
+        source_root: root_lookup.call(recording),
+        descendant_ids: walk_descendant_ids(recording)
+      }
+    end
+
+    RecordingStudio.stub(:root_recording_or_self, root_lookup) do
+      RecordingStudio.stub(:lock_for_move!, locker, &block)
+    end
+  end
+
+  def walk_descendant_ids(recording)
+    descendants = []
+    frontier = [recording.id]
+
+    until frontier.empty?
+      children = FakeRecording.where(parent_recording_id: frontier).pluck(:id)
+      descendants.concat(children)
+      frontier = children
+    end
+
+    descendants
   end
 
   def root_id_resolver
@@ -245,13 +262,11 @@ class MoveableCapabilitiesTest < Minitest::Test
     end
   end
 
-  def test_recording_methods_compute_cross_root_and_descendants
+  def test_recording_methods_compute_cross_root
     source = FakeRecording.new(id: "source", root_recording_id: "root-1")
     child = FakeRecording.new(id: "child", parent_recording_id: "source", root_recording_id: "root-1")
-    FakeRecording.new(id: "grandchild", parent_recording_id: "child", root_recording_id: "root-1")
     other_root = FakeRecording.new(id: "root-2", root_recording_id: nil)
 
-    assert_equal %w[child grandchild], source.send(:descendant_ids)
     RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
       assert_not source.send(:cross_root?, child)
       assert source.send(:cross_root?, other_root)
@@ -278,12 +293,14 @@ class MoveableCapabilitiesTest < Minitest::Test
       true
     end
 
-    RecordingStudio.stub(:capability_options, capability_options) do
-      RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
-        RecordingStudio.stub(:assert_parent_allowed!, parent_allowed) do
-          RecordingStudio::Moveable::Policy.stub(:new, policy) do
-            source.move_to!(new_parent: target, actor: :actor, impersonator: :impersonator,
-                            metadata: { reason: "reorg" })
+    with_move_locks do
+      RecordingStudio.stub(:capability_options, capability_options) do
+        RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
+          RecordingStudio.stub(:assert_parent_allowed!, parent_allowed) do
+            RecordingStudio::Moveable::Policy.stub(:new, policy) do
+              source.move_to!(new_parent: target, actor: :actor, impersonator: :impersonator,
+                              metadata: { reason: "reorg" })
+            end
           end
         end
       end
@@ -292,10 +309,11 @@ class MoveableCapabilitiesTest < Minitest::Test
     assert_equal :movable, source.asserted_capability
     assert_equal target, source.root_checked_with
     assert_equal target, source.descendant_guard_with
-    assert_equal({ parent_recording: target }, source.updated_with)
+    assert_equal %w[child], source.guarded_descendant_ids
+    assert_equal({ parent_recording: target, root_recording_id: "root-1" }, source.updated_with)
     assert_equal target, policy.destination
     assert_equal [target, target], policy.destinations
-    assert_equal %w[child source target], FakeRecording.lock_proxy.looked_up_ids
+    assert_equal [source, target], @lock_calls.map { |recording, parent, _root| [recording, parent] }.fetch(0)
     assert_equal "moved", source.logged_event[:action]
     assert_equal :actor, source.logged_event[:actor]
     assert_equal :impersonator, source.logged_event[:impersonator]
@@ -322,11 +340,13 @@ class MoveableCapabilitiesTest < Minitest::Test
 
     capability_options = ->(*, **) { { allow_cross_root: true } }
 
-    RecordingStudio.stub(:capability_options, capability_options) do
-      RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
-        RecordingStudio.stub(:assert_parent_allowed!, true) do
-          RecordingStudio::Moveable::Policy.stub(:new, FakePolicy.new) do
-            source.moveable_to!(new_parent: target, actor: :actor)
+    with_move_locks do
+      RecordingStudio.stub(:capability_options, capability_options) do
+        RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
+          RecordingStudio.stub(:assert_parent_allowed!, true) do
+            RecordingStudio::Moveable::Policy.stub(:new, FakePolicy.new) do
+              source.moveable_to!(new_parent: target, actor: :actor)
+            end
           end
         end
       end
@@ -352,14 +372,16 @@ class MoveableCapabilitiesTest < Minitest::Test
 
     capability_options = ->(*, **) { { allow_cross_root: true } }
 
-    RecordingStudio.stub(:capability_options, capability_options) do
-      RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
-        RecordingStudio.stub(:assert_parent_allowed!, true) do
-          RecordingStudio::Moveable::Policy.stub(:new, lambda { |source:, **|
-            sources_checked << source
-            policy
-          }) do
-            source.moveable_to!(new_parent: target, actor: :actor)
+    with_move_locks do
+      RecordingStudio.stub(:capability_options, capability_options) do
+        RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
+          RecordingStudio.stub(:assert_parent_allowed!, true) do
+            RecordingStudio::Moveable::Policy.stub(:new, lambda { |source:, **|
+              sources_checked << source
+              policy
+            }) do
+              source.moveable_to!(new_parent: target, actor: :actor)
+            end
           end
         end
       end
@@ -378,14 +400,16 @@ class MoveableCapabilitiesTest < Minitest::Test
       raise ArgumentError, "RecordingStudioPage cannot be recorded under RecordingStudioArchiveBox"
     end
 
-    RecordingStudio.stub(:capability_options, capability_options) do
-      RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
-        RecordingStudio.stub(:assert_parent_allowed!, parent_allowed) do
-          error = assert_raises(ArgumentError) do
-            source.move_to!(new_parent: target, actor: :actor)
-          end
+    with_move_locks do
+      RecordingStudio.stub(:capability_options, capability_options) do
+        RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
+          RecordingStudio.stub(:assert_parent_allowed!, parent_allowed) do
+            error = assert_raises(ArgumentError) do
+              source.move_to!(new_parent: target, actor: :actor)
+            end
 
-          assert_match(/RecordingStudioPage cannot be recorded under RecordingStudioArchiveBox/, error.message)
+            assert_match(/RecordingStudioPage cannot be recorded under RecordingStudioArchiveBox/, error.message)
+          end
         end
       end
     end
@@ -397,13 +421,15 @@ class MoveableCapabilitiesTest < Minitest::Test
 
     capability_options = ->(*, **) { { allow_cross_root: false } }
 
-    RecordingStudio.stub(:capability_options, capability_options) do
-      RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
-        error = assert_raises(ArgumentError) do
-          source.move_to!(new_parent: target, actor: :actor)
-        end
+    with_move_locks do
+      RecordingStudio.stub(:capability_options, capability_options) do
+        RecordingStudio.stub(:root_recording_id_for, root_id_resolver) do
+          error = assert_raises(ArgumentError) do
+            source.move_to!(new_parent: target, actor: :actor)
+          end
 
-        assert_equal "Destination must belong to this root recording", error.message
+          assert_equal "Destination must belong to this root recording", error.message
+        end
       end
     end
   end

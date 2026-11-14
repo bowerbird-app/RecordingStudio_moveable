@@ -91,6 +91,24 @@ class MoveableApiActionsTest < ActionDispatch::IntegrationTest
     assert_equal original_parent_id, @page.reload.parent_recording_id
   end
 
+  def test_move_endpoint_returns_409_when_the_move_conflict_is_exhausted
+    original_parent_id = @page.parent_recording_id
+    locker = lambda do |*|
+      raise RecordingStudio::MoveConflict, "The tree changed while locking. Retry the move."
+    end
+
+    RecordingStudio.stub(:lock_for_move!, locker) do
+      post move_action_path(@page), params: { parent_id: @target_folder.id }, headers: @headers
+    end
+
+    assert_response :conflict
+    error = JSON.parse(response.body).fetch("error")
+    assert_equal "conflict", error.fetch("code")
+    assert_equal "The tree changed, please try again", error.fetch("message")
+    assert_equal ["The tree changed, please try again"], error.fetch("details")
+    assert_equal original_parent_id, @page.reload.parent_recording_id
+  end
+
   def test_move_endpoint_returns_403_for_move_policy_denial_and_preserves_parent
     original_parent_id = @source_folder.parent_recording_id
     RecordingStudio::Moveable.configure do |config|

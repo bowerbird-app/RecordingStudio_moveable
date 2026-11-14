@@ -92,6 +92,7 @@ class LocalesTest < Minitest::Test
         assert_equal "Search destinations", Copy.t("dialog.search_destinations")
         assert_equal "Return to previous page", Copy.t("dialog.back")
         assert_equal "Moved successfully.", Copy.t("flashes.moved")
+        assert_equal "The tree changed, please try again", Copy.t("flashes.tree_changed")
         assert_equal "workspace", Copy.t("roots", count: 1)
         assert_equal "workspaces", Copy.t("roots", count: 2)
         assert_equal "Updating destinations...", Copy.t("js.updating")

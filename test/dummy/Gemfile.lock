@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio.git
-  revision: 481dfd1f32703bd23a38c4cfd1faf171df42b430
-  tag: v6.7.0
+  revision: 4539f538836ea0abf80b9c306344683390776841
+  tag: v6.11.0
   specs:
-    recording_studio (6.7.0)
+    recording_studio (6.11.0)
       flat_pack (>= 0.1.315)
       rails (>= 8.1.4.1)
 
@@ -69,10 +69,10 @@ GIT
 PATH
   remote: ../..
   specs:
-    recording_studio_moveable (4.1.1)
+    recording_studio_moveable (4.2.0)
       flat_pack (>= 0.1.331)
       rails (>= 8.1.0, < 9.0)
-      recording_studio (>= 6.1.0)
+      recording_studio (>= 6.11.0)
       recording_studio_accessible (~> 0.6)
       recording_studio_icons (>= 0.1.0)
       view_component (>= 4.14, < 5)
@@ -423,7 +423,7 @@ GEM
       ostruct
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
-    tailwind_merge (0.16.0)
+    tailwind_merge (1.5.6)
       sin_lru_redux (~> 2.5)
     tailwindcss-rails (4.4.0)
       railties (>= 7.0.0)
@@ -628,12 +628,12 @@ CHECKSUMS
   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
   rbs (4.2.0) sha256=51f7b886dcc05bc09e10b901daa6a81829f6adc03101d6ca9ea4aac6103e0674
   rdoc (8.1.0) sha256=befc37880a5cfd36dcb176c748b5fd5ee39dd3536a75e81824e4972ce230f60a
-  recording_studio (6.7.0)
+  recording_studio (6.11.0)
   recording_studio_accessible (0.32.0)
   recording_studio_icons (0.2.1)
   recording_studio_internationalization (0.2.1)
   recording_studio_metrics (0.8.0)
-  recording_studio_moveable (4.1.1)
+  recording_studio_moveable (4.2.0)
   recording_studio_trashable (0.14.0)
   regexp_parser (2.11.3) sha256=ca13f381a173b7a93450e53459075c9b76a10433caadcb2f1180f2c741fc55a4
   reline (0.7.0) sha256=5b012d8e55dbf9d450f12bde2cf7d15ff546ae80b3f8f3b30e570d431815583d
@@ -652,7 +652,7 @@ CHECKSUMS
   solid_queue (1.2.4) sha256=bb60f9552a969ac377d87601b0ff6a088f5e6f20b0cbbe3844a59d022cac0e4b
   sshkit (1.24.0) sha256=9597c1f984778ae9742f2dc839778d57a6a2efb868107046575c52ac7c628e6c
   stimulus-rails (1.3.4) sha256=765676ffa1f33af64ce026d26b48e8ffb2e0b94e0f50e9119e11d6107d67cb06
-  tailwind_merge (0.16.0) sha256=e2a2b26aaef57ae6af6d0e98380bbcbf324ce4e9778cd56df8e837c30e66005c
+  tailwind_merge (1.5.6) sha256=bf9b492446af3caafb4a4976465153eb800f6b4df2538974dee0e4acc5457530
   tailwindcss-rails (4.4.0) sha256=efa2961351a52acebe616e645a81a30bb4f27fde46cc06ce7688d1cd1131e916
   tailwindcss-ruby (4.1.16) sha256=d30e4713152bb89ebe1fddb5b5f9b31d7755bf5576453e601eb58b19174c48c0
   tailwindcss-ruby (4.1.16-aarch64-linux-gnu) sha256=916554206b47b4218ba9130ee369687a6546fba0224b7168f118e4f955b2f97e

@@ -10,7 +10,7 @@
 
 `recording_studio_moveable` works without `recording_studio_api`. When the host application installs
 `RecordingStudioApi`, Moveable registers a member `move` action for the `:movable` capability during engine
-initialization. This gem requires RecordingStudio `>= 6.1.0`. RecordingStudio Admin is not a Moveable
+initialization. This gem requires RecordingStudio `>= 6.11.0`. RecordingStudio Admin is not a Moveable
 dependency. Keep the adapter in host apps that already have a compatible API engine.
 
 The action contract is version `1.0.0`, uses `POST`, and requires `:edit`. A surface exposes it only when the
@@ -152,6 +152,8 @@ calls also stamp `authorized_by_type` and `authorized_by_id`. API-key and client
 
 Structural move failures, including self/descendant destinations, invalid parent types, and prohibited
 cross-root moves, return `422 Unprocessable Entity`. Move policy denials return `403 Forbidden`.
+An exhausted `RecordingStudio::MoveConflict` returns `409 Conflict` with the API error payload
+(`error.code` `conflict`, `error.message`, and `error.details`).
 
 RecordingStudioApi also supports the compatibility alias:
 
