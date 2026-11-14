@@ -32,86 +32,72 @@ module RecordingStudio
         module RecordingMethods
           include RecordingStudio::Capability
 
-          # Equivalent behavior to legacy RecordingStudio::Capabilities::Movable#move_to!
-          # with addon-owned authorization handling and metadata logging.
-          # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/BlockLength
+          MOVE_ATTEMPTS = 5
+
+          # Locks come from RecordingStudio.lock_for_move!. Moveable still owns
+          # the cycle check, cross-root opt-in, authorization, and the moved event.
           def move_to!(new_parent:, actor:, impersonator: nil, metadata: {})
-            self.class.transaction do
-              ordered_ids = [new_parent.id, id, *descendant_ids].compact.uniq.sort
-              ordered_ids.each { |recording_id| self.class.lock.find(recording_id) }
-
-              reload
-              new_parent = self.class.find(new_parent.id)
-
-              assert_capability!(:movable)
-              assert_parent_recording_not_self_or_descendant!(new_parent)
-
-              if cross_root?(new_parent) && !moveable_allows_cross_root?
-                raise ArgumentError, RecordingStudioMoveable::Copy.t("errors.destination_wrong_root")
-              end
-
-              assert_recording_belongs_to_root!(new_parent) unless cross_root_move?(new_parent)
-              RecordingStudio.assert_parent_allowed!(child_type: recordable_type, parent_recording: new_parent)
-
-              policy = RecordingStudio::Moveable::Policy.new(
-                actor: actor,
-                source: self,
-                impersonator: impersonator,
-                metadata: metadata
-              )
-              descendants = descendant_recordings
-              policy.authorize_move!(destination: new_parent)
-              authorize_descendant_moves!(
-                descendants,
-                destination: new_parent,
-                actor: actor,
-                impersonator: impersonator,
-                metadata: metadata
-              )
-
-              from_id = parent_recording_id
-              log_event!(
-                action: "moved",
-                actor: actor,
-                impersonator: impersonator,
-                metadata: metadata.to_h.merge(
-                  from_parent_id: from_id,
-                  to_parent_id: new_parent.id,
-                  from_root_id: resolved_root_id(self),
-                  to_root_id: resolved_root_id(new_parent)
-                )
-              )
-
-              if cross_root_move?(new_parent)
-                transfer_to_root!(new_parent, descendants: descendants.map(&:id))
-              else
-                update!(parent_recording: new_parent)
-              end
+            attempts = 0
+            begin
+              attempts += 1
+              self.class.transaction { lock_and_commit_move!(new_parent:, actor:, impersonator:, metadata:) }
+            rescue RecordingStudio::MoveConflict
+              retry if attempts < MOVE_ATTEMPTS
+              raise
             end
           end
-          # rubocop:enable Metrics/MethodLength, Metrics/AbcSize, Metrics/BlockLength
 
           alias moveable_to! move_to!
 
           private
+
+          def lock_and_commit_move!(new_parent:, actor:, impersonator:, metadata:)
+            to_root = RecordingStudio.root_recording_or_self(new_parent)
+            locks = RecordingStudio.lock_for_move!(self, to_parent: new_parent, to_root: to_root)
+            locks[:recording].send(:commit_locked_move!, locks, actor:, impersonator:, metadata:)
+          end
+
+          def commit_locked_move!(locks, actor:, impersonator:, metadata:)
+            parent = locks[:to_parent]
+            descendant_ids = locks[:descendant_ids]
+            assert_move_allowed!(locks, parent, descendant_ids)
+            authorize_move_tree!(parent, descendant_ids, actor:, impersonator:, metadata:)
+            log_moved_event!(parent, actor:, impersonator:, metadata:)
+            write_descendant_roots!(locks) if across_roots?(locks)
+            update!(parent_recording: parent, root_recording_id: locks[:to_root].id)
+          end
+
+          def assert_move_allowed!(locks, parent, descendant_ids)
+            assert_capability!(:movable)
+            assert_parent_recording_not_self_or_descendant!(parent, descendant_ids: descendant_ids)
+            reject_disallowed_cross_root!(locks)
+            assert_recording_belongs_to_root!(parent) unless across_roots?(locks)
+            RecordingStudio.assert_parent_allowed!(child_type: recordable_type, parent_recording: parent)
+          end
+
+          def reject_disallowed_cross_root!(locks)
+            return unless across_roots?(locks) && !moveable_allows_cross_root?
+
+            raise ArgumentError, RecordingStudioMoveable::Copy.t("errors.destination_wrong_root")
+          end
 
           def moveable_allows_cross_root?
             options = RecordingStudio.capability_options(:movable, for_type: recordable_type) || {}
             options[:allow_cross_root] == true
           end
 
-          def assert_parent_recording_not_self_or_descendant!(new_parent)
-            if new_parent.id == id
+          def assert_parent_recording_not_self_or_descendant!(new_parent, descendant_ids:)
+            if new_parent.id.to_s == id.to_s
               raise ArgumentError, RecordingStudioMoveable::Copy.t("errors.cannot_move_under_itself")
             end
 
-            return unless descendant_ids.include?(new_parent.id)
+            return unless descendant_ids.map(&:to_s).include?(new_parent.id.to_s)
 
             raise ArgumentError, RecordingStudioMoveable::Copy.t("errors.cannot_move_under_descendant")
           end
 
-          def cross_root_move?(new_parent)
-            cross_root?(new_parent)
+          def across_roots?(locks)
+            locks[:to_root].id.to_s != locks[:source_root].id.to_s
           end
 
           def cross_root?(recording)
@@ -122,40 +108,52 @@ module RecordingStudio
             RecordingStudio.root_recording_id_for(recording)
           end
 
-          def descendant_ids
-            descendants = []
-            frontier = [id]
-
-            until frontier.empty?
-              children = self.class.where(parent_recording_id: frontier).pluck(:id)
-              descendants.concat(children)
-              frontier = children
-            end
-
-            descendants
-          end
-
-          def descendant_recordings
-            descendant_ids.map { |descendant_id| self.class.find(descendant_id) }
-          end
-
-          def authorize_descendant_moves!(descendants, destination:, actor:, impersonator:, metadata:)
-            descendants.each do |descendant|
-              RecordingStudio::Moveable::Policy.new(
-                actor: actor,
-                source: descendant,
-                impersonator: impersonator,
-                metadata: metadata
-              ).authorize_move!(destination: destination)
+          def authorize_move_tree!(destination, descendant_ids, actor:, impersonator:, metadata:)
+            authorize_one_move!(self, destination, actor:, impersonator:, metadata:)
+            descendant_ids.each do |descendant_id|
+              authorize_one_move!(
+                self.class.find(descendant_id),
+                destination,
+                actor:,
+                impersonator:,
+                metadata:
+              )
             end
           end
 
-          def transfer_to_root!(new_parent, descendants: nil)
-            new_root_id = resolved_root_id(new_parent)
-            descendant_ids = descendants || self.descendant_ids
+          def authorize_one_move!(recording, destination, actor:, impersonator:, metadata:)
+            RecordingStudio::Moveable::Policy.new(
+              actor: actor,
+              source: recording,
+              impersonator: impersonator,
+              metadata: metadata
+            ).authorize_move!(destination: destination)
+          end
 
-            self.class.where(id: descendant_ids).update_all(root_recording_id: new_root_id) if descendant_ids.any?
-            update!(parent_recording: new_parent, root_recording_id: new_root_id)
+          def log_moved_event!(new_parent, actor:, impersonator:, metadata:)
+            log_event!(
+              action: "moved",
+              actor: actor,
+              impersonator: impersonator,
+              metadata: move_event_metadata(new_parent, metadata)
+            )
+          end
+
+          def move_event_metadata(new_parent, metadata)
+            metadata.to_h.merge(
+              from_parent_id: parent_recording_id,
+              to_parent_id: new_parent.id,
+              from_root_id: resolved_root_id(self),
+              to_root_id: resolved_root_id(new_parent)
+            )
+          end
+
+          # Before update! so core's callback rewrites event roots, including moved.
+          def write_descendant_roots!(locks)
+            descendant_ids = locks[:descendant_ids]
+            return if descendant_ids.empty?
+
+            self.class.where(id: descendant_ids).update_all(root_recording_id: locks[:to_root].id)
           end
         end
       end

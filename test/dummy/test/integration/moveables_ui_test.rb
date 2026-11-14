@@ -418,6 +418,30 @@ class MoveablesUiTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Current location"
   end
 
+  def test_exhausted_move_conflict_redirects_with_tree_changed_flash
+    original_parent_id = @page.parent_recording_id
+    calls = 0
+    locker = lambda do |*|
+      calls += 1
+      raise RecordingStudio::MoveConflict, "The tree changed while locking. Retry the move."
+    end
+
+    RecordingStudio.stub(:lock_for_move!, locker) do
+      post recording_studio_moveable.move_recording_path(recording_id: @page.id),
+           params: { destination_id: @target_folder.id }
+    end
+
+    assert_equal 5, calls
+    assert_redirected_to recording_studio_moveable.move_recording_path(
+      recording_id: @page.id,
+      redirect_mode: "previous_page"
+    )
+    assert_equal "The tree changed, please try again", flash[:alert]
+    follow_redirect!
+    assert_includes response.body, "The tree changed, please try again"
+    assert_equal original_parent_id, @page.reload.parent_recording_id
+  end
+
   def test_move_action_redirects_to_root_with_flash_when_no_previous_page_is_available
     post recording_studio_moveable.move_recording_path(recording_id: @page.id), params: { destination_id: @target_folder.id }
 

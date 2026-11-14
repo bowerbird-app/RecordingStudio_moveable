@@ -344,6 +344,28 @@ class MoveableApiTest < Minitest::Test
     end
   end
 
+  def test_handler_translates_exhausted_move_conflict_to_a_409_payload
+    conflict = RecordingStudio::MoveConflict.new("The tree changed while locking. Retry the move.")
+    source = Recording.new(move_error: conflict)
+
+    with_fake_recording_studio_api do
+      error = assert_raises(RecordingStudio::Moveable::Api::Conflict) do
+        RecordingStudio::Moveable::Api::MoveRecording.call(
+          action_context(
+            source:,
+            access_grant: AccessGrant.new("destination" => Recording.new),
+            params: { destination_id: "destination" }
+          )
+        )
+      end
+
+      assert_equal 409, RecordingStudio::Moveable::Api::Conflict::STATUS
+      assert_equal "The tree changed, please try again", error.message
+      assert_equal ["The tree changed, please try again"], error.details
+      assert_nil source.moved_with
+    end
+  end
+
   def test_handler_preserves_unrecognized_argument_errors
     source = Recording.new(move_error: ArgumentError.new("unexpected move failure"))
 

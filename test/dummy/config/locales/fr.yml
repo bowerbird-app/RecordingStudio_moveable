@@ -29,6 +29,7 @@ fr:
         other: "espaces"
       flashes:
         moved: "Déplacé."
+        tree_changed: "L'arborescence a changé, réessayez."
       js:
         updating: "Mise à jour des destinations…"
         moving: "Déplacement…"

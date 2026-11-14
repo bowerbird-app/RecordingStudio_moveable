@@ -17,6 +17,7 @@ en:
         other: "workspaces"
       flashes:
         moved: "Moved successfully."
+        tree_changed: "The tree changed, please try again"
       js:
         updating: "Updating destinations..."
         moving: "Moving item..."

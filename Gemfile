@@ -6,7 +6,7 @@ source "https://rubygems.org"
 gemspec
 
 gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.356"
-gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.7.0"
+gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v6.11.0"
 gem "recording_studio_accessible", "~> 0.6", github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.32.0"
 gem "recording_studio_icons", github: "bowerbird-app/RecordingStudio_icons", tag: "v0.2.1"
 gem "view_component", "4.19.0"

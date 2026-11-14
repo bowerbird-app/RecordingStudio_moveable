@@ -70,10 +70,88 @@ class MoveableCapabilityTest < ActiveSupport::TestCase
     assert_equal other_root.id, @child_folder.reload.root_recording_id
     assert_equal other_root.id, @page.reload.root_recording_id
 
-    event = @source_folder.events.first
+    event = @source_folder.events.find_by!(action: "moved")
     assert_equal @root.id, event.metadata["from_root_id"]
     assert_equal other_root.id, event.metadata["to_root_id"]
     assert_equal "workspace transfer", event.metadata["reason"]
+    assert_equal other_root.id, event.root_recording_id
+    [@child_folder, @page].each do |descendant|
+      descendant.events.each do |descendant_event|
+        assert_equal other_root.id, descendant_event.root_recording_id
+      end
+    end
+  end
+
+  def test_move_to_retries_a_transient_move_conflict
+    calls = 0
+    original = RecordingStudio.method(:lock_for_move!)
+    locker = lambda do |recording, to_parent:, to_root:|
+      calls += 1
+      raise RecordingStudio::MoveConflict, "retry" if calls < 3
+
+      original.call(recording, to_parent: to_parent, to_root: to_root)
+    end
+
+    RecordingStudio.stub(:lock_for_move!, locker) do
+      @page.move_to!(new_parent: @target_folder, actor: @actor)
+    end
+
+    assert_equal 3, calls
+    assert_equal @target_folder.id, @page.reload.parent_recording_id
+  end
+
+  def test_move_to_reraises_move_conflict_after_five_attempts
+    calls = 0
+    original_parent_id = @page.parent_recording_id
+    locker = lambda do |*|
+      calls += 1
+      raise RecordingStudio::MoveConflict, "retry"
+    end
+
+    RecordingStudio.stub(:lock_for_move!, locker) do
+      error = assert_raises(RecordingStudio::MoveConflict) do
+        @page.move_to!(new_parent: @target_folder, actor: @actor)
+      end
+      assert_equal "retry", error.message
+    end
+
+    assert_equal 5, calls
+    assert_equal original_parent_id, @page.reload.parent_recording_id
+  end
+
+  def test_api_move_reports_an_exhausted_conflict_as_409
+    destination = @target_folder
+    access_grant = Struct.new(:destination) do
+      def accessible_recordings
+        RecordingStudio::Recording.where(id: destination.id)
+      end
+
+      def authorize!(**)
+        true
+      end
+    end.new(destination)
+    context = Struct.new(:recording, :api_client, :credential, :access_grant, :params, keyword_init: true).new(
+      recording: @page,
+      api_client: Struct.new(:id).new("client-1"),
+      credential: Struct.new(:id).new("credential-1"),
+      access_grant: access_grant,
+      params: { parent_id: destination.id }
+    )
+    locker = lambda do |*|
+      raise RecordingStudio::MoveConflict, "retry"
+    end
+
+    RecordingStudio.stub(:lock_for_move!, locker) do
+      error = assert_raises(RecordingStudio::Moveable::Api::Conflict) do
+        RecordingStudio::Moveable::Api::MoveRecording.call(context)
+      end
+
+      assert_equal 409, error.class::STATUS
+      assert_equal "The tree changed, please try again", error.message
+      assert_equal ["The tree changed, please try again"], error.details
+    end
+
+    assert_equal @source_folder.id, @page.reload.parent_recording_id
   end
 
   def test_move_to_blocks_self_and_descendant_destinations

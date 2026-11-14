@@ -1,5 +1,18 @@
 # Upgrading RecordingStudio Moveable
 
+## Upgrading to Moveable 4.2
+
+Moveable 4.2 requires RecordingStudio `>= 6.11.0`. Moves take their locks with `RecordingStudio.lock_for_move!` and retry `RecordingStudio::MoveConflict` up to 5 times. There is no Moveable migration. Hosts already on RecordingStudio 6.11 have `recording_studio_events.root_recording_id`. The dummy app copies core's 6.9 migration so it boots.
+
+```ruby
+gem "recording_studio", ">= 6.11.0"
+gem "recording_studio_moveable", "~> 4.2"
+```
+
+1. Run core's migrations (`bin/rails db:migrate`, or `recording_studio:migrations` on a fresh install) before booting app code that writes events.
+2. An exhausted move conflict redirects with the flash `recording_studio.moveable.flashes.tree_changed` ("The tree changed, please try again"). The API move action returns 409 with the API error payload (`error.code` `conflict`).
+3. A cycle or a chain deeper than 1000 raises `RecordingStudio::TreeWalkError` from core. Moveable does not catch it.
+
 ## Upgrading to Moveable 4.1.1
 
 Moveable 4.1.1 drops the unused public layout view `app/views/layouts/recording_studio_moveable.html.erb`. Full-page move screens still wrap through `recording_studio_layout` (core default layout unless you set `config.layout`). Dummy Internationalization is tagged `v0.2.1`. No migration.

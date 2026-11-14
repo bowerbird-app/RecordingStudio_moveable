@@ -113,7 +113,7 @@
 
     <%= render FlatPack::Alert::Component.new(
       title: "Results",
-      description: "A successful move returns the reloaded recording. A destination outside the API grant is not found, policy denials return 403, and invalid structural moves return 422. Move metadata records the action, API client, and credential.",
+      description: "A successful move returns the reloaded recording. A destination outside the API grant is not found, policy denials return 403, and invalid structural moves return 422. If the tree keeps changing, the move returns 409. Move metadata records the action, API client, and credential.",
       style: :info
     ) %>
 
