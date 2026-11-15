@@ -100,7 +100,7 @@ module MoveableDemo
     attr_reader :actor
 
     def ensure_root_recording!(workspace)
-      RecordingStudio.root_recording_for(workspace)
+      RecordingStudio.create_root_recording!(workspace, actor: actor)
     end
 
     def ensure_root_access!(root_recording)

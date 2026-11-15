@@ -1,5 +1,19 @@
 # Upgrading RecordingStudio Moveable
 
+## Upgrading to Moveable 5.0
+
+Moveable 5.0 requires RecordingStudio `>= 7.0`, `< 8.0` and RecordingStudio Accessible `>= 0.44.0`, `< 1.0`. There is no Moveable migration.
+
+```ruby
+gem "recording_studio", ">= 7.0", "< 8.0"
+gem "recording_studio_accessible", ">= 0.44.0", "< 1.0"
+gem "recording_studio_moveable", "~> 5.0"
+```
+
+1. Create a root with `RecordingStudio.create_root_recording!(recordable, actor:)`. `RecordingStudio.root_recording_for(recordable)` returns the existing root, or `nil`.
+2. Set `RecordingStudio.configuration.authorize_write`. Writes need an actor.
+3. `move_to!` still locks with `RecordingStudio.lock_for_move!` and retries `RecordingStudio::MoveConflict` up to 5 times. Core 7 raises `RecordingStudio::SlotTaken` from that lock when the moved type is declared single under the destination parent and another row already occupies it. Moveable does not declare a single child, so a normal move keeps the 6.11 lock path.
+
 ## Upgrading to Moveable 4.2
 
 Moveable 4.2 requires RecordingStudio `>= 6.11.0`. Moves take their locks with `RecordingStudio.lock_for_move!` and retry `RecordingStudio::MoveConflict` up to 5 times. There is no Moveable migration. Hosts already on RecordingStudio 6.11 have `recording_studio_events.root_recording_id`. The dummy app copies core's 6.9 migration so it boots.

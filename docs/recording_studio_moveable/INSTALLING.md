@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** October 27, 2026
+> *   **Last Updated:** November 15, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -15,8 +15,8 @@ This guide explains how to install the RecordingStudioMoveable engine in your Ra
 ## Prerequisites
 
 - Rails 8.1+ application
-- RecordingStudio core 6.1.0+
-- FlatPack 0.1.315+ (git only; this repo pins commit `1fcbafe` for 0.1.319)
+- RecordingStudio core `>= 7.0`, `< 8.0` (this repo pins tag `v7.0.0`)
+- FlatPack 0.1.331+ (git only; this repo pins tag `v0.1.356`)
 - PostgreSQL (recommended for UUID compatibility)
 - TailwindCSS (optional, for styling engine views). Load FlatPack stylesheets before Tailwind.
 
@@ -29,15 +29,15 @@ This guide explains how to install the RecordingStudioMoveable engine in your Ra
 Add to your `Gemfile`:
 
 ```ruby
-gem "recording_studio", ">= 6.1.0", github: "bowerbird-app/RecordingStudio", tag: "v6.1.0"
-gem "recording_studio_accessible", "~> 0.6"
-gem "flat_pack", github: "bowerbird-app/flatpack", ref: "1fcbafe94f8eb118f0a22182f63f5110fcc97a56"
+gem "recording_studio", ">= 7.0", "< 8.0", github: "bowerbird-app/RecordingStudio", tag: "v7.0.0"
+gem "recording_studio_accessible", ">= 0.44.0", "< 1.0"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.356"
 gem "view_component", ">= 4.14", "< 5"
-# Accessible >= 0.17 needs Trashable query helpers (prefer require: false).
+# Accessible needs Trashable query helpers (prefer require: false).
 gem "recording_studio_trashable", github: "bowerbird-app/RecordingStudio_trashable",
-                                  tag: "v0.11.0", require: false
+                                  tag: "v0.17.0", require: false
 gem "recording_studio_metrics", github: "bowerbird-app/RecordingStudio_metrics",
-                                tag: "v0.2.0", require: false
+                                tag: "v0.9.0", require: false
 # From GitHub
 gem "recording_studio_moveable", github: "bowerbird-app/RecordingStudio_moveable"
 
@@ -59,12 +59,12 @@ bundle install
 RecordingStudioMoveable depends on `recording_studio_accessible` for built-in authorization. Keep it in your Gemfile explicitly if your application manages access grants directly:
 
 ```ruby
-gem "recording_studio_accessible", "~> 0.6"
-# Accessible >= 0.17: query-only Trashable pin (no Trashable engine/UI required).
+gem "recording_studio_accessible", ">= 0.44.0", "< 1.0"
+# Query-only Trashable pin (no Trashable engine/UI required).
 gem "recording_studio_trashable", github: "bowerbird-app/RecordingStudio_trashable",
-                                  tag: "v0.10.0", require: false
+                                  tag: "v0.17.0", require: false
 gem "recording_studio_metrics", github: "bowerbird-app/RecordingStudio_metrics",
-                                tag: "v0.2.0", require: false
+                                tag: "v0.9.0", require: false
 ```
 
 Then run the Accessible setup if your application does not already have the required access tables:

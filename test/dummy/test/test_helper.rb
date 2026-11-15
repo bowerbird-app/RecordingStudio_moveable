@@ -22,9 +22,10 @@ module DummyMoveableTestHelpers
     end
   end
 
-  def create_workspace_root
+  def create_workspace_root(actor: nil)
     workspace = Workspace.create!(name: "Workspace #{SecureRandom.hex(4)}")
-    root = RecordingStudio.root_recording_for(workspace)
+    actor ||= create_user(email: "root-#{SecureRandom.hex(4)}@example.com")
+    root = RecordingStudio.create_root_recording!(workspace, actor: actor)
     [ workspace, root ]
   end
 

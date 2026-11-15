@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** October 28, 2026
+> *   **Last Updated:** November 15, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -10,7 +10,7 @@
 
 `recording_studio_moveable` works without `recording_studio_api`. When the host application installs
 `RecordingStudioApi`, Moveable registers a member `move` action for the `:movable` capability during engine
-initialization. This gem requires RecordingStudio `>= 6.11.0`. RecordingStudio Admin is not a Moveable
+initialization. This gem requires RecordingStudio `>= 7.0`, `< 8.0`. RecordingStudio Admin is not a Moveable
 dependency. Keep the adapter in host apps that already have a compatible API engine.
 
 The action contract is version `1.0.0`, uses `POST`, and requires `:edit`. A surface exposes it only when the
