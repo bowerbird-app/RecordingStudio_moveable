@@ -48,17 +48,6 @@ class ConfigurationTest < Minitest::Test
     assert_equal original[:enable_feature_x], @configuration.enable_feature_x
   end
 
-  def test_to_h_reports_registered_hook_counts
-    @configuration.hooks.before_initialize { nil }
-    @configuration.hooks.before_initialize { nil }
-    @configuration.hooks.after_service { nil }
-
-    result = @configuration.to_h
-
-    assert_equal 2, result.fetch(:hooks_registered).fetch(:before_initialize)
-    assert_equal 1, result.fetch(:hooks_registered).fetch(:after_service)
-  end
-
   def test_move_modal_configuration_defaults
     assert_equal true, @configuration.move_modal_prefetch_enabled
     assert_equal 80, @configuration.move_modal_prefetch_delay_ms

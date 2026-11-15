@@ -22,41 +22,17 @@ module RecordingStudioMoveable
       app.config.importmap.paths << root.join("config/importmap.rb")
     end
 
-    initializer "recording_studio_moveable.before_initialize",
-                before: "recording_studio_moveable.load_config" do |_app|
-      RecordingStudioMoveable::Hooks.run(:before_initialize, self)
-    end
-
     initializer "recording_studio_moveable.load_config" do |app|
       RecordingStudioMoveable::Engine.send(:load_yaml_config, app) if app.respond_to?(:config_for)
 
       if app.config.respond_to?(:x) && app.config.x.respond_to?(:recording_studio_moveable)
         RecordingStudioMoveable::Engine.send(:load_x_config, app.config.x.recording_studio_moveable)
       end
-
-      RecordingStudioMoveable::Hooks.run(:on_configuration, RecordingStudioMoveable.configuration)
-    end
-
-    initializer "recording_studio_moveable.after_initialize",
-                after: "recording_studio_moveable.load_config" do |_app|
-      RecordingStudioMoveable::Hooks.run(:after_initialize, self)
     end
 
     initializer "recording_studio_moveable.register_recording_studio_api_action",
                 before: "recording_studio_api.after_initialize" do
       RecordingStudio::Moveable::Api.register_capability_action!
-    end
-
-    initializer "recording_studio_moveable.apply_model_extensions" do
-      ActiveSupport.on_load(:active_record) do
-        RecordingStudioMoveable::Hooks.run(:active_record_loaded, self)
-      end
-    end
-
-    initializer "recording_studio_moveable.apply_controller_extensions" do
-      ActiveSupport.on_load(:action_controller) do
-        RecordingStudioMoveable::Hooks.run(:action_controller_loaded, self)
-      end
     end
 
     class << self

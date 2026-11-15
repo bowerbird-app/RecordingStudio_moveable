@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.0] - 2026-11-15
+
+### Breaking
+- `RecordingStudioMoveable::Hooks` is gone.
+- `RecordingStudioMoveable::Services::BaseService` and `RecordingStudioMoveable::Services::ExampleService` are gone.
+- `RecordingStudioMoveable.configuration.hooks` is gone.
+- `configuration.to_h` no longer includes `:hooks_registered`.
+- The engine no longer runs `before_initialize`, `on_configuration`, `after_initialize`, `active_record_loaded`, or `action_controller_loaded`.
+
+### Upgrade Notes
+- Install Moveable `6.0.0`. No migration.
+- Delete references to `RecordingStudioMoveable::Hooks`, `RecordingStudioMoveable::Services::BaseService`, `RecordingStudioMoveable::Services::ExampleService`, and `configuration.hooks` on this gem.
+- Register hooks on `RecordingStudio.configuration.hooks`. A host service inherits `RecordingStudio::Services::BaseService`.
+- The move path is unchanged. `move_to!` still writes the `moved` event through Core.
+
 ## [5.0.0] - 2026-11-15
 
 ### Breaking

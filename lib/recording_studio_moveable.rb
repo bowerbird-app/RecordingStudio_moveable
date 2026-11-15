@@ -3,10 +3,7 @@
 require "recording_studio_moveable/version"
 require "recording_studio_moveable/configuration"
 require "recording_studio_moveable/copy"
-require "recording_studio_moveable/hooks"
 require "recording_studio_moveable/root_label"
-require "recording_studio_moveable/services/base_service"
-require "recording_studio_moveable/services/example_service"
 require "recording_studio"
 
 # Load core Labels before the addon fallback so RecordingStudio 4 owns the constant.

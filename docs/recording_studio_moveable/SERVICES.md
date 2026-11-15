@@ -1,49 +1,27 @@
-> **Architecture Documentation**
-> *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** December 11, 2025
->
-> *Maintainers: Please update the date above when modifying this file.*
+# Services
 
----
+Moveable 6.0 does not ship a service base. `RecordingStudioMoveable::Services::BaseService` and `RecordingStudioMoveable::Services::ExampleService` are gone.
 
-# Service Objects
-
-Business logic in RecordingStudioMoveable is encapsulated in service objects using the Result monad pattern.
-
----
-
-## Usage
+A host service inherits `RecordingStudio::Services::BaseService`. Implement `perform`, and return `success` or `failure`. Call the service with `.call`. The result is `RecordingStudio::Services::BaseService::Result`.
 
 ```ruby
-result = RecordingStudioMoveable::Services::ExampleService.call(name: "World")
+class NotifyMove < RecordingStudio::Services::BaseService
+  def initialize(recording:)
+    super()
+    @recording = recording
+  end
 
-if result.success?
-  puts result.value  # => "Hello, World!"
-else
-  puts result.error
-end
-```
+  private
 
-## Creating Services
+  def perform
+    return failure("Recording is required") if @recording.nil?
 
-Create your own services by inheriting from `BaseService`:
-
-```ruby
-module RecordingStudioMoveable
-  module Services
-    class MyService < BaseService
-      def initialize(param:)
-        @param = param
-      end
-
-      private
-
-      def perform
-        # Your logic here
-        success(result_value)
-        # or: failure("Error message")
-      end
-    end
+    success(@recording)
   end
 end
+
+result = NotifyMove.call(recording: recording)
+result.value if result.success?
 ```
+
+Moveable's own move path is `Recording#move_to!` on the move capability. That method does not go through a service object.

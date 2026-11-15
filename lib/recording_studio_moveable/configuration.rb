@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "hooks"
-
 module RecordingStudioMoveable
   class Configuration
     SERIALIZABLE_ATTRIBUTES = %i[
@@ -26,7 +24,7 @@ module RecordingStudioMoveable
                   :move_modal_reuse_shell,
                   :current_actor_resolver,
                   :current_impersonator_resolver
-    attr_reader :hooks, :layout
+    attr_reader :layout
 
     def initialize
       @api_key = ENV.fetch("RECORDING_STUDIO_MOVEABLE_API_KEY", nil)
@@ -38,7 +36,6 @@ module RecordingStudioMoveable
       @move_modal_reuse_shell = true
       @layout = nil
       initialize_context_resolvers
-      @hooks = Hooks.new
     end
 
     def layout=(value)
@@ -47,7 +44,6 @@ module RecordingStudioMoveable
 
     def to_h
       SERIALIZABLE_ATTRIBUTES.index_with { |attribute| public_send(attribute) }
-                             .merge(hooks_registered: hooks.instance_variable_get(:@registry).transform_values(&:size))
     end
 
     def merge!(hash)
