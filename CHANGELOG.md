@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-11-15
+
+### Breaking
+- Require `recording_studio` `>= 7.0`, `< 8.0`. Development and the dummy pin RecordingStudio tag `v7.0.0`.
+- Require `recording_studio_accessible` `>= 0.44.0`, `< 1.0`. Development and the dummy pin Accessible tag `v0.44.0`.
+
+### Changed
+- Dummy seeds and tests create roots with `RecordingStudio.create_root_recording!(recordable, actor:)`. `root_recording_for` only finds an existing root.
+- The dummy `authorize_write` callback allows writes. Those writes pass an actor.
+- Dummy pins that accept core 7: Trashable `v0.17.0`, Metrics `v0.9.0`, and Internationalization `v0.3.0`. FlatPack stays `v0.1.356`. Icons stay `v0.2.1`.
+- `move_to!` still locks with `RecordingStudio.lock_for_move!` and uses the returned recording, parent, root, and descendant ids. Core 7 raises `SlotTaken` from that lock only when the moved type is a declared single child. Moveable does not declare one, so the 6.11 move path stays.
+
+### Upgrade Notes
+- Install Moveable `5.0.0` with RecordingStudio `>= 7.0`, `< 8.0` (this repo pins tag `v7.0.0`) and Accessible `>= 0.44.0`, `< 1.0` (tag `v0.44.0`). No Moveable migration. Create roots with `create_root_recording!(recordable, actor:)`. See `docs/recording_studio_moveable/UPGRADING.md`.
+
 ## [4.2.0] - 2026-11-14
 
 ### Changed
@@ -208,7 +223,8 @@ Cloud Agent Builds match RecordingStudio_billing v0.9.13.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.1.1...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v5.0.0...HEAD
+[4.2.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.1.1...v4.2.0
 [4.1.1]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.1.0...v4.1.1
 [4.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.0.2...v4.1.0
 [4.0.2]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.0.1...v4.0.2

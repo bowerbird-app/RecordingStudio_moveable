@@ -303,8 +303,8 @@ class RenameVerificationTest < Minitest::Test
     api = File.read(File.join(@root, "docs", "recording_studio_moveable", "API.md"))
     gemspec = read_gemspec
 
-    assert_match(/recording_studio["'],\s*">= 6.1.0"/, gemspec)
-    assert_includes api, "RecordingStudio `>= 6.1.0`"
+    assert_match(/recording_studio["'],\s*">= 7\.0",\s*"< 8\.0"/, gemspec)
+    assert_includes api, "RecordingStudio `>= 7.0`, `< 8.0`"
     refute_includes api, "`~> 3.0`"
     refute_includes api, 'tag: "1.1.0"'
     refute_includes api, "browser-administration dependency"
