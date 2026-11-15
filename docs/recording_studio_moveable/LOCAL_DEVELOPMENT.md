@@ -187,7 +187,7 @@ bin/rails db:migrate
 |-------|----------|
 | `PG::ConnectionBad` | Ensure PostgreSQL is running and credentials are correct. |
 | `relation does not exist` | Run `bin/rails db:prepare` to create tables. |
-| Tailwind styles missing | Run `bin/rails tailwindcss:build`. |
+| Tailwind styles missing | Run `bin/rails tailwindcss:build`. That writes `@source` paths from the installed gems, then compiles. |
 | Port 3000 in use | Use `PORT=3001 bin/dev`. |
 | Redis connection refused | Start Redis: `redis-server` or `brew services start redis`. |
 | Bundle install fails | Check Ruby version matches `.ruby-version` (3.3.0). |

@@ -1,21 +1,27 @@
 @import "tailwindcss" source(none);
+@import "../builds/tailwind/gem_sources.css";
 
 /*
- * Flatpack / Recording Studio templates live in vendored gems. Dummy bundle is
- * test/dummy/vendor/bundle (three levels up from this file). CI/cloud installs
- * may also land in /usr/local/bundle. Scan both so utilities used by those
- * templates keep.
+ * Flatpack and Recording Studio utility classes live in those gems.
+ * tailwindcss:build writes app/assets/builds/tailwind/gem_sources.css from
+ * Bundler's install path, so a system gem dir and a vendored bundle both scan.
+ * The relative globs below cover a vendored bundle when that file is empty.
+ * Dummy views and this engine's views are sourced further down.
  */
-@source "../../../vendor/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
-@source "../../../vendor/bundle/ruby/*/bundler/gems/RecordingStudio-*/app/views/**/*.erb";
-@source "../../../vendor/bundle/ruby/*/bundler/gems/RecordingStudio_accessible-*/app/views/**/*.erb";
-@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
-@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/RecordingStudio-*/app/views/**/*.erb";
-@source "../../../../../../usr/local/bundle/ruby/*/bundler/gems/RecordingStudio_accessible-*/app/views/**/*.erb";
-@source "../../../../../../usr/local/lib/ruby/gems/*/bundler/gems/flatpack-*/app/components/**/*.{rb,erb}";
-@source "../../../../../../usr/local/lib/ruby/gems/*/bundler/gems/RecordingStudio-*/app/views/**/*.erb";
-@source "../../../../../../usr/local/lib/ruby/gems/*/bundler/gems/RecordingStudio_accessible-*/app/views/**/*.erb";
-@source "../../../../../../usr/local/lib/ruby/gems/*/bundler/gems/RecordingStudio_Internationalization-*/app/**/*.{rb,erb}";
+@source "../../../vendor/bundle/**/bundler/gems/flatpack-*/app/components/**/*.rb";
+@source "../../../vendor/bundle/**/bundler/gems/flatpack-*/app/components/**/*.erb";
+@source "../../../vendor/bundle/**/bundler/gems/flatpack-*/app/helpers/**/*.rb";
+@source "../../../../../vendor/bundle/**/bundler/gems/flatpack-*/app/components/**/*.rb";
+@source "../../../../../vendor/bundle/**/bundler/gems/flatpack-*/app/components/**/*.erb";
+@source "../../../../../vendor/bundle/**/bundler/gems/flatpack-*/app/helpers/**/*.rb";
+@source "../../../vendor/bundle/**/bundler/gems/RecordingStudio-*/app/views/**/*.erb";
+@source "../../../../../vendor/bundle/**/bundler/gems/RecordingStudio-*/app/views/**/*.erb";
+@source "../../../vendor/bundle/**/bundler/gems/RecordingStudio_accessible-*/app/views/**/*.erb";
+@source "../../../../../vendor/bundle/**/bundler/gems/RecordingStudio_accessible-*/app/views/**/*.erb";
+@source "../../../vendor/bundle/**/bundler/gems/RecordingStudio_trashable-*/app/views/**/*.erb";
+@source "../../../../../vendor/bundle/**/bundler/gems/RecordingStudio_trashable-*/app/views/**/*.erb";
+@source "../../../vendor/bundle/**/bundler/gems/RecordingStudio_Internationalization-*/app/views/**/*.erb";
+@source "../../../../../vendor/bundle/**/bundler/gems/RecordingStudio_Internationalization-*/app/views/**/*.erb";
 
 /* Extend Tailwind theme with the FlatPack tokens used by the dummy app. */
 @theme {

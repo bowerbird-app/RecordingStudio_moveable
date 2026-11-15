@@ -251,9 +251,9 @@ test/dummy/
 5.2 Tailwind Entry Point
 ------------------------------------------------------------
 
-The file `test/dummy/app/assets/tailwind/application.css` configures Tailwind with `source(none)` and explicit `@source` globs. Dummy views, this engine's views, and vendored Flatpack / RecordingStudio / Accessible templates all need to be scanned so utility classes used by those components keep.
+The file `test/dummy/app/assets/tailwind/application.css` configures Tailwind with `source(none)` and explicit `@source` globs. Dummy views, this engine's views, and Flatpack / Recording Studio / Accessible / Trashable / Internationalization templates all need to be scanned so utility classes used by those components keep.
 
-Dummy's bundle path is `test/dummy/vendor/bundle` (three levels up from the Tailwind entry). CI may also install gems into `/usr/local/bundle` or `/usr/local/lib/ruby/gems`, so the dummy entry scans those as well. When the dummy mounts Recording Studio Internationalization, it also scans that gem's views so the language selector keeps its utilities.
+`bin/rails tailwindcss:build` and `tailwindcss:watch` first run `tailwindcss:gem_sources`. That task writes `app/assets/builds/tailwind/gem_sources.css` with `@source` lines for the gems Bundler installed, whatever the path (`vendor/bundle`, `/usr/local/bundle`, or `/usr/local/lib/ruby/gems`). The entry also keeps relative `vendor/bundle` globs for a vendored dummy or repo-root bundle. Do not aim those globs at `/usr/local` with a fixed number of `../` segments. That count depends on the checkout path and misses the install.
 
 > **Note:** Host applications should `@source` the installed gem paths for Flatpack, RecordingStudio, and this engine rather than copying dummy-relative vendor globs.
 

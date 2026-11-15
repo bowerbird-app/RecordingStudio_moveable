@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dummy seeds and tests create roots with `RecordingStudio.create_root_recording!(recordable, actor:)`. `root_recording_for` only finds an existing root.
 - The dummy `authorize_write` callback allows writes. Those writes pass an actor.
 - Dummy pins that accept core 7: Trashable `v0.17.0`, Metrics `v0.9.0`, and Internationalization `v0.3.0`. FlatPack stays `v0.1.356`. Icons stay `v0.2.1`.
+- The dummy Tailwind build writes `@source` paths from the installed Flatpack and Recording Studio gems before it compiles, so move screens pick up Flatpack utilities wherever Bundler put those gems.
 - `move_to!` still locks with `RecordingStudio.lock_for_move!` and uses the returned recording, parent, root, and descendant ids. Core 7 raises `SlotTaken` from that lock only when the moved type is a declared single child. Moveable does not declare one, so the 6.11 move path stays.
 
 ### Upgrade Notes
