@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** October 8, 2026
+> *   **Last Updated:** November 15, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -20,7 +20,6 @@ Addon-owned move behavior and UI for RecordingStudio.
 - ✓ Codespaces environment automatically sets up on build
 - ✓ Install generator for host applications
 - ✓ Migrations generator for database setup
-- ✓ Service object pattern with Result monad
 
 ---
 
@@ -60,8 +59,8 @@ Addon-owned move behavior and UI for RecordingStudio.
 | [Optional API Action](API.md) | Installing and configuring the optional RecordingStudioApi move action. |
 | [Private Gems](PRIVATE_GEMS.md) | How to authenticate and access private gem dependencies in Codespaces, local, and production environments. |
 | [Database Migrations](MIGRATIONS.md) | How to generate and manage database migrations for the engine. |
-| [Service Objects](SERVICES.md) | Explanation of the Service Object pattern and Result monad used for business logic. |
-| [Engine Hooks](HOOKS.md) | Guide to customizing engine behavior using lifecycle and service hooks. |
+| [Service Objects](SERVICES.md) | Host services inherit Core's `RecordingStudio::Services::BaseService`. Moveable does not ship its own. |
+| [Engine Hooks](HOOKS.md) | Host hooks register on Core's `RecordingStudio::Hooks`. Moveable does not ship its own. |
 | [Asset Architecture](CSS_JS_ASSETS_ARCHITECTURE.md) | Details on TailwindCSS setup and asset pipeline integration. |
 | [Security](SECURITY.md) | Security considerations. |
 | [Cursor skills in Cloud Agents](../cursor-skills.md) | How Cloud Agent Builds fetch skills and start the dummy app. |
@@ -83,10 +82,7 @@ recording_studio_moveable/
 │   ├── recording_studio_moveable/
 │   │   ├── configuration.rb
 │   │   ├── engine.rb
-│   │   ├── version.rb
-│   │   └── services/        # Service objects
-│   │       ├── base_service.rb
-│   │       └── example_service.rb
+│   │   └── version.rb
 │   └── generators/
 ├── test/dummy/              # Test Rails app
 ├── docs/                    # Documentation

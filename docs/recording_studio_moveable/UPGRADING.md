@@ -1,5 +1,17 @@
 # Upgrading RecordingStudio Moveable
 
+## Upgrading to Moveable 6.0
+
+Moveable 6.0 removes the template hook registry and service base. There is no migration. `move_to!` is unchanged.
+
+```ruby
+gem "recording_studio_moveable", "~> 6.0"
+```
+
+1. Delete references to `RecordingStudioMoveable::Hooks`, `RecordingStudioMoveable::Services::BaseService`, `RecordingStudioMoveable::Services::ExampleService`, and `RecordingStudioMoveable.configuration.hooks`.
+2. Register hooks on `RecordingStudio.configuration.hooks`. Inherit host services from `RecordingStudio::Services::BaseService`.
+3. Stop reading `:hooks_registered` from `RecordingStudioMoveable.configuration.to_h`.
+
 ## Upgrading to Moveable 5.0
 
 Moveable 5.0 requires RecordingStudio `>= 7.0`, `< 8.0` and RecordingStudio Accessible `>= 0.44.0`, `< 1.0`. There is no Moveable migration.
