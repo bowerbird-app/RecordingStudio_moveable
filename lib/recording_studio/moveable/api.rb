@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "recording_studio/moveable/api/move_recording"
+require "recording_studio/moveable/api/move_tool_copy"
 
 module RecordingStudio
   module Moveable
@@ -74,9 +75,9 @@ module RecordingStudio
           definition = {
             reject_unknown: true,
             fields: {
-              parent_id: { type: :string, allow_blank: false },
-              destination_id: { type: :string, allow_blank: false },
-              new_parent_id: { type: :string, allow_blank: false }
+              parent_id: { type: :string, allow_blank: false, description: PARENT_ID_DESCRIPTION },
+              destination_id: { type: :string, allow_blank: false, description: DESTINATION_ID_DESCRIPTION },
+              new_parent_id: { type: :string, allow_blank: false, description: NEW_PARENT_ID_DESCRIPTION }
             }
           }
 
@@ -100,16 +101,7 @@ module RecordingStudio
         end
 
         def move_openapi
-          {
-            summary: "Move",
-            description: "Moves the recording below an accessible destination recording.",
-            responses: {
-              "200" => { description: "Recording moved successfully." },
-              "403" => { description: "API access is not authorized to move this recording." },
-              "409" => { description: "The tree changed while the move was locking. Retry the move." },
-              "422" => { description: "Move request is invalid." }
-            }
-          }
+          MOVE_OPENAPI
         end
       end
     end

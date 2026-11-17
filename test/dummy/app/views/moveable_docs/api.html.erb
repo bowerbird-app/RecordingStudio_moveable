@@ -101,13 +101,13 @@
         Content-Type: application/json
         Authorization: ******
 
-        { "parent_id": "<destination-recording-id>" }
+        { "destination_id": "<destination-recording-id>" }
       CODE
     ) %>
 
     <%= render FlatPack::Alert::Component.new(
       title: "Request requirements",
-      description: "parent_id is preferred; destination_id and new_parent_id remain accepted for compatible clients. The API access grant must include both recordings with edit access. The destination must be an allowed parent and within the source root unless Moveable enables cross-root moves.",
+      description: "Send destination_id, the new parent's recording id. parent_id and new_parent_id are aliases. If more than one is sent, parent_id is used first. The API access grant must include both recordings with edit access. The destination must be an allowed parent and within the source root unless Moveable enables cross-root moves.",
       style: :info
     ) %>
 

@@ -140,14 +140,17 @@ POST /recording_studio_api/api/v1/recording_studio_pages/:id/actions/move
 Content-Type: application/json
 Authorization: ******
 
-{ "parent_id": "<destination-recording-id>" }
+{ "destination_id": "<destination-recording-id>" }
 ```
 
-`parent_id` is preferred. `destination_id` and `new_parent_id` are supported aliases for existing clients.
+Send `destination_id`, the new parent's recording id. `parent_id` and `new_parent_id` are aliases. If more than
+one is present, the handler uses `parent_id`, then `destination_id`, then `new_parent_id`.
 All other input keys are rejected. The handler limits destination lookup to the API access grant's accessible
 recordings and authorizes `:edit` access to both the source and destination before calling `move_to!`. It records
 the API action, API client ID, and credential ID as move metadata and returns the reloaded recording for API
-serialization. When the API action context responds to `with_authorized_by` (RecordingStudio API 0.16.0+), OAuth
+serialization. That JSON is the same resource document as show: `id`, `type`, `parent_id`, `root_id`,
+`created_at`, `updated_at`, and the type's own fields. `parent_id` in the response is the destination's id.
+When the API action context responds to `with_authorized_by` (RecordingStudio API 0.16.0+), OAuth
 calls also stamp `authorized_by_type` and `authorized_by_id`. API-key and client-credentials writes do not.
 
 Structural move failures, including self/descendant destinations, invalid parent types, and prohibited

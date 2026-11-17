@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.1] - 2026-11-17
+
+### Changed
+- The move API action describes what it does, which input to send, and what the response contains. `destination_id` is the documented input. `parent_id` and `new_parent_id` stay accepted aliases. Move rules are unchanged.
+
+### Upgrade Notes
+- No migration; no API change.
+
 ## [6.0.0] - 2026-11-15
 
 ### Breaking
