@@ -96,6 +96,7 @@ class MoveableApiTest < Minitest::Test
       assert_equal api.serializer, registration.fetch(:serializer)
       refute registration.fetch(:openapi).key?(:tags)
       assert_equal "Move", registration.fetch(:openapi).fetch(:summary)
+      assert_move_tool_copy(registration)
       assert_equal expected_input_contract, registration.fetch(:input_contract)
     end
   end
@@ -391,11 +392,53 @@ class MoveableApiTest < Minitest::Test
     {
       reject_unknown: true,
       fields: {
-        parent_id: { type: :string, allow_blank: false },
-        destination_id: { type: :string, allow_blank: false },
-        new_parent_id: { type: :string, allow_blank: false }
+        parent_id: { type: :string, allow_blank: false, description: described_parent_id },
+        destination_id: { type: :string, allow_blank: false, description: described_destination_id },
+        new_parent_id: { type: :string, allow_blank: false, description: described_new_parent_id }
       }
     }
+  end
+
+  def assert_move_tool_copy(registration)
+    openapi = registration.fetch(:openapi)
+    description = openapi.fetch(:description)
+    fields = registration.fetch(:input_contract).fetch(:fields)
+    path_id = openapi.fetch(:parameters).find { |parameter| parameter.fetch(:name) == "id" }
+
+    refute_empty description
+    assert_includes description, "destination_id"
+    assert_includes description, "aliases of destination_id"
+    assert_match(/id, type, parent_id, root_id, created_at, updated_at/, description)
+    refute_empty path_id.fetch(:description)
+    refute_equal "Path parameter id.", path_id.fetch(:description)
+    assert_includes path_id.fetch(:description), "record to move"
+
+    {
+      parent_id: described_parent_id,
+      destination_id: described_destination_id,
+      new_parent_id: described_new_parent_id
+    }.each do |name, text|
+      field_description = fields.fetch(name).fetch(:description)
+
+      refute_empty field_description
+      assert_equal text, field_description
+    end
+
+    assert_includes fields.fetch(:destination_id).fetch(:description), "Send this field"
+    assert_includes fields.fetch(:parent_id).fetch(:description), "Alias of destination_id"
+    assert_includes fields.fetch(:new_parent_id).fetch(:description), "Alias of destination_id"
+  end
+
+  def described_destination_id
+    RecordingStudio::Moveable::Api::DESTINATION_ID_DESCRIPTION
+  end
+
+  def described_parent_id
+    RecordingStudio::Moveable::Api::PARENT_ID_DESCRIPTION
+  end
+
+  def described_new_parent_id
+    RecordingStudio::Moveable::Api::NEW_PARENT_ID_DESCRIPTION
   end
 
   def action_context(source:, access_grant:, params:, client: ApiPrincipal.new("client-1"),
