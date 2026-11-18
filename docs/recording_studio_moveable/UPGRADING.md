@@ -1,5 +1,21 @@
 # Upgrading RecordingStudio Moveable
 
+## Upgrading to Moveable 6.0.3
+
+Moveable 6.0.3 keeps the 6.0 move API. There is no Moveable migration. Development and the dummy pin RecordingStudio `v7.7.1`, Accessible `v0.54.1` (`~> 0.54`), Trashable `v1.2.1`, Metrics `v0.9.2`, Icons `v0.4.2`, FlatPack `v0.1.378`, and dummy Internationalization `v0.3.1`. The published ranges stay RecordingStudio `>= 7.0`, `< 8.0` and Accessible `>= 0.44.0`, `< 1.0`. Accessible `0.54` requires RecordingStudio `>= 7.7.0`.
+
+Hosts that install RecordingStudio 7.7 MUST run these core migrations before booting:
+
+1. `20261116230000_add_recording_studio_recordings_root_type_creation_index` (RecordingStudio 7.4)
+2. `20261117120000_enforce_recording_studio_recording_root_invariant` (RecordingStudio 7.5)
+3. `20261117200000_replace_recording_studio_recordings_root_index` (RecordingStudio 7.7)
+
+This dummy does not copy those three.
+
+```ruby
+gem "recording_studio_moveable", "~> 6.0"
+```
+
 ## Upgrading to Moveable 6.0
 
 Moveable 6.0 removes the template hook registry and service base. There is no migration. `move_to!` is unchanged.
