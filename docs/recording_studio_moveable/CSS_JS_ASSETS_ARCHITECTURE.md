@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** August 21, 2026
+> *   **Last Updated:** November 18, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -100,6 +100,12 @@ In config/importmap.rb:
 
     pin "<engine_name>", to: "<engine_name>/index.js"
     pin_all_from "<engine_name>/controllers", under: "<engine_name>/controllers"
+
+This gem's pin sets `preload: "application"`:
+
+    pin "recording_studio_moveable", to: "recording_studio_moveable/index.js", preload: "application"
+
+The `application` entry modulepreloads `recording_studio_moveable`. The install generator adds `import "recording_studio_moveable"` to `app/javascript/application.js`. Another entry does not modulepreload it. That entry loads the module when its JavaScript imports `recording_studio_moveable`.
 
 ------------------------------------------------------------
 2.3 Where JS Imports Must Be Added
