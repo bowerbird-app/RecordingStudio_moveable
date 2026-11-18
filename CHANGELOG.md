@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.3] - 2026-11-18
+
+### Changed
+- Development and the dummy pin RecordingStudio `v7.7.1`, Accessible `v0.54.1` (`~> 0.54`), Trashable `v1.2.1`, Metrics `v0.9.2`, Icons `v0.4.2`, and FlatPack `v0.1.378`. The dummy pins Internationalization `v0.3.1`.
+- The published dependency ranges stay RecordingStudio `>= 7.0`, `< 8.0` and Accessible `>= 0.44.0`, `< 1.0`.
+
+### Upgrade Notes
+- No Moveable migration.
+- Hosts MUST run RecordingStudio `20261116230000_add_recording_studio_recordings_root_type_creation_index` (7.4), `20261117120000_enforce_recording_studio_recording_root_invariant` (7.5), and `20261117200000_replace_recording_studio_recordings_root_index` (7.7) before booting RecordingStudio 7.7. This dummy does not copy those three.
+- Accessible `0.54` requires RecordingStudio `>= 7.7.0`.
+
 ## [6.0.2] - 2026-11-18
 
 ### Changed
@@ -256,7 +267,12 @@ Cloud Agent Builds match RecordingStudio_billing v0.9.13.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v5.0.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.3...HEAD
+[6.0.3]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.2...v6.0.3
+[6.0.2]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.1...v6.0.2
+[6.0.1]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.0...v6.0.1
+[6.0.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v5.0.0...v6.0.0
+[5.0.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.2.0...v5.0.0
 [4.2.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.1.1...v4.2.0
 [4.1.1]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.1.0...v4.1.1
 [4.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v4.0.2...v4.1.0

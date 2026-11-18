@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** April 28, 2026
+> *   **Last Updated:** November 18, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -11,6 +11,12 @@
 This guide explains how to work with database migrations in RecordingStudioMoveable.
 
 RecordingStudioMoveable itself does not own the access-control schema. If you use built-in authorization, install access-related migrations from `recording_studio_accessible`.
+
+Hosts that install RecordingStudio 7.7 MUST run these core migrations. This dummy does not copy them:
+
+- `20261116230000_add_recording_studio_recordings_root_type_creation_index` (RecordingStudio 7.4)
+- `20261117120000_enforce_recording_studio_recording_root_invariant` (RecordingStudio 7.5)
+- `20261117200000_replace_recording_studio_recordings_root_index` (RecordingStudio 7.7)
 
 ---
 

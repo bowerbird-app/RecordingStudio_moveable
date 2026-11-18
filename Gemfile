@@ -5,18 +5,18 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in recording_studio_moveable.gemspec
 gemspec
 
-gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.356"
-gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v7.0.0"
-gem "recording_studio_accessible", ">= 0.44.0", "< 1.0",
-    github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.44.0"
-gem "recording_studio_icons", github: "bowerbird-app/RecordingStudio_icons", tag: "v0.2.1"
+gem "flat_pack", github: "bowerbird-app/flatpack", tag: "v0.1.378"
+gem "recording_studio", github: "bowerbird-app/RecordingStudio", tag: "v7.7.1"
+gem "recording_studio_accessible", "~> 0.54",
+    github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.54.1"
+gem "recording_studio_icons", github: "bowerbird-app/RecordingStudio_icons", tag: "v0.4.2"
 gem "view_component", "4.19.0"
 # Trashable gemspec dep is git-only; pin for Bundler resolution.
-gem "recording_studio_metrics", github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.9.0",
+gem "recording_studio_metrics", github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.9.2",
                                 require: false
 # Accessible query-only trash helpers. require: false so Bundler does not auto-load the Trashable engine.
 gem "recording_studio_trashable", github: "bowerbird-app/RecordingStudio_trashable",
-                                  tag: "v0.17.0", require: false
+                                  tag: "v1.2.1", require: false
 
 gem "puma"
 gem "sprockets-rails"

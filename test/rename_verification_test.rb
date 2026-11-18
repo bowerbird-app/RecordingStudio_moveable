@@ -295,8 +295,8 @@ class RenameVerificationTest < Minitest::Test
     expected = "compare/v#{version}...HEAD"
 
     assert_includes changelog, "[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/#{expected}"
-    refute_match(/^\[#{Regexp.escape(version)}\]: /, changelog,
-                 "Do not add a [#{version}] footer while Unreleased compares from v#{version}")
+    assert_includes changelog,
+                    "[#{version}]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.2...v#{version}"
   end
 
   def test_api_docs_match_gemspec_core_requirement
