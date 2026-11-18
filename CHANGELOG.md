@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.2] - 2026-11-18
+
+### Changed
+- The import map pin `recording_studio_moveable` sets `preload: "application"`. Only the `application` entry modulepreloads it. Another entry loads the module when that entry imports it.
+
+### Upgrade Notes
+- No migration. An `application` entry that imports `recording_studio_moveable` still modulepreloads it.
+- A different entry no longer gets that modulepreload. Import `recording_studio_moveable` in that entry when the page uses move UI.
+
 ## [6.0.1] - 2026-11-17
 
 ### Changed
