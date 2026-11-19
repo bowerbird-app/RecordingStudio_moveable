@@ -4,15 +4,23 @@ require "test_helper"
 
 class RecordingStudioMoveableTest < Minitest::Test
   def test_version_exists
-    assert_equal "6.0.3", ::RecordingStudioMoveable::VERSION
+    assert_equal "6.1.0", ::RecordingStudioMoveable::VERSION
 
     root = File.expand_path("..", __dir__)
     changelog = File.read(File.join(root, "CHANGELOG.md"))
+    assert_includes changelog, "## [6.1.0] - 2026-11-19"
     assert_includes changelog, "## [6.0.3] - 2026-11-18"
     assert_includes changelog,
-                    "[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.3...HEAD"
+                    "[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.1.0...HEAD"
+    assert_includes changelog,
+                    "[6.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.3...v6.1.0"
     assert_includes changelog,
                     "[6.0.3]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.2...v6.0.3"
+    assert_includes changelog,
+                    "Hosts MUST run the Recording Studio 7.4, 7.5 and 7.7 migrations if they have not."
+    assert_includes changelog,
+                    "flat_pack 0.2.0 is supported; hosts moving to 0.2 must remove the manual " \
+                    "`flat_pack/heroicons` importmap pin and any `flat-pack--icon` controller registration."
 
     upgrading = File.read(File.join(root, "docs/recording_studio_moveable/UPGRADING.md"))
     assert_includes upgrading, "Hosts that install RecordingStudio 7.7 MUST run"
@@ -22,12 +30,19 @@ class RecordingStudioMoveableTest < Minitest::Test
 
     gemfile = File.read(File.join(root, "Gemfile"))
     dummy_gemfile = File.read(File.join(root, "test/dummy/Gemfile"))
-    %w[v7.7.1 v0.54.1 v1.2.1 v0.9.2 v0.4.2 v0.1.378].each do |tag|
+    %w[v7.8.0 v0.56.0 v1.2.3 v0.10.0 v0.5.0 v0.2.0].each do |tag|
       assert_includes gemfile, tag
       assert_includes dummy_gemfile, tag
     end
     assert_includes dummy_gemfile, "v0.3.1"
-    assert_includes gemfile, '"~> 0.54"'
+    assert_includes gemfile, '"~> 7.8"'
+    assert_includes gemfile, '"~> 0.2"'
+    assert_includes gemfile, '"~> 0.56"'
+    assert_includes gemfile, '"~> 0.5"'
+    assert_includes gemfile, '"~> 0.10"'
+    assert_includes gemfile, '"~> 1.2"'
+    assert_includes dummy_gemfile, '"~> 7.8"'
+    assert_includes dummy_gemfile, '"~> 0.2"'
   end
 
   def test_engine_exists
