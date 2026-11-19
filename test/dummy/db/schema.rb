@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_14_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_17_000024) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -41,6 +41,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_14_090000) do
     t.index ["recording_id"], name: "index_recording_studio_access_invitations_on_recording_id"
     t.index ["token_digest"], name: "idx_rs_access_invitations_token_digest", unique: true
     t.check_constraint "accepted_at IS NULL OR revoked_at IS NULL", name: "access_invitations_not_accepted_and_revoked"
+  end
+
+  create_table "recording_studio_access_requests", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "actor_type", null: false
+    t.uuid "actor_id", null: false
+    t.string "role"
+    t.string "action"
+    t.text "message"
+    t.string "status", default: "pending", null: false
+    t.uuid "access_recording_id"
+    t.text "review_note"
+    t.datetime "created_at", null: false
+    t.jsonb "gate_metadata", default: {}, null: false
+    t.uuid "target_recording_id", null: false
+    t.string "pending_key"
+    t.index ["actor_type", "actor_id"], name: "index_recording_studio_access_requests_on_actor"
+    t.index ["pending_key"], name: "index_recording_studio_access_requests_one_pending", unique: true, where: "(pending_key IS NOT NULL)"
+    t.check_constraint "action IS NULL OR char_length(action::text) <= 120", name: "recording_studio_access_requests_action_length"
+    t.check_constraint "message IS NULL OR char_length(message) <= 2000", name: "recording_studio_access_requests_message_length"
+    t.check_constraint "review_note IS NULL OR char_length(review_note) <= 2000", name: "recording_studio_access_requests_note_length"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'approved'::character varying, 'denied'::character varying]::text[])", name: "recording_studio_access_requests_status"
   end
 
   create_table "recording_studio_access_rules", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -84,13 +105,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_14_090000) do
   end
 
   create_table "recording_studio_api_api_clients", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "access_recording_id", null: false
+    t.uuid "access_recording_id"
     t.string "api_key", default: "public", null: false
     t.datetime "created_at", null: false
     t.string "name", null: false
     t.datetime "updated_at", null: false
+    t.string "owner_type"
+    t.uuid "owner_id"
     t.index ["access_recording_id"], name: "index_recording_studio_api_api_clients_on_access_recording_id", unique: true
     t.index ["api_key"], name: "index_recording_studio_api_api_clients_on_api_key"
+    t.index ["owner_type", "owner_id"], name: "index_rs_api_clients_on_owner"
   end
 
   create_table "recording_studio_api_api_credentials", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -169,6 +193,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_14_090000) do
     t.integer "status_code", null: false
     t.datetime "updated_at", null: false
     t.string "user_agent"
+    t.datetime "arrived_at", default: -> { "clock_timestamp()" }
+    t.integer "latency_bucket_ms"
     t.index ["api_client_id", "occurred_at"], name: "index_rs_api_request_logs_on_client_and_time"
     t.index ["api_credential_id", "occurred_at"], name: "index_rs_api_request_logs_on_credential_and_time"
     t.index ["api_key", "occurred_at"], name: "index_rs_api_request_logs_on_api_and_time"
@@ -183,6 +209,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_14_090000) do
     t.datetime "created_at", null: false
     t.string "key", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "runtime_overrides", default: {}, null: false
     t.index ["key"], name: "index_recording_studio_api_api_settings_on_key", unique: true
   end
 

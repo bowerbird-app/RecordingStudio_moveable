@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Development and the dummy pin RecordingStudio `v7.8.0` (`~> 7.8`), Accessible `v0.56.0` (`~> 0.56`), Trashable `v1.2.3` (`~> 1.2`), Metrics `v0.10.0` (`~> 0.10`), Icons `v0.5.0` (`~> 0.5`), and FlatPack `v0.2.0` (`~> 0.2`). The dummy pins Internationalization `v0.3.1`.
+- The dummy loads Recording Studio API `v1.20.0` (`~> 1.20`) and Logs `v0.9.0` (`~> 0.9`) so the previously skipped API and accessible-pages tests now run.
 - The published dependency ranges stay RecordingStudio `>= 7.0`, `< 8.0`, Accessible `>= 0.44.0`, `< 1.0`, and FlatPack `>= 0.1.331`.
 
 ### Upgrade Notes
