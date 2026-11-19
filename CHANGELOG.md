@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.1.0] - 2026-11-19
+
+### Changed
+- Development and the dummy pin RecordingStudio `v7.8.0` (`~> 7.8`), Accessible `v0.56.0` (`~> 0.56`), Trashable `v1.2.3` (`~> 1.2`), Metrics `v0.10.0` (`~> 0.10`), Icons `v0.5.0` (`~> 0.5`), and FlatPack `v0.2.0` (`~> 0.2`). The dummy pins Internationalization `v0.3.1`.
+- The dummy loads Recording Studio API `v1.20.0` (`~> 1.20`) and Logs `v0.9.0` (`~> 0.9`) so the previously skipped API and accessible-pages tests now run.
+- The published dependency ranges stay RecordingStudio `>= 7.0`, `< 8.0`, Accessible `>= 0.44.0`, `< 1.0`, and FlatPack `>= 0.1.331`.
+
+### Upgrade Notes
+- No Moveable migration.
+- Hosts MUST run the Recording Studio 7.4, 7.5 and 7.7 migrations if they have not.
+- flat_pack 0.2.0 is supported; hosts moving to 0.2 must remove the manual `flat_pack/heroicons` importmap pin and any `flat-pack--icon` controller registration.
+
 ## [6.0.3] - 2026-11-18
 
 ### Changed
@@ -267,7 +279,8 @@ Cloud Agent Builds match RecordingStudio_billing v0.9.13.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.3...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.1.0...HEAD
+[6.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.3...v6.1.0
 [6.0.3]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.2...v6.0.3
 [6.0.2]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.1...v6.0.2
 [6.0.1]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.0...v6.0.1

@@ -28,6 +28,9 @@ RecordingStudio.configure do |config|
   config.authorize_write = lambda { |**|
     true
   }
+
+  # Workspace roots are API access points so the dummy can provision API clients.
+  config.enable_capability(:api_access_point, on: "Workspace")
 end
 
 RecordingStudioAccessible::Compatibility.load_missing_constants!(Rails.application)

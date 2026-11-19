@@ -1,5 +1,17 @@
 # Upgrading RecordingStudio Moveable
 
+## Upgrading to Moveable 6.1.0
+
+Moveable 6.1.0 keeps the 6.0 move API. There is no Moveable migration. Development and the dummy pin RecordingStudio `v7.8.0` (`~> 7.8`), Accessible `v0.56.0` (`~> 0.56`), Trashable `v1.2.3` (`~> 1.2`), Metrics `v0.10.0` (`~> 0.10`), Icons `v0.5.0` (`~> 0.5`), FlatPack `v0.2.0` (`~> 0.2`), and dummy Internationalization `v0.3.1`. The published ranges stay RecordingStudio `>= 7.0`, `< 8.0`, Accessible `>= 0.44.0`, `< 1.0`, and FlatPack `>= 0.1.331`.
+
+Hosts MUST run the Recording Studio 7.4, 7.5 and 7.7 migrations if they have not. This dummy does not copy those three.
+
+flat_pack 0.2.0 is supported; hosts moving to 0.2 must remove the manual `flat_pack/heroicons` importmap pin and any `flat-pack--icon` controller registration.
+
+```ruby
+gem "recording_studio_moveable", "~> 6.1"
+```
+
 ## Upgrading to Moveable 6.0.3
 
 Moveable 6.0.3 keeps the 6.0 move API. There is no Moveable migration. Development and the dummy pin RecordingStudio `v7.7.1`, Accessible `v0.54.1` (`~> 0.54`), Trashable `v1.2.1`, Metrics `v0.9.2`, Icons `v0.4.2`, FlatPack `v0.1.378`, and dummy Internationalization `v0.3.1`. The published ranges stay RecordingStudio `>= 7.0`, `< 8.0` and Accessible `>= 0.44.0`, `< 1.0`. Accessible `0.54` requires RecordingStudio `>= 7.7.0`.

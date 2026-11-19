@@ -5,7 +5,7 @@
 
   <%= render FlatPack::Alert::Component.new(
     title: "Demo note",
-    description: "This demo app currently ships without recording_studio_api because that gem still requires RecordingStudio 3. Moveable still registers the optional move action automatically once a host installs a RecordingStudio-4-compatible API release.",
+    description: "This demo loads Recording Studio API and registers the move action for pages and folders. Moveable registers that action when the API engine is loaded.",
     style: :warning
   ) %>
 
