@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.1.1] - 2026-11-23
+
+### Added
+- Named Recording Studio MCP tool `move` when the host loads `recording_studio_mcp`. `destination_id` is the new parent. `parent_id` and `new_parent_id` stay aliases. The destination must already exist, be an allowed parent type, and be in the same root unless the recordable opts into `allow_cross_root`. It cannot be the record itself or a descendant.
+
+### Changed
+- The dummy pins Recording Studio API `v1.21.3` (`~> 1.21`) so it can load Recording Studio MCP `v0.45.2` (`>= 0.45.2`, `< 0.46`). The dummy also loads Admin `v2.20.0`, Cache `v0.8.0`, Attachable `v0.34.4`, Site Settings `v0.6.0`, and Oauth `v0.25.1`. Published Moveable ranges are unchanged.
+
+### Upgrade Notes
+- No migration. The move HTTP action and `move_to!` are unchanged.
+- MCP stays optional. This gem does not depend on `recording_studio_mcp`.
+- Hosts that load Recording Studio MCP `>= 0.45.2`, `< 0.46` include `RecordingStudioMoveable::McpCopy.tool_names` on the server and register each exposed recordable type with `RecordingStudioMcp.register_type`. That list is `move`. Leave `capability_action` off that server. A server that still includes `capability_action` can list it beside `move`.
+
 ## [6.1.0] - 2026-11-19
 
 ### Changed
@@ -279,7 +292,8 @@ Cloud Agent Builds match RecordingStudio_billing v0.9.13.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.1.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.1.1...HEAD
+[6.1.1]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.1.0...v6.1.1
 [6.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.3...v6.1.0
 [6.0.3]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.2...v6.0.3
 [6.0.2]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.1...v6.0.2

@@ -7,8 +7,12 @@ Rails.application.routes.draw do
   get "/recording_studio", to: redirect("/"), as: nil
   mount RecordingStudio::Engine, at: "/recording_studio"
   mount RecordingStudioAccessible::Engine, at: "/recording_studio_accessible"
+  mount RecordingStudioOauth::Engine, at: "/recording_studio_oauth"
   mount RecordingStudioApi::Engine, at: "/recording_studio_api"
+  mount RecordingStudioMcp::Engine, at: "/recording_studio_mcp"
   mount RecordingStudioMoveable::Engine, at: "/recording_studio_moveable", as: :recording_studio_moveable
+
+  RecordingStudioOauth::ProtectedResourceRegistry.draw_origin_well_known(self)
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

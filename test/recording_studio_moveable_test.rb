@@ -4,14 +4,17 @@ require "test_helper"
 
 class RecordingStudioMoveableTest < Minitest::Test
   def test_version_exists
-    assert_equal "6.1.0", ::RecordingStudioMoveable::VERSION
+    assert_equal "6.1.1", ::RecordingStudioMoveable::VERSION
 
     root = File.expand_path("..", __dir__)
     changelog = File.read(File.join(root, "CHANGELOG.md"))
+    assert_includes changelog, "## [6.1.1] - 2026-11-23"
     assert_includes changelog, "## [6.1.0] - 2026-11-19"
     assert_includes changelog, "## [6.0.3] - 2026-11-18"
     assert_includes changelog,
-                    "[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.1.0...HEAD"
+                    "[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.1.1...HEAD"
+    assert_includes changelog,
+                    "[6.1.1]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.1.0...v6.1.1"
     assert_includes changelog,
                     "[6.1.0]: https://github.com/bowerbird-app/RecordingStudio_moveable/compare/v6.0.3...v6.1.0"
     assert_includes changelog,
@@ -35,8 +38,10 @@ class RecordingStudioMoveableTest < Minitest::Test
       assert_includes dummy_gemfile, tag
     end
     assert_includes dummy_gemfile, "v0.3.1"
-    assert_includes dummy_gemfile, "v1.20.0"
-    assert_includes dummy_gemfile, '"~> 1.20"'
+    assert_includes dummy_gemfile, "v1.21.3"
+    assert_includes dummy_gemfile, '"~> 1.21"'
+    assert_includes dummy_gemfile, "v0.45.2"
+    assert_includes dummy_gemfile, '">= 0.45.2", "< 0.46"'
     assert_includes dummy_gemfile, "v0.9.0"
     assert_includes changelog, "previously skipped API and accessible-pages tests now run"
     assert_includes gemfile, '"~> 7.8"'

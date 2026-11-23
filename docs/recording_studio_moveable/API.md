@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** November 15, 2026
+> *   **Last Updated:** November 23, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -130,6 +130,10 @@ RecordingStudioApi.register_recordable_type_api(
 
 This named allowlist does not expose `:move` on `public`, and the public allowlist does not expose it on
 `:operations`.
+
+## MCP
+
+`recording_studio_mcp` is not a dependency. When a host loads it at `>= 0.45.2`, `< 0.46`, `RecordingStudio::Moveable::Api.register_capability_action!` also calls `RecordingStudioMoveable::McpCopy.register!`. The tool name is `move`. Include `RecordingStudioMoveable::McpCopy.tool_names` on the MCP server, and register each recordable type with `RecordingStudioMcp.register_type` using the API type string. Calls pass that string. `destination_id` is the new parent. `parent_id` and `new_parent_id` are aliases. The write rules match the HTTP action: the destination must already exist, be an allowed parent type, and be in the same root unless `allow_cross_root` is set. The destination cannot be the record itself or a descendant.
 
 ## Endpoint and Input
 

@@ -35,6 +35,11 @@ module RecordingStudioMoveable
       RecordingStudio::Moveable::Api.register_capability_action!
     end
 
+    initializer "recording_studio_moveable.mcp",
+                after: "recording_studio_moveable.register_recording_studio_api_action" do
+      config.to_prepare { RecordingStudioMoveable::McpCopy.register! }
+    end
+
     class << self
       private
 

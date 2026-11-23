@@ -2,6 +2,7 @@
 
 require "recording_studio/moveable/api/move_recording"
 require "recording_studio/moveable/api/move_tool_copy"
+require "recording_studio_moveable/mcp_copy"
 
 module RecordingStudio
   module Moveable
@@ -12,8 +13,13 @@ module RecordingStudio
       class << self
         def register_capability_action!
           MoveRecording.install_conflict_response!
-          return unless recording_studio_api_available?
+          register_move_action! if recording_studio_api_available?
+          RecordingStudioMoveable::McpCopy.register!
+        end
 
+        private
+
+        def register_move_action!
           if named_api_registration_supported?
             RecordingStudioApi.configuration.each_api do |api_definition|
               register_capability_action_for(api_definition.name)
@@ -22,8 +28,6 @@ module RecordingStudio
             RecordingStudioApi.register_capability_action(:move, **capability_action_options)
           end
         end
-
-        private
 
         def register_capability_action_for(api_name)
           return if RecordingStudioApi.capability_action(:move, api: api_name)
