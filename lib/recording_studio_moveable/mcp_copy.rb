@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
-require "recording_studio/moveable/api/move_tool_copy"
-
 module RecordingStudioMoveable
   module McpCopy
     ACTION = :move
-    ApiCopy = RecordingStudio::Moveable::Api
 
     DESCRIPTION =
       "Move this record under a different parent so it sits somewhere else in the tree. The record " \
@@ -19,14 +16,28 @@ module RecordingStudioMoveable
       "root_id, created_at, updated_at, and this type's own fields. parent_id in the result is the " \
       "destination's recording id."
 
+    ID_DESCRIPTION =
+      "Recording id of the record to move. Take it from that record's id on a list or show result. " \
+      "This is not the new parent."
+    DESTINATION_ID_DESCRIPTION =
+      "Recording id of the new parent. Send this field. Take the id from the destination record on a " \
+      "list or show result. parent_id and new_parent_id are aliases."
+    PARENT_ID_DESCRIPTION =
+      "Alias of destination_id. Recording id of the new parent. If this is present, the tool uses it " \
+      "before destination_id."
+    NEW_PARENT_ID_DESCRIPTION =
+      "Alias of destination_id. Recording id of the new parent. The tool uses it only when " \
+      "destination_id and parent_id are blank."
     INPUT = {
-      "id" => { description: ApiCopy::PATH_ID_DESCRIPTION },
-      "destination_id" => { description: ApiCopy::DESTINATION_ID_DESCRIPTION },
-      "parent_id" => { description: ApiCopy::PARENT_ID_DESCRIPTION },
-      "new_parent_id" => { description: ApiCopy::NEW_PARENT_ID_DESCRIPTION }
+      "id" => { description: ID_DESCRIPTION },
+      "destination_id" => { description: DESTINATION_ID_DESCRIPTION },
+      "parent_id" => { description: PARENT_ID_DESCRIPTION },
+      "new_parent_id" => { description: NEW_PARENT_ID_DESCRIPTION }
     }.freeze
 
-    OUTPUT = ApiCopy::MOVE_OPENAPI.dig(:responses, "200", :description).freeze
+    OUTPUT =
+      "Moved record as the same result as show. Includes id, type, parent_id, root_id, created_at, " \
+      "updated_at, and this type's own fields. parent_id is the new parent."
 
     module_function
 

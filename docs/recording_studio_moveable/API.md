@@ -149,6 +149,8 @@ Authorization: ******
 
 Send `destination_id`, the new parent's recording id. `parent_id` and `new_parent_id` are aliases. If more than
 one is present, the handler uses `parent_id`, then `destination_id`, then `new_parent_id`.
+The OpenAPI summary and descriptions for this action are written for HTTP clients. They live in
+`RecordingStudio::Moveable::Api::OpenapiCopy` and are not the MCP tool text.
 All other input keys are rejected. The handler limits destination lookup to the API access grant's accessible
 recordings and authorizes `:edit` access to both the source and destination before calling `move_to!`. It records
 the API action, API client ID, and credential ID as move metadata and returns the reloaded recording for API
