@@ -14,7 +14,6 @@ module RecordingStudio
         def register_capability_action!
           MoveRecording.install_conflict_response!
           register_move_action! if recording_studio_api_available?
-          RecordingStudioMoveable::McpCopy.register!
         end
 
         private
@@ -79,9 +78,9 @@ module RecordingStudio
           definition = {
             reject_unknown: true,
             fields: {
-              parent_id: { type: :string, allow_blank: false, description: PARENT_ID_DESCRIPTION },
-              destination_id: { type: :string, allow_blank: false, description: DESTINATION_ID_DESCRIPTION },
-              new_parent_id: { type: :string, allow_blank: false, description: NEW_PARENT_ID_DESCRIPTION }
+              parent_id: { type: :string, allow_blank: false, description: OpenapiCopy::PARENT_ID },
+              destination_id: { type: :string, allow_blank: false, description: OpenapiCopy::DESTINATION_ID },
+              new_parent_id: { type: :string, allow_blank: false, description: OpenapiCopy::NEW_PARENT_ID }
             }
           }
 
@@ -105,7 +104,7 @@ module RecordingStudio
         end
 
         def move_openapi
-          MOVE_OPENAPI
+          OpenapiCopy::DOCUMENT
         end
       end
     end

@@ -42,72 +42,37 @@ module RecordingStudioMoveable
     module_function
 
     def tool_names
-      movable_type_names.map { |type_name| tool_name_for(type_name) }
-    end
+      return [] unless defined?(::RecordingStudioMcp)
 
-    def tool_name_for(type_name)
-      "move_#{tool_token(public_type_name(type_name))}"
+      movable_types.map { |type_name| ::RecordingStudioMcp::ToolName.call(type_name, ACTION) }
     end
 
     def register!
       return unless defined?(::RecordingStudioMcp)
       return unless ::RecordingStudioMcp.respond_to?(:register_tool)
 
-      movable_type_names.each { |type_name| register_type_tool(type_name) }
+      movable_types.each { |type_name| register_type_tool(type_name) }
       nil
     end
 
     def register_type_tool(type_name)
-      public_name = public_type_name(type_name)
       ::RecordingStudioMcp.register_tool(
-        name: tool_name_for(type_name),
+        name: ::RecordingStudioMcp::ToolName.call(type_name, ACTION),
         type: type_name.to_s,
         action: ACTION,
-        title: "Move #{public_name}",
-        description: description_for(public_name),
+        title: "Move",
+        description: description_for,
         input: INPUT,
         output: OUTPUT
       )
     end
 
-    def description_for(public_name)
-      "Move this #{public_name} record. #{DESCRIPTION}"
+    def description_for
+      "Move this record. #{DESCRIPTION}"
     end
 
-    def public_type_name(type_name)
-      strip_namespace(api_public_name(type_name).presence || type_name)
-    end
-
-    def strip_namespace(type_name)
-      demodulized = type_name.to_s.demodulize
-      stripped = demodulized.sub(/\ARecordingStudio/, "")
-      stripped.presence || demodulized
-    end
-
-    def tool_token(public_name)
-      public_name.to_s.demodulize.gsub(/[^A-Za-z0-9]/, "").downcase
-    end
-
-    def movable_type_names
-      return [] unless defined?(RecordingStudio)
-      return [] unless RecordingStudio.respond_to?(:capability_enabled?)
-      return [] unless RecordingStudio.respond_to?(:configuration)
-
-      names = Array(RecordingStudio.configuration.recordable_types).filter_map { |type| recordable_type_name(type) }
-      names.select { |type_name| RecordingStudio.capability_enabled?(:movable, for: type_name) }
-    end
-
-    def recordable_type_name(type)
-      return type.name if type.respond_to?(:name) && !type.is_a?(String)
-
-      type.to_s
-    end
-
-    def api_public_name(type_name)
-      return unless defined?(::RecordingStudioApi)
-      return unless ::RecordingStudioApi.respond_to?(:recordable_registration_for)
-
-      ::RecordingStudioApi.recordable_registration_for(type_name.to_s)&.public_name
+    def movable_types
+      RecordingStudio.configuration.enabled_recordable_types_for(:movable)
     end
   end
 end

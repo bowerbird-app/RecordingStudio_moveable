@@ -41,7 +41,7 @@ class RecordingStudioMoveableTest < Minitest::Test
     assert_includes dummy_gemfile, "v1.21.3"
     assert_includes dummy_gemfile, '"~> 1.21"'
     assert_includes dummy_gemfile, "v0.45.2"
-    assert_includes dummy_gemfile, '">= 0.45.2", "< 0.46"'
+    assert_includes dummy_gemfile, '">= 0.45", "~> 0.45"'
     assert_includes dummy_gemfile, "v0.9.0"
     assert_includes changelog, "previously skipped API and accessible-pages tests now run"
     assert_includes gemfile, '"~> 7.8"'

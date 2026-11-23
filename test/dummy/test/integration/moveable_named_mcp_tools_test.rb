@@ -43,14 +43,15 @@ class MoveableNamedMcpToolsTest < ActionDispatch::IntegrationTest
   test "enabled types get move tools and a disabled type does not" do
     names = listed_tool_names
 
-    assert_includes names, "move_page"
-    assert_includes names, "move_folder"
+    assert_equal "move_press_kit", RecordingStudioMcp::ToolName.call("PressKit", :move)
+    assert_includes names, move_tool("RecordingStudioPage")
+    assert_includes names, move_tool("RecordingStudioFolder")
     refute_includes names, "move"
-    refute_includes names, "move_workspace"
-    refute_includes names, "move_archivebox"
+    refute_includes names, move_tool("Workspace")
+    refute_includes names, move_tool("RecordingStudioArchiveBox")
     refute_includes names, "capability_action"
 
-    page = listed_tools.fetch("move_page")
+    page = listed_tools.fetch(move_tool("RecordingStudioPage"))
     properties = page.fetch("inputSchema").fetch("properties")
     %w[id destination_id parent_id new_parent_id].each do |field|
       assert properties.key?(field), field
@@ -61,7 +62,7 @@ class MoveableNamedMcpToolsTest < ActionDispatch::IntegrationTest
   end
 
   test "an editor moves a page and a view token does not" do
-    moved = call_move("move_page", @page, @destination, token: @edit_token)
+    moved = call_move(move_tool("RecordingStudioPage"), @page, @destination, token: @edit_token)
 
     refute moved.dig("result", "isError"), moved.to_json
     assert_equal @destination.id, @page.reload.parent_recording_id
@@ -70,7 +71,7 @@ class MoveableNamedMcpToolsTest < ActionDispatch::IntegrationTest
       page.title = "MCP view page"
     end
     original_parent_id = fresh.parent_recording_id
-    denied = call_move("move_page", fresh, @destination, token: @view_token)
+    denied = call_move(move_tool("RecordingStudioPage"), fresh, @destination, token: @view_token)
 
     assert denied.dig("result", "isError"), denied.to_json
     assert_equal original_parent_id, fresh.reload.parent_recording_id
@@ -81,7 +82,7 @@ class MoveableNamedMcpToolsTest < ActionDispatch::IntegrationTest
       config.use_builtin_access = false
       config.authorization_hook = ->(**) { true }
     end
-    allowed = call_move("move_page", @page, @destination, token: @edit_token)
+    allowed = call_move(move_tool("RecordingStudioPage"), @page, @destination, token: @edit_token)
 
     refute allowed.dig("result", "isError"), allowed.to_json
     assert_equal @destination.id, @page.reload.parent_recording_id
@@ -94,32 +95,47 @@ class MoveableNamedMcpToolsTest < ActionDispatch::IntegrationTest
       page.title = "MCP hook page"
     end
     original_parent_id = parked.parent_recording_id
-    denied = call_move("move_page", parked, @destination, token: @edit_token)
+    denied = call_move(move_tool("RecordingStudioPage"), parked, @destination, token: @edit_token)
 
     assert denied.dig("result", "isError"), denied.to_json
     assert_equal original_parent_id, parked.reload.parent_recording_id
   end
 
-  test "cross-root move follows allow_cross_root" do
-    hidden = call_move("move_folder", @source, @other_folder, token: @edit_token)
+  test "cross-root move follows the actor's grants and allow_cross_root" do
+    hidden = call_move(move_tool("RecordingStudioFolder"), @source, @other_folder, token: @edit_token)
 
     assert hidden.dig("result", "isError"), hidden.to_json
     assert_equal @root.id, @source.reload.parent_recording_id
 
-    RecordingStudio::Moveable.configure do |config|
-      config.use_builtin_access = false
-      config.authorization_hook = ->(**) { true }
+    outsider = create_user
+    granted = RecordingStudioAccessible.grant_access(
+      recording: @root,
+      actor: outsider,
+      role: :edit,
+      manager_actor: @owner
+    )
+    raise granted.error if granted.failure?
+    parked = @root.record(RecordingStudioFolder, actor: @owner, parent_recording: @root) do |folder|
+      folder.name = "MCP parked"
     end
+    parked_parent_id = parked.parent_recording_id
 
-    moved = RecordingStudio::Moveable::Api::MoveRecording.call(move_context(@source, @other_folder))
+    assert_raises(RecordingStudio::AccessDenied) do
+      parked.move_to!(new_parent: @other_folder, actor: outsider)
+    end
+    assert_equal parked_parent_id, parked.reload.parent_recording_id
 
-    assert_equal @other_folder.id, moved.parent_recording_id
+    assert RecordingStudioAccessible.authorized?(actor: @owner, recording: @source, role: :edit)
+    assert RecordingStudioAccessible.authorized?(actor: @owner, recording: @other_folder, role: :edit)
+    @source.move_to!(new_parent: @other_folder, actor: @owner)
+
+    assert_equal @other_folder.id, @source.reload.parent_recording_id
     @source.move_to!(new_parent: @root, actor: @owner)
     disable_cross_root_for(RecordingStudioFolder)
     original_parent_id = @source.reload.parent_recording_id
 
-    error = assert_raises(RecordingStudioApi::InvalidActionInputError) do
-      RecordingStudio::Moveable::Api::MoveRecording.call(move_context(@source, @other_folder))
+    error = assert_raises(ArgumentError) do
+      @source.move_to!(new_parent: @other_folder, actor: @owner)
     end
 
     assert_match(/root/, error.message)
@@ -127,9 +143,9 @@ class MoveableNamedMcpToolsTest < ActionDispatch::IntegrationTest
   end
 
   test "self, descendant, and a disallowed parent stay put" do
-    assert_rejected "move_folder", @source, @source
-    assert_rejected "move_folder", @source, @child
-    assert_rejected "move_page", @page, @archive
+    assert_rejected move_tool("RecordingStudioFolder"), @source, @source
+    assert_rejected move_tool("RecordingStudioFolder"), @source, @child
+    assert_rejected move_tool("RecordingStudioPage"), @page, @archive
   end
 
   private
@@ -206,25 +222,7 @@ class MoveableNamedMcpToolsTest < ActionDispatch::IntegrationTest
     RecordingStudio.set_capability_options(:movable, on: recordable_type.name, allow_cross_root: false)
   end
 
-  def move_context(recording, destination)
-    RecordingStudioApi::ActionContext.new(
-      recording: recording,
-      api_client: @owner,
-      credential: @owner,
-      access_recording: @root,
-      access_grant: VisibleGrant.new([recording, destination]),
-      root_recording: @root,
-      params: { destination_id: destination.id }
-    )
-  end
-
-  VisibleGrant = Struct.new(:recordings) do
-    def accessible_recordings
-      RecordingStudio::Recording.where(id: recordings.map(&:id))
-    end
-
-    def authorize!(**)
-      true
-    end
+  def move_tool(type_name)
+    RecordingStudioMcp::ToolName.call(type_name, :move)
   end
 end

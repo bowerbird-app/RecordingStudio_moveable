@@ -87,7 +87,7 @@ Moveable no longer owns destination type definitions. Set `allow_cross_root: tru
 
 ## MCP
 
-Recording Studio MCP is optional. This gem does not depend on it. When the host loads `recording_studio_mcp` `>= 0.45.2`, `< 0.46`, Moveable registers one tool for each recordable type that has `:movable` enabled. The name is `move_` plus the public type name, with the Ruby namespace and other non-letters removed, then lowercased. `PressKit` is `move_presskit`. `Page` is `move_page`. A type without `:movable` gets no move tool. There is no shared `move` tool. Installing this gem still enables nothing.
+Recording Studio MCP is optional. This gem does not depend on it. When the host loads `recording_studio_mcp` `>= 0.45`, `~> 0.45`, prepare registers one tool for each recordable type that has `:movable` enabled. The name comes from `RecordingStudioMcp::ToolName.call(type_name, :move)`. `PressKit` is `move_press_kit`. `Page` is `move_page`. A type without `:movable` gets no move tool. There is no shared `move` tool. Installing this gem still enables nothing.
 
 ```ruby
 RecordingStudioMcp.register_server(:public, api: :public) do

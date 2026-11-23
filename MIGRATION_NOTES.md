@@ -4,9 +4,9 @@
 
 Named MCP tools are per recordable type. There is no shared `move` tool.
 
-A type with `:movable` enabled gets `move_<public_type>`. The suffix is the public type name with the Ruby namespace and other non-letters removed, then lowercased. `PressKit` is `move_presskit`. `Page` is `move_page`. A type without `:movable` gets no move tool. Installing the gem does not enable `:movable`.
+A type with `:movable` enabled gets the name from `RecordingStudioMcp::ToolName.call(type_name, :move)`. `PressKit` is `move_press_kit`. `Page` is `move_page`. A type without `:movable` gets no move tool. Installing the gem does not enable `:movable`.
 
-Hosts that load `recording_studio_mcp` `>= 0.45.2`, `< 0.46` include `RecordingStudioMoveable::McpCopy.tool_names` on the server and register each exposed type with `RecordingStudioMcp.register_type`. Registration runs on prepare, so types added by the host or another gem are picked up. `recording_studio_mcp` is not a runtime dependency. The HTTP move action is unchanged.
+Hosts that load `recording_studio_mcp` `>= 0.45`, `~> 0.45` include `RecordingStudioMoveable::McpCopy.tool_names` on the server and register each exposed type with `RecordingStudioMcp.register_type`. Registration runs on prepare, so types added by the host or another gem are picked up. `recording_studio_mcp` is not a runtime dependency. The HTTP move action is unchanged.
 
 ## Moveable 4.0
 

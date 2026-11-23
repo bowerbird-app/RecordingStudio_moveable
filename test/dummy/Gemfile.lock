@@ -615,7 +615,7 @@ DEPENDENCIES
   recording_studio_icons (~> 0.5)!
   recording_studio_internationalization!
   recording_studio_logs (~> 0.9)!
-  recording_studio_mcp (>= 0.45.2, < 0.46)!
+  recording_studio_mcp (~> 0.45, >= 0.45)!
   recording_studio_metrics (~> 0.10)!
   recording_studio_moveable!
   recording_studio_oauth!

@@ -59,13 +59,6 @@ module RecordingStudio
           }
         }.freeze
       end
-
-      PATH_ID_DESCRIPTION = OpenapiCopy::PATH_ID
-      DESTINATION_ID_DESCRIPTION = OpenapiCopy::DESTINATION_ID
-      PARENT_ID_DESCRIPTION = OpenapiCopy::PARENT_ID
-      NEW_PARENT_ID_DESCRIPTION = OpenapiCopy::NEW_PARENT_ID
-      MOVE_DESCRIPTION = OpenapiCopy::DESCRIPTION
-      MOVE_OPENAPI = OpenapiCopy::DOCUMENT
     end
   end
 end

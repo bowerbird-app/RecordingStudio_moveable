@@ -437,15 +437,15 @@ class MoveableApiTest < Minitest::Test
   end
 
   def described_destination_id
-    RecordingStudio::Moveable::Api::DESTINATION_ID_DESCRIPTION
+    RecordingStudio::Moveable::Api::OpenapiCopy::DESTINATION_ID
   end
 
   def described_parent_id
-    RecordingStudio::Moveable::Api::PARENT_ID_DESCRIPTION
+    RecordingStudio::Moveable::Api::OpenapiCopy::PARENT_ID
   end
 
   def described_new_parent_id
-    RecordingStudio::Moveable::Api::NEW_PARENT_ID_DESCRIPTION
+    RecordingStudio::Moveable::Api::OpenapiCopy::NEW_PARENT_ID
   end
 
   def action_context(source:, access_grant:, params:, client: ApiPrincipal.new("client-1"),

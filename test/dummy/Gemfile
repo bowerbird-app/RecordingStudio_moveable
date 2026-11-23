@@ -33,7 +33,7 @@ gem "recording_studio_site_settings",
     github: "bowerbird-app/RecordingStudio_site_settings", tag: "v0.6.0"
 gem "recording_studio_oauth",
     github: "bowerbird-app/RecordingStudio_Oauth", tag: "v0.25.1"
-gem "recording_studio_mcp", ">= 0.45.2", "< 0.46",
+gem "recording_studio_mcp", ">= 0.45", "~> 0.45",
     github: "bowerbird-app/RecordingStudio_MCP", tag: "v0.45.2"
 
 # Devise authentication
