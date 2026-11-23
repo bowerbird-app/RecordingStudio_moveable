@@ -133,7 +133,7 @@ This named allowlist does not expose `:move` on `public`, and the public allowli
 
 ## MCP
 
-`recording_studio_mcp` is not a dependency. When a host loads it at `>= 0.45.2`, `< 0.46`, `RecordingStudio::Moveable::Api.register_capability_action!` also calls `RecordingStudioMoveable::McpCopy.register!`. The tool name is `move`. Include `RecordingStudioMoveable::McpCopy.tool_names` on the MCP server, and register each recordable type with `RecordingStudioMcp.register_type` using the API type string. Calls pass that string. `destination_id` is the new parent. `parent_id` and `new_parent_id` are aliases. The write rules match the HTTP action: the destination must already exist, be an allowed parent type, and be in the same root unless `allow_cross_root` is set. The destination cannot be the record itself or a descendant.
+`recording_studio_mcp` is not a dependency. When a host loads it at `>= 0.45.2`, `< 0.46`, prepare registers one MCP tool per recordable type with `:movable` enabled. The tool name is `move_` plus the public type name, namespaces and non-letters removed, then lowercased (`move_presskit`, `move_page`). There is no shared `move` tool. Types without `:movable` are skipped. Include `RecordingStudioMoveable::McpCopy.tool_names` on the MCP server, and register each recordable type with `RecordingStudioMcp.register_type`. `destination_id` is the new parent. `parent_id` and `new_parent_id` are aliases. The write rules match the HTTP action: the destination must already exist, be an allowed parent type, and be in the same root unless `allow_cross_root` is set. The destination cannot be the record itself or a descendant.
 
 ## Endpoint and Input
 

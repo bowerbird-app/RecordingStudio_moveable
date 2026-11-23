@@ -12,7 +12,7 @@ RecordingStudioMcp.register_server(:public, api: :public) do
 end
 ```
 
-`RecordingStudioMoveable::McpCopy.tool_names` is `["move"]`. `destination_id` is the new parent. `parent_id` and `new_parent_id` stay aliases. Register each recordable type with `RecordingStudioMcp.register_type` and pass that type string on the call. Do not include `capability_action` on that server for this action. A server that still includes `capability_action` can list it beside `move`. Hosts that do not load MCP keep the UI and the HTTP action only. This gem does not depend on `recording_studio_mcp`.
+`RecordingStudioMoveable::McpCopy.tool_names` lists one `move_<public_type>` tool for each type with `:movable` enabled. `PressKit` is `move_presskit`. `Page` is `move_page`. There is no shared `move` tool. A type without `:movable` is absent. Installing the gem does not enable `:movable`. `destination_id` is the new parent. `parent_id` and `new_parent_id` stay aliases. Register each recordable type with `RecordingStudioMcp.register_type`. Do not include `capability_action` on that server for this action. A server that still includes `capability_action` can list it beside the named move tools. Hosts that do not load MCP keep the UI and the HTTP action only. This gem does not depend on `recording_studio_mcp`.
 
 ## Upgrading to Moveable 6.1.0
 

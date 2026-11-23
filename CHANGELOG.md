@@ -10,15 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [6.1.1] - 2026-11-23
 
 ### Added
-- Named Recording Studio MCP tool `move` when the host loads `recording_studio_mcp`. `destination_id` is the new parent. `parent_id` and `new_parent_id` stay aliases. The destination must already exist, be an allowed parent type, and be in the same root unless the recordable opts into `allow_cross_root`. It cannot be the record itself or a descendant.
+- Named Recording Studio MCP tools, one per recordable type with `:movable` enabled. The name is `move_` plus the public type (`PressKit` becomes `move_presskit`, `Page` becomes `move_page`). There is no shared `move` tool. A type without `:movable` gets no move tool. `destination_id` is the new parent. `parent_id` and `new_parent_id` stay aliases. The destination must already exist, be an allowed parent type, and be in the same root unless the recordable opts into `allow_cross_root`. It cannot be the record itself or a descendant.
 
 ### Changed
 - The dummy pins Recording Studio API `v1.21.3` (`~> 1.21`) so it can load Recording Studio MCP `v0.45.2` (`>= 0.45.2`, `< 0.46`). The dummy also loads Admin `v2.20.0`, Cache `v0.8.0`, Attachable `v0.34.4`, Site Settings `v0.6.0`, and Oauth `v0.25.1`. Published Moveable ranges are unchanged.
 
 ### Upgrade Notes
-- No migration. The move HTTP action and `move_to!` are unchanged.
+- No migration. The move HTTP action and `move_to!` are unchanged. Installing the gem still does not enable `:movable`.
 - MCP stays optional. This gem does not depend on `recording_studio_mcp`.
-- Hosts that load Recording Studio MCP `>= 0.45.2`, `< 0.46` include `RecordingStudioMoveable::McpCopy.tool_names` on the server and register each exposed recordable type with `RecordingStudioMcp.register_type`. That list is `move`. Leave `capability_action` off that server. A server that still includes `capability_action` can list it beside `move`.
+- Hosts that load Recording Studio MCP `>= 0.45.2`, `< 0.46` include `RecordingStudioMoveable::McpCopy.tool_names` on the server. That list is the per-type `move_<public_type>` names, not `move`. Register each exposed recordable type with `RecordingStudioMcp.register_type`. Leave `capability_action` off that server. A server that still includes `capability_action` can list it beside the named move tools.
 
 ## [6.1.0] - 2026-11-19
 

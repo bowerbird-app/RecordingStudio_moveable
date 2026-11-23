@@ -10,69 +10,158 @@ class MoveableNamedMcpToolsTest < ActionDispatch::IntegrationTest
     @owner = create_user
     @workspace, @root = create_workspace_root(actor: @owner)
     grant_root_access(root: @root, actor: @owner, role: :admin)
+    _, @other_root = create_workspace_root(actor: @owner)
+    grant_root_access(root: @other_root, actor: @owner, role: :admin)
     @source = @root.record(RecordingStudioFolder, actor: @owner, parent_recording: @root) do |folder|
       folder.name = "MCP source"
     end
     @destination = @root.record(RecordingStudioFolder, actor: @owner, parent_recording: @root) do |folder|
       folder.name = "MCP destination"
     end
+    @child = @root.record(RecordingStudioFolder, actor: @owner, parent_recording: @source) do |folder|
+      folder.name = "MCP child"
+    end
+    @other_folder = @other_root.record(RecordingStudioFolder, actor: @owner, parent_recording: @other_root) do |folder|
+      folder.name = "MCP other root"
+    end
     @page = @root.record(RecordingStudioPage, actor: @owner, parent_recording: @source) do |page|
       page.title = "MCP page"
+    end
+    @archive = @root.record(RecordingStudioArchiveBox, actor: @owner, parent_recording: @root) do |box|
+      box.name = "MCP archive"
     end
     @edit_token = issue_access_token(role: :edit)
     @view_token = issue_access_token(role: :view)
   end
 
   def teardown
+    RecordingStudio::Moveable.reset_configuration!
+    restore_dummy_moveable_capabilities!
     clear_api_records!
   end
 
-  test "named move is listed and capability_action is not" do
-    listed = rpc(@edit_token, "tools/list")
-    tools = listed.dig("result", "tools")
-    flunk listed.to_json if tools.nil?
+  test "enabled types get move tools and a disabled type does not" do
+    names = listed_tool_names
 
-    by_name = tools.to_h { |tool| [tool.fetch("name"), tool] }
+    assert_includes names, "move_page"
+    assert_includes names, "move_folder"
+    refute_includes names, "move"
+    refute_includes names, "move_workspace"
+    refute_includes names, "move_archivebox"
+    refute_includes names, "capability_action"
 
-    assert by_name.key?("move"), by_name.keys.sort.inspect
-    refute by_name.key?("capability_action")
-
-    move = by_name.fetch("move")
-    properties = move.fetch("inputSchema").fetch("properties")
-
-    %w[id type destination_id parent_id new_parent_id].each do |field|
+    page = listed_tools.fetch("move_page")
+    properties = page.fetch("inputSchema").fetch("properties")
+    %w[id destination_id parent_id new_parent_id].each do |field|
       assert properties.key?(field), field
     end
-    assert_includes move.fetch("description"), "destination_id"
-    assert_includes move.fetch("description"), "allow_cross_root"
-    refute_match(/\bedit\b|\bview\b|\bAdmin\b/, move.fetch("description"))
+    assert_includes page.fetch("description"), "destination_id"
+    assert_includes page.fetch("description"), "allow_cross_root"
+    refute_match(/\bedit\b|\bview\b|\bAdmin\b/, page.fetch("description"))
   end
 
-  test "move through the named tool relocates the record for an editor" do
-    moved = rpc(@edit_token, "tools/call", name: "move", arguments: move_arguments)
+  test "an editor moves a page and a view token does not" do
+    moved = call_move("move_page", @page, @destination, token: @edit_token)
 
     refute moved.dig("result", "isError"), moved.to_json
     assert_equal @destination.id, @page.reload.parent_recording_id
-    assert_equal @destination.id, payload(moved).fetch("parent_id")
-  end
 
-  test "move through the named tool leaves the record when the token cannot edit" do
-    original_parent_id = @page.parent_recording_id
-    denied = rpc(@view_token, "tools/call", name: "move", arguments: move_arguments)
+    fresh = @root.record(RecordingStudioPage, actor: @owner, parent_recording: @source) do |page|
+      page.title = "MCP view page"
+    end
+    original_parent_id = fresh.parent_recording_id
+    denied = call_move("move_page", fresh, @destination, token: @view_token)
 
     assert denied.dig("result", "isError"), denied.to_json
-    refute_includes denied.dig("result", "content", 0, "text").to_s, "Unknown type"
-    assert_equal original_parent_id, @page.reload.parent_recording_id
+    assert_equal original_parent_id, fresh.reload.parent_recording_id
+  end
+
+  test "the custom authorization hook allows and denies the move" do
+    RecordingStudio::Moveable.configure do |config|
+      config.use_builtin_access = false
+      config.authorization_hook = ->(**) { true }
+    end
+    allowed = call_move("move_page", @page, @destination, token: @edit_token)
+
+    refute allowed.dig("result", "isError"), allowed.to_json
+    assert_equal @destination.id, @page.reload.parent_recording_id
+
+    RecordingStudio::Moveable.configure do |config|
+      config.use_builtin_access = false
+      config.authorization_hook = ->(**) { false }
+    end
+    parked = @root.record(RecordingStudioPage, actor: @owner, parent_recording: @source) do |page|
+      page.title = "MCP hook page"
+    end
+    original_parent_id = parked.parent_recording_id
+    denied = call_move("move_page", parked, @destination, token: @edit_token)
+
+    assert denied.dig("result", "isError"), denied.to_json
+    assert_equal original_parent_id, parked.reload.parent_recording_id
+  end
+
+  test "cross-root move follows allow_cross_root" do
+    hidden = call_move("move_folder", @source, @other_folder, token: @edit_token)
+
+    assert hidden.dig("result", "isError"), hidden.to_json
+    assert_equal @root.id, @source.reload.parent_recording_id
+
+    RecordingStudio::Moveable.configure do |config|
+      config.use_builtin_access = false
+      config.authorization_hook = ->(**) { true }
+    end
+
+    moved = RecordingStudio::Moveable::Api::MoveRecording.call(move_context(@source, @other_folder))
+
+    assert_equal @other_folder.id, moved.parent_recording_id
+    @source.move_to!(new_parent: @root, actor: @owner)
+    disable_cross_root_for(RecordingStudioFolder)
+    original_parent_id = @source.reload.parent_recording_id
+
+    error = assert_raises(RecordingStudioApi::InvalidActionInputError) do
+      RecordingStudio::Moveable::Api::MoveRecording.call(move_context(@source, @other_folder))
+    end
+
+    assert_match(/root/, error.message)
+    assert_equal original_parent_id, @source.reload.parent_recording_id
+  end
+
+  test "self, descendant, and a disallowed parent stay put" do
+    assert_rejected "move_folder", @source, @source
+    assert_rejected "move_folder", @source, @child
+    assert_rejected "move_page", @page, @archive
   end
 
   private
 
-  def move_arguments
-    {
-      type: "RecordingStudioPage",
-      id: @page.id,
-      destination_id: @destination.id
-    }
+  def assert_rejected(tool_name, recording, destination)
+    original_parent_id = recording.parent_recording_id
+    result = call_move(tool_name, recording, destination, token: @edit_token)
+
+    assert result.dig("result", "isError"), result.to_json
+    refute_includes result.dig("result", "content", 0, "text").to_s, "Unknown tool"
+    assert_equal original_parent_id, recording.reload.parent_recording_id
+  end
+
+  def call_move(tool_name, recording, destination, token:)
+    rpc(
+      token,
+      "tools/call",
+      name: tool_name,
+      arguments: { id: recording.id, destination_id: destination.id }
+    )
+  end
+
+  def listed_tool_names
+    listed_tools.keys
+  end
+
+  def listed_tools
+    listed = rpc(@edit_token, "tools/list")
+    tools = listed.dig("result", "tools")
+    flunk listed.to_json if tools.nil?
+
+    tools.to_h { |tool| [tool.fetch("name"), tool] }
   end
 
   def rpc(token, method, **params)
@@ -85,13 +174,6 @@ class MoveableNamedMcpToolsTest < ActionDispatch::IntegrationTest
          }
     assert_response :success, response.body
     JSON.parse(response.body)
-  end
-
-  def payload(body)
-    structured = body.dig("result", "structuredContent")
-    return structured if structured.is_a?(Hash) && structured["id"]
-
-    JSON.parse(body.dig("result", "content", 0, "text").to_s)
   end
 
   def issue_access_token(role:)
@@ -118,5 +200,31 @@ class MoveableNamedMcpToolsTest < ActionDispatch::IntegrationTest
     RecordingStudioApi::ApiAccessToken.delete_all
     RecordingStudioApi::ApiCredential.delete_all
     RecordingStudioApi::ApiClient.delete_all
+  end
+
+  def disable_cross_root_for(recordable_type)
+    RecordingStudio.set_capability_options(:movable, on: recordable_type.name, allow_cross_root: false)
+  end
+
+  def move_context(recording, destination)
+    RecordingStudioApi::ActionContext.new(
+      recording: recording,
+      api_client: @owner,
+      credential: @owner,
+      access_recording: @root,
+      access_grant: VisibleGrant.new([recording, destination]),
+      root_recording: @root,
+      params: { destination_id: destination.id }
+    )
+  end
+
+  VisibleGrant = Struct.new(:recordings) do
+    def accessible_recordings
+      RecordingStudio::Recording.where(id: recordings.map(&:id))
+    end
+
+    def authorize!(**)
+      true
+    end
   end
 end

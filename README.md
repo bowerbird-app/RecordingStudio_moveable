@@ -87,7 +87,7 @@ Moveable no longer owns destination type definitions. Set `allow_cross_root: tru
 
 ## MCP
 
-Recording Studio MCP is optional. This gem does not depend on it. When the host loads `recording_studio_mcp` `>= 0.45.2`, `< 0.46`, Moveable registers the tool `move`. Include it on the server:
+Recording Studio MCP is optional. This gem does not depend on it. When the host loads `recording_studio_mcp` `>= 0.45.2`, `< 0.46`, Moveable registers one tool for each recordable type that has `:movable` enabled. The name is `move_` plus the public type name, with the Ruby namespace and other non-letters removed, then lowercased. `PressKit` is `move_presskit`. `Page` is `move_page`. A type without `:movable` gets no move tool. There is no shared `move` tool. Installing this gem still enables nothing.
 
 ```ruby
 RecordingStudioMcp.register_server(:public, api: :public) do
@@ -95,7 +95,7 @@ RecordingStudioMcp.register_server(:public, api: :public) do
 end
 ```
 
-`move` places the record under `destination_id`. `parent_id` and `new_parent_id` are aliases. The destination must already exist, be an allowed parent type, and stay in the same root unless the recordable opts into `allow_cross_root`. The destination cannot be the record itself or a descendant. Register each recordable type the server should see with `RecordingStudioMcp.register_type`, using the same type string the API registry uses (`RecordingStudioPage`). Calls pass that string. Leave `capability_action` off that server. The HTTP move action is unchanged.
+`tool_names` is read again on each prepare, so types registered by the host or another gem are picked up. Register each exposed type with `RecordingStudioMcp.register_type`. `destination_id` is the new parent. `parent_id` and `new_parent_id` are aliases. The destination must already exist, be an allowed parent type, and stay in the same root unless the recordable opts into `allow_cross_root`. The destination cannot be the record itself or a descendant. Leave `capability_action` off that server. The HTTP move action is unchanged.
 
 ### Migration note from legacy built-in gate
 
