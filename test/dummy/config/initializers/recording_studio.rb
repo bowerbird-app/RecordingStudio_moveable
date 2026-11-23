@@ -6,7 +6,11 @@ RecordingStudio.configure do |config|
     "Workspace",
     "RecordingStudioFolder",
     "RecordingStudioPage",
-    "RecordingStudioArchiveBox"
+    "RecordingStudioArchiveBox",
+    # Oauth loads Site Settings, which loads Attachable. Those types must be
+    # registered or the dummy refuses to boot.
+    "RecordingStudioAttachable::Attachment",
+    "RecordingStudioSiteSettings::SiteSetting"
   ]
 
   # Actor resolver for events when no actor is explicitly supplied

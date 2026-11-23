@@ -95,7 +95,7 @@ class MoveableApiTest < Minitest::Test
       assert_equal RecordingStudio::Moveable::Api::MoveRecording, registration.fetch(:handler)
       assert_equal api.serializer, registration.fetch(:serializer)
       refute registration.fetch(:openapi).key?(:tags)
-      assert_equal "Move", registration.fetch(:openapi).fetch(:summary)
+      assert_equal "Move a record", registration.fetch(:openapi).fetch(:summary)
       assert_move_tool_copy(registration)
       assert_equal expected_input_contract, registration.fetch(:input_contract)
     end
@@ -408,7 +408,14 @@ class MoveableApiTest < Minitest::Test
     refute_empty description
     assert_includes description, "destination_id"
     assert_includes description, "aliases of destination_id"
+    assert_includes description, "returns 404"
+    assert_includes description, "returns 403"
+    assert_includes description, "returns 422"
+    assert_includes description, "returns 409"
     assert_match(/id, type, parent_id, root_id, created_at, updated_at/, description)
+    refute_includes description, "list or show"
+    refute_includes description, "tool"
+    refute_match(/\bedit\b|\bview\b|\brole\b/, description)
     refute_empty path_id.fetch(:description)
     refute_equal "Path parameter id.", path_id.fetch(:description)
     assert_includes path_id.fetch(:description), "record to move"
@@ -424,21 +431,21 @@ class MoveableApiTest < Minitest::Test
       assert_equal text, field_description
     end
 
-    assert_includes fields.fetch(:destination_id).fetch(:description), "Send this field"
+    assert_includes fields.fetch(:destination_id).fetch(:description), "request body"
     assert_includes fields.fetch(:parent_id).fetch(:description), "Alias of destination_id"
     assert_includes fields.fetch(:new_parent_id).fetch(:description), "Alias of destination_id"
   end
 
   def described_destination_id
-    RecordingStudio::Moveable::Api::DESTINATION_ID_DESCRIPTION
+    RecordingStudio::Moveable::Api::OpenapiCopy::DESTINATION_ID
   end
 
   def described_parent_id
-    RecordingStudio::Moveable::Api::PARENT_ID_DESCRIPTION
+    RecordingStudio::Moveable::Api::OpenapiCopy::PARENT_ID
   end
 
   def described_new_parent_id
-    RecordingStudio::Moveable::Api::NEW_PARENT_ID_DESCRIPTION
+    RecordingStudio::Moveable::Api::OpenapiCopy::NEW_PARENT_ID
   end
 
   def action_context(source:, access_grant:, params:, client: ApiPrincipal.new("client-1"),

@@ -1,5 +1,19 @@
 # Upgrading RecordingStudio Moveable
 
+## Upgrading to Moveable 6.1.1
+
+Moveable 6.1.1 keeps the 6.1 move API. There is no migration.
+
+When the host also loads `recording_studio_mcp` `>= 0.45`, `~> 0.45`, include the move tool on the MCP server:
+
+```ruby
+RecordingStudioMcp.register_server(:public, api: :public) do
+  include_tools(*RecordingStudioMoveable::McpCopy.tool_names)
+end
+```
+
+`RecordingStudioMoveable::McpCopy.tool_names` lists one tool for each type with `:movable` enabled. The name comes from `RecordingStudioMcp::ToolName.call(type_name, :move)`. `PressKit` is `move_press_kit`. `Page` is `move_page`. There is no shared `move` tool. A type without `:movable` is absent. Installing the gem does not enable `:movable`. `destination_id` is the new parent. `parent_id` and `new_parent_id` stay aliases. Register each recordable type with `RecordingStudioMcp.register_type`. Do not include `capability_action` on that server for this action. A server that still includes `capability_action` can list it beside the named move tools. Hosts that do not load MCP keep the UI and the HTTP action only. This gem does not depend on `recording_studio_mcp`.
+
 ## Upgrading to Moveable 6.1.0
 
 Moveable 6.1.0 keeps the 6.0 move API. There is no Moveable migration. Development and the dummy pin RecordingStudio `v7.8.0` (`~> 7.8`), Accessible `v0.56.0` (`~> 0.56`), Trashable `v1.2.3` (`~> 1.2`), Metrics `v0.10.0` (`~> 0.10`), Icons `v0.5.0` (`~> 0.5`), FlatPack `v0.2.0` (`~> 0.2`), and dummy Internationalization `v0.3.1`. The published ranges stay RecordingStudio `>= 7.0`, `< 8.0`, Accessible `>= 0.44.0`, `< 1.0`, and FlatPack `>= 0.1.331`.

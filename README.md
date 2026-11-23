@@ -85,6 +85,18 @@ Moveable no longer owns destination type definitions. Set `allow_cross_root: tru
 
 `.enabled(...)` remains as an alias of `.to`. Keep using `.to` in host apps.
 
+## MCP
+
+Recording Studio MCP is optional. This gem does not depend on it. When the host loads `recording_studio_mcp` `>= 0.45`, `~> 0.45`, prepare registers one tool for each recordable type that has `:movable` enabled. The name comes from `RecordingStudioMcp::ToolName.call(type_name, :move)`. `PressKit` is `move_press_kit`. `Page` is `move_page`. A type without `:movable` gets no move tool. There is no shared `move` tool. Installing this gem still enables nothing.
+
+```ruby
+RecordingStudioMcp.register_server(:public, api: :public) do
+  include_tools(*RecordingStudioMoveable::McpCopy.tool_names)
+end
+```
+
+`tool_names` is read again on each prepare, so types registered by the host or another gem are picked up. Register each exposed type with `RecordingStudioMcp.register_type`. `destination_id` is the new parent. `parent_id` and `new_parent_id` are aliases. The destination must already exist, be an allowed parent type, and stay in the same root unless the recordable opts into `allow_cross_root`. The destination cannot be the record itself or a descendant. Leave `capability_action` off that server. The HTTP move action is unchanged.
+
 ### Migration note from legacy built-in gate
 
 This addon registers `:movable` without a legacy feature gate so it can continue working even when legacy move built-in is disabled.

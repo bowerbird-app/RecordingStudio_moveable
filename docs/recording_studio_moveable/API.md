@@ -1,6 +1,6 @@
 > **Architecture Documentation**
 > *   **Canonical Source:** [bowerbird-app/RecordingStudio_moveable](https://github.com/bowerbird-app/RecordingStudio_moveable/tree/main/docs/recording_studio_moveable)
-> *   **Last Updated:** November 15, 2026
+> *   **Last Updated:** November 23, 2026
 >
 > *Maintainers: Please update the date above when modifying this file.*
 
@@ -131,6 +131,10 @@ RecordingStudioApi.register_recordable_type_api(
 This named allowlist does not expose `:move` on `public`, and the public allowlist does not expose it on
 `:operations`.
 
+## MCP
+
+`recording_studio_mcp` is not a dependency. When a host loads it at `>= 0.45`, `~> 0.45`, prepare registers one MCP tool per recordable type with `:movable` enabled. The name comes from `RecordingStudioMcp::ToolName.call(type_name, :move)` (`move_press_kit`, `move_page`). There is no shared `move` tool. Types without `:movable` are skipped. Include `RecordingStudioMoveable::McpCopy.tool_names` on the MCP server, and register each recordable type with `RecordingStudioMcp.register_type`. `destination_id` is the new parent. `parent_id` and `new_parent_id` are aliases. The write rules match the HTTP action: the destination must already exist, be an allowed parent type, and be in the same root unless `allow_cross_root` is set. The destination cannot be the record itself or a descendant.
+
 ## Endpoint and Input
 
 For a moveable `RecordingStudioPage`, clients call:
@@ -145,6 +149,8 @@ Authorization: ******
 
 Send `destination_id`, the new parent's recording id. `parent_id` and `new_parent_id` are aliases. If more than
 one is present, the handler uses `parent_id`, then `destination_id`, then `new_parent_id`.
+The OpenAPI summary and descriptions for this action are written for HTTP clients. They live in
+`RecordingStudio::Moveable::Api::OpenapiCopy` and are not the MCP tool text.
 All other input keys are rejected. The handler limits destination lookup to the API access grant's accessible
 recordings and authorizes `:edit` access to both the source and destination before calling `move_to!`. It records
 the API action, API client ID, and credential ID as move metadata and returns the reloaded recording for API

@@ -2,6 +2,7 @@
 
 require_relative "../../app/helpers/recording_studio_moveable/copy_helper"
 require_relative "../../app/helpers/recording_studio_moveable/moveables_helper"
+require_relative "mcp_copy"
 
 module RecordingStudioMoveable
   class Engine < ::Rails::Engine
@@ -33,6 +34,11 @@ module RecordingStudioMoveable
     initializer "recording_studio_moveable.register_recording_studio_api_action",
                 before: "recording_studio_api.after_initialize" do
       RecordingStudio::Moveable::Api.register_capability_action!
+    end
+
+    initializer "recording_studio_moveable.mcp",
+                after: "recording_studio_moveable.register_recording_studio_api_action" do
+      config.to_prepare { RecordingStudioMoveable::McpCopy.register! }
     end
 
     class << self
