@@ -43,9 +43,12 @@ class MoveableNamedMcpToolsTest < ActionDispatch::IntegrationTest
   test "enabled types get move tools and a disabled type does not" do
     names = listed_tool_names
 
-    assert_equal "move_press_kit", RecordingStudioMcp::ToolName.call("PressKit", :move)
+    assert_equal [move_tool("RecordingStudioFolder"), move_tool("RecordingStudioPage")],
+                 RecordingStudioMoveable::McpCopy.tool_names.sort
     assert_includes names, move_tool("RecordingStudioPage")
     assert_includes names, move_tool("RecordingStudioFolder")
+    assert_equal "Move Page", listed_tools.fetch(move_tool("RecordingStudioPage")).fetch("title")
+    assert_equal "Move Folder", listed_tools.fetch(move_tool("RecordingStudioFolder")).fetch("title")
     refute_includes names, "move"
     refute_includes names, move_tool("Workspace")
     refute_includes names, move_tool("RecordingStudioArchiveBox")

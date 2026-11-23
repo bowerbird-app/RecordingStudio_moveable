@@ -60,15 +60,11 @@ module RecordingStudioMoveable
         name: ::RecordingStudioMcp::ToolName.call(type_name, ACTION),
         type: type_name.to_s,
         action: ACTION,
-        title: "Move",
-        description: description_for,
+        title: "Move #{RecordingStudioMoveable::Labels.resolver.type_label_for(type_name)}",
+        description: DESCRIPTION,
         input: INPUT,
         output: OUTPUT
       )
-    end
-
-    def description_for
-      "Move this record. #{DESCRIPTION}"
     end
 
     def movable_types

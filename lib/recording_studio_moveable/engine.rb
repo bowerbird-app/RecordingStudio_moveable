@@ -2,6 +2,7 @@
 
 require_relative "../../app/helpers/recording_studio_moveable/copy_helper"
 require_relative "../../app/helpers/recording_studio_moveable/moveables_helper"
+require_relative "mcp_copy"
 
 module RecordingStudioMoveable
   class Engine < ::Rails::Engine

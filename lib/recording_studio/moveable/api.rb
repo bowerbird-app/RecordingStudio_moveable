@@ -2,7 +2,6 @@
 
 require "recording_studio/moveable/api/move_recording"
 require "recording_studio/moveable/api/openapi_copy"
-require "recording_studio_moveable/mcp_copy"
 
 module RecordingStudio
   module Moveable

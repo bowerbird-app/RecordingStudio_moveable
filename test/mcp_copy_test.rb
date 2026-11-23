@@ -23,7 +23,8 @@ class McpCopyTest < Minitest::Test
   end
 
   def test_description_states_move_prerequisites_without_a_role
-    description = RecordingStudioMoveable::McpCopy.description_for
+    description = RecordingStudioMoveable::McpCopy::DESCRIPTION
+    assert_equal 1, description.scan("Move this record").size
 
     assert_includes description, "destination_id"
     assert_includes description, "parent_id"
